@@ -1,0 +1,121 @@
+/* ===========================================================
+   赛博斗蛐蛐 · 手机端适配（在 styles.css 之后加载，只做响应式覆盖）
+   -----------------------------------------------------------
+   · 触摸设备：禁止拖动时页面滚动/缩放，扩大点按目标
+   · ≤900px（手机竖屏 / 窄窗口）：画布铺满宽度、单位池移到画布下方横向滚动
+   · 横屏矮屏：单位池变成右侧窄栏
+   =========================================================== */
+
+/* ---------- 触摸设备通用 ---------- */
+@media (pointer: coarse), (hover: none) {
+  html, body { overscroll-behavior: none; }
+  .cc-app { -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+  #stage { touch-action: none; }                       /* 画布上拖拽不触发页面滚动 */
+  .cc-btn, .cc-side, .cc-step, button, a { touch-action: manipulation; }
+  .cc-bench-list { touch-action: pan-x; -webkit-overflow-scrolling: touch; }
+}
+
+/* ---------- 手机竖屏 / 窄窗口 ---------- */
+@media (max-width: 900px) {
+  body { align-items: stretch !important; }
+  .cc-app {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 6px 6px 10px !important;
+    gap: 8px !important;
+    flex-direction: column !important;
+  }
+
+  /* 顶部状态条：允许换行、吸顶、字号收小 */
+  .cc-hud {
+    position: sticky !important;
+    top: 0;
+    z-index: 30;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+    backdrop-filter: blur(6px);
+  }
+  .cc-hud .cc-title { font-size: 14px !important; }
+  .cc-hud .cc-stat { font-size: 11px !important; padding: 1px 6px !important; }
+  .cc-hud .cc-btn { min-height: 34px !important; padding: 6px 12px !important; font-size: 12px !important; }
+
+  /* 画布：等比铺满宽度 */
+  .cc-stage { flex-direction: column !important; width: 100% !important; gap: 8px !important; }
+  .cc-stage-canvas { width: 100% !important; }
+  #stage {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 960 / 600;
+    border-radius: 10px;
+  }
+
+  /* 单位池：移到画布下方，卡片横向滚动 */
+  .cc-bench {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    padding: 8px !important;
+  }
+  .cc-bench-title { font-size: 12px !important; }
+  .cc-bench-tools { flex-wrap: wrap !important; gap: 6px !important; }
+  .cc-bench-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)) !important;
+    gap: 6px !important;
+    max-height: 50vh;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 4px !important;
+  }
+  .cc-bench-hint { display: none !important; }
+  .cc-card { min-height: 96px; }
+  .cc-bench { padding: 6px !important; }
+
+  /* 面板与按钮：手指好点 */
+  .cc-report, .cc-panel, .cc-mask { max-height: 62vh; overflow: auto; }
+  .cc-rep-lines { font-size: 13px !important; line-height: 1.8 !important; }
+  button, .cc-btn { min-height: 40px; }
+
+  /* 桌面操作提示在手机上是噪音 */
+  .cc-foot, .cc-status { display: none !important; }
+
+  /* 底部给权限徽章留出空间，别压住卡片 */
+  .cc-app { padding-bottom: 34px !important; }
+  #cc-access-badge {
+    position: fixed !important;
+    left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 6px 8px;
+    font-size: 10.5px !important;
+    background: rgba(10, 14, 22, .92);
+    border-top: 1px solid #23304a;
+    opacity: 1;
+  }
+  #cc-access-badge a { color: #7fe3ff; text-decoration: none; padding: 2px 6px; border: 1px solid #33507a; border-radius: 6px; }
+}
+
+/* ---------- 手机横屏（矮屏）：单位池改成右侧窄栏 ---------- */
+@media (max-width: 1000px) and (max-height: 520px) and (orientation: landscape) {
+  .cc-app { flex-direction: column !important; }
+  .cc-stage { flex-direction: row !important; align-items: stretch !important; }
+  .cc-stage-canvas { flex: 1 1 auto !important; width: auto !important; }
+  #stage { width: 100% !important; height: auto !important; max-height: 78vh; aspect-ratio: 960 / 600; }
+  .cc-bench { flex: 0 0 210px !important; width: 210px !important; }
+  .cc-bench-list {
+    display: flex !important; flex-wrap: wrap !important; overflow-y: auto !important;
+    max-height: 52vh; gap: 6px !important;
+  }
+  .cc-bench-list > * { width: 62px !important; }
+  .cc-hud { position: static !important; }
+}
+
+/* ---------- 小提示：横屏体验更好 ---------- */
+#cc-rotate-tip {
+  position: fixed; left: 50%; bottom: 46px; transform: translateX(-50%);
+  background: rgba(16, 21, 32, .94); border: 1px solid #35507a; color: #cfe3ff;
+  padding: 8px 14px; border-radius: 10px; font-size: 12.5px; z-index: 60;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .45);
+}
+#cc-rotate-tip.hidden { display: none; }
