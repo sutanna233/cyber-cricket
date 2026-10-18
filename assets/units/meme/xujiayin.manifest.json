@@ -1,0 +1,82 @@
+{
+  "id": "xujiayin",
+  "queries": [
+    "许家印 表情包",
+    "许家印 恒大 梗图",
+    "许家印 搞笑图片"
+  ],
+  "candidates": [
+    {
+      "rank": 1,
+      "score": 3.959,
+      "url": "https://pic4.zhimg.com/v2-f6ea528ccbf24b67c5d976a86e7779eb_b.jpg",
+      "src_size": [
+        600,
+        600
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.381,
+      "file": "xujiayin_1.png"
+    },
+    {
+      "rank": 2,
+      "score": 3.832,
+      "url": "https://k.sinaimg.cn/n/sinakd20111/686/w1006h1280/20230929/447f-c568fb341d46706d14ea2a0f797b936f.jpg/w700d1q75cms.jpg",
+      "src_size": [
+        700,
+        891
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.653,
+      "file": "xujiayin_2.png"
+    },
+    {
+      "rank": 3,
+      "score": 3.701,
+      "url": "https://k.sinaimg.cn/n/sinakd20117/197/w960h837/20260414/77de-99978d220937a72fbe33d4ea6fadba0e.jpg/w700d1q75cms.jpg?by=cms_fixed_width",
+      "src_size": [
+        700,
+        611
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.725,
+      "file": "xujiayin_3.png"
+    },
+    {
+      "rank": 4,
+      "score": 3.601,
+      "url": "http://n.sinaimg.cn/sinakd20240319ac/48/w1080h1368/20240319/da66-8c8d5856c3e64e8031d946aeba7b0eb6.jpg",
+      "src_size": [
+        1080,
+        1368
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.664,
+      "file": "xujiayin_4.png"
+    },
+    {
+      "rank": 5,
+      "score": 3.592,
+      "url": "https://n.sinaimg.cn/spider20230101/194/w1080h714/20230101/ba48-d108e8d7cab9bf443a43ab0f839dcbd5.png",
+      "src_size": [
+        1080,
+        714
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.549,
+      "file": "xujiayin_5.png"
+    },
+    {
+      "rank": 6,
+      "score": 3.474,
+      "url": "http://i2.hexun.com/2019-04-17/196857960.jpg",
+      "src_size": [
+        648,
+        592
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.653,
+      "file": "xujiayin_6.png"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+services:
+  cyber-cricket:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: cyber-cricket:latest
+    container_name: cyber-cricket
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8130:8130"      # 只绑本机，交给 nginx 反代；想直连改成 "8130:8130"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8130"
+      CC_MODE: "view"               # 访客权限：view（只能看）/ pause（可暂停）/ play（完整）
+      CC_ADMIN_USER: "admin"
+      CC_ADMIN_PASS: "${CC_ADMIN_PASS:?请在 .env 里设置 CC_ADMIN_PASS}"
+      CC_SECRET: "${CC_SECRET:?请在 .env 里设置 CC_SECRET（随机长字符串）}"
+      CC_SESSION_DAYS: "7"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8130/api/session').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3

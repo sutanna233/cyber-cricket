@@ -1,0 +1,48 @@
+# ===========================================================
+# 这个仓库只放「游戏本体 + 部署文件」。
+# 资产生成/抠图/音频合成/测试这些开发侧东西留在本地，不进仓库。
+# ===========================================================
+
+# 依赖与缓存
+node_modules/
+__pycache__/
+*.pyc
+*.log
+
+# 密钥与用户数据（绝对不要提交）
+tools/.nai_token
+data/
+deploy/.env
+.env
+
+# 开发侧：工具链与测试
+tools/
+tests/
+run-tests.js
+docs/CONTRACT.md
+
+# 贴图流水线中间产物（运行时只用 assets/units/meme/<id>.png 与 assets/units/<id>.png）
+assets/units/meme/alt/
+assets/units/meme/src/
+assets/units/meme/nai_raw/
+assets/units/meme/cutout_raw/
+assets/units/meme/_preview_*
+assets/units/meme/_contact_sheet.png
+assets/units/meme/*_[0-9].png
+assets/units/meme/*_[0-9][0-9].png
+assets/units/meme/*_keep.png
+assets/units/meme/*_cut.png
+assets/units/meme/*_i2i_*.png
+assets/units/meme/*_style*.png
+
+# 抓图缓存与验收截图
+tools/meme_cache/
+shots/
+tools/qa/
+tools/_rendercheck/media/
+tools/_rendercheck/shots/
+tools/_shellcheck/out/
+
+# 临时文件
+*.tmp
+*.bak

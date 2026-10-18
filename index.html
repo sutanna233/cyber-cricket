@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>赛博斗蛐蛐 · 放置 ARPG</title>
+  <!-- 相对路径：直接双击 file:// 打开也不白屏 -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div id="app" class="cc-app">
+
+    <!-- ================= 顶部状态条 ================= -->
+    <header id="hud" class="cc-hud">
+      <div class="hud-left">
+        <span class="cc-logo">赛博斗蛐蛐</span>
+        <span class="cc-sub">放置 ARPG</span>
+      </div>
+
+      <div class="hud-mid">
+        <span class="cc-stat"><b>阶段</b><span id="phase">摆阵</span></span>
+        <span class="cc-stat"><b>存活</b><i>左</i><span id="alive-a">0</span><i>:</i><i>右</i><span id="alive-b">0</span></span>
+        <span class="cc-stat"><b>对局计时</b><span id="match-time">0:00</span></span>
+        <span class="cc-stat" id="autostart-wrap"><b>开打倒计时</b><span id="autostart">5.0</span><i>s</i></span>
+        <span class="cc-stat"><b>单位池</b><span id="bench-count">14/14</span></span>
+      </div>
+
+      <div class="hud-right">
+        <button id="btn-pause" class="cc-btn" type="button" title="空格 或 点击：暂停 / 继续">暂停</button>
+        <button id="btn-restart" class="cc-btn ghost" type="button" title="重新开始：场数归零，回到摆阵（保留两侧布阵与人数）">重新开始</button>
+      </div>
+    </header>
+
+    <!-- ================= 舞台 ================= -->
+    <main class="cc-stage">
+      <section class="cc-stage-canvas">
+        <canvas id="stage" width="960" height="600" aria-label="对战画面"></canvas>
+
+        <!-- 暂停遮罩（渲染层另绘 assets/ui/paused.png，这里给文字提示） -->
+        <div id="pausedMask" class="cc-mask hidden">
+          <div class="cc-mask-box">
+            <div class="cc-mask-title">已暂停</div>
+            <div class="cc-mask-tip" id="paused-text"></div>
+          </div>
+        </div>
+
+        <!-- 战报面板 -->
+        <div id="report" class="cc-panel cc-report hidden">
+          <div id="rep-title" class="cc-rep-title">左方</div>
+          <div id="rep-sub" class="cc-rep-sub">第 1 场 · 对局等级 1.0 · 用时 0:00</div>
+          <div id="rep-lines" class="cc-rep-lines"></div>
+          <div id="rep-foot" class="cc-rep-foot">3 秒后自动重开一场（沿用左右双方布阵）</div>
+        </div>
+
+        <!-- 全局错误：红屏面板 -->
+        <div id="errorPanel" class="cc-panel cc-error hidden">
+          <div class="cc-err-title">运行错误</div>
+          <div id="err-msg" class="cc-err-msg"></div>
+          <div id="err-stack" class="cc-err-stack"></div>
+        </div>
+      </section>
+
+      <!-- 单位池面板（上帝视角：左右任一侧都能摆，可调每侧人数） -->
+      <aside id="bench" class="cc-bench">
+        <h2 class="cc-bench-title">
+          <span class="cc-bench-head">单位池<span id="bench-side" class="cc-bench-side">左方布阵中</span></span>
+          <span class="cc-bench-hint">拖到擂台 · 或点击选中再点空位 · 拖回此处取消</span>
+        </h2>
+
+        <div class="cc-bench-tools">
+          <div class="cc-side-switch">
+            <button id="side-A" class="cc-side on" type="button" title="给左方摆阵">左方</button>
+            <button id="side-B" class="cc-side" type="button" title="给右方摆阵">右方</button>
+          </div>
+          <div class="cc-size">
+            <b>左方人数</b>
+            <button id="size-A-minus" class="cc-step" type="button" title="左方上场人数 −1">−</button>
+            <span id="size-A-val" class="cc-size-val">6</span>
+            <button id="size-A-plus" class="cc-step" type="button" title="左方上场人数 +1">+</button>
+          </div>
+          <div class="cc-size">
+            <b>右方人数</b>
+            <button id="size-B-minus" class="cc-step" type="button" title="右方上场人数 −1">−</button>
+            <span id="size-B-val" class="cc-size-val">6</span>
+            <button id="size-B-plus" class="cc-step" type="button" title="右方上场人数 +1">+</button>
+          </div>
+        </div>
+
+        <div id="placing-hint" class="cc-placing-hint hidden"></div>
+        <div id="benchList" class="cc-bench-list"></div>
+      </aside>
+    </main>
+
+    <!-- ================= 底部提示 ================= -->
+    <footer class="cc-foot">
+      <div id="status" class="cc-status">左 / 右任一侧都能摆阵 · 空格 或 按钮 暂停/继续 · 重新开始 · 停手 5 秒自动开打 · 空的一侧自动随机满编</div>
+      <div id="notice" class="cc-notice hidden"></div>
+    </footer>
+  </div>
+
+  <!-- ============ 模块按契约顺序加载（经典 script，无构建/无 import） ============ -->
+  <script src="js/util.js"></script>
+  <script src="js/fighters.js"></script>
+  <script src="js/waves.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/battle.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/main.js"></script>
+<script src="js/access.js"></script>
+
+  <!-- 启动（main.js 已定义 boot；此处容错调用） -->
+  <script>
+    (function () {
+      function go() {
+        try {
+          if (globalThis.CC && CC.main && typeof CC.main.boot === 'function') CC.main.boot();
+        } catch (e) {
+          try { if (globalThis.CC && CC.main && CC.main.fail) CC.main.fail(e, 'boot'); } catch (e2) { }
+        }
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+      else go();
+    })();
+  </script>
+</body>
+
+</html>

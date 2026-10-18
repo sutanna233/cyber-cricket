@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>赛博斗蛐蛐 · 账号</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+    background: radial-gradient(circle at 50% 25%, #1a2340 0%, #0a0d14 60%, #05070b 100%);
+    color: #dfe6ef; font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+  }
+  .card {
+    width: 420px; padding: 26px 26px 20px;
+    background: rgba(16,21,32,.94); border: 1px solid #2b3852; border-radius: 14px;
+    box-shadow: 0 0 32px rgba(74,163,255,.18), inset 0 0 40px rgba(74,163,255,.05);
+  }
+  h1 { font-size: 19px; letter-spacing: 2px; color: #cfe3ff; }
+  .sub { font-size: 12px; color: #7f8ea6; margin: 4px 0 18px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    flex: 1; padding: 8px 0; text-align: center; cursor: pointer; font-size: 13px;
+    background: #0f131b; border: 1px solid #2b3852; border-radius: 8px; color: #9fb0c8;
+  }
+  .tab.on { background: #16304f; border-color: #4aa3ff; color: #eaf2ff; }
+  label { display: block; font-size: 12px; color: #9fb0c8; margin: 12px 0 6px; }
+  input {
+    width: 100%; padding: 10px 12px; font-size: 14px; color: #eaf2ff;
+    background: #0b0f16; border: 1px solid #2b3852; border-radius: 8px; outline: none;
+  }
+  input:focus { border-color: #4aa3ff; box-shadow: 0 0 0 2px rgba(74,163,255,.18); }
+  button {
+    width: 100%; margin-top: 16px; padding: 11px 0; font-size: 14px; cursor: pointer;
+    color: #04121f; background: linear-gradient(180deg,#7fd7ff,#3fa9f5);
+    border: 0; border-radius: 9px; font-weight: 700; letter-spacing: 1px;
+  }
+  button:disabled { opacity: .55; cursor: default; }
+  button.ghost { background: transparent; border: 1px solid #33507a; color: #cfe3ff; font-weight: 500; }
+  button.tiny { width: auto; margin: 0; padding: 4px 10px; font-size: 12px; font-weight: 500; border-radius: 6px; }
+  .msg { margin-top: 12px; font-size: 12.5px; min-height: 18px; color: #ff8f8f; }
+  .msg.ok { color: #7bff8a; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 0; border-bottom: 1px solid #1c2434; font-size: 12.5px; }
+  .row:last-child { border-bottom: 0; }
+  .tag { font-size: 11px; padding: 1px 6px; border-radius: 5px; background: #22304a; color: #9fd0ff; }
+  .tag.admin { background: #4a2a3a; color: #ffb4d1; }
+  .tag.banned { background: #4a2323; color: #ff9d9d; }
+  #users { max-height: 240px; overflow: auto; margin-top: 8px; }
+  a.back { display: block; text-align: center; margin-top: 16px; font-size: 12px; color: #7f8ea6; text-decoration: none; }
+  a.back:hover { color: #7fe3ff; }
+  .hint { font-size: 11.5px; color: #6f7d94; margin-top: 10px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>赛博斗蛐蛐</h1>
+  <div class="sub">注册后就能自己布阵开打（每个人玩自己那一局，互不影响）</div>
+
+  <div id="tabs" class="tabs">
+    <div class="tab on" id="tab-login">登录</div>
+    <div class="tab" id="tab-reg">注册</div>
+  </div>
+
+  <form id="form" autocomplete="off">
+    <label for="user">用户名</label>
+    <input id="user" name="user" type="text" autocomplete="username" placeholder="2~20 位中文/字母/数字/下划线">
+    <label for="pass">密码</label>
+    <input id="pass" name="pass" type="password" autocomplete="current-password" placeholder="至少 6 位，不要纯数字">
+    <button id="submit" type="submit">登 录</button>
+  </form>
+
+  <div id="msg" class="msg"></div>
+
+  <div id="me" style="display:none">
+    <div class="row"><span>当前账号</span><span id="me-name" class="tag"></span></div>
+    <div class="row"><span>权限</span><span id="me-role" class="tag"></span></div>
+    <button id="enter" class="ghost" type="button">进入对战</button>
+    <button id="logout" class="ghost" type="button" style="margin-top:10px">退出登录</button>
+  </div>
+
+  <div id="admin-panel" style="display:none; margin-top:18px">
+    <div class="row" style="border:0"><b style="color:#7fe3ff">用户管理</b><span id="user-count" class="tag"></span></div>
+    <div id="users"></div>
+    <button id="reload-users" class="ghost" type="button" style="margin-top:12px">刷新列表</button>
+  </div>
+
+  <div class="hint" id="hint"></div>
+  <a class="back" href="./">← 返回对战</a>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const msg = $('msg');
+  let mode = 'login';
+  let session = null;
+
+  const say = (t, ok) => { msg.textContent = t || ''; msg.className = 'msg' + (ok ? ' ok' : ''); };
+
+  function setTab(m) {
+    mode = m;
+    $('tab-login').classList.toggle('on', m === 'login');
+    $('tab-reg').classList.toggle('on', m === 'reg');
+    $('submit').textContent = m === 'login' ? '登 录' : '注 册';
+    $('pass').setAttribute('autocomplete', m === 'login' ? 'current-password' : 'new-password');
+    say('');
+  }
+  $('tab-login').onclick = () => setTab('login');
+  $('tab-reg').onclick = () => setTab('reg');
+
+  async function api(path, opts) {
+    const r = await fetch(path, Object.assign({ credentials: 'same-origin' }, opts || {}));
+    let d = {};
+    try { d = await r.json(); } catch (e) {}
+    if (!r.ok && !d.error) d.error = 'HTTP ' + r.status;
+    return { status: r.status, ok: r.ok, data: d };
+  }
+
+  async function refresh() {
+    const { data } = await api('/api/session');
+    session = data;
+    if (!data.registerEnabled) { $('tabs').style.display = 'none'; setTab('login'); }
+    else $('tabs').style.display = 'flex';
+
+    const logged = data.role === 'admin' || data.role === 'user';
+    $('form').style.display = logged ? 'none' : 'block';
+    $('tabs').style.display = logged ? 'none' : (data.registerEnabled ? 'flex' : 'none');
+    $('me').style.display = logged ? 'block' : 'none';
+
+    if (logged) {
+      $('me-name').textContent = data.user ? data.user.name : '-';
+      $('me-role').textContent = data.role === 'admin' ? '管理员（+ 用户管理）' : '注册用户（可布阵开打）';
+      $('me-role').className = 'tag' + (data.role === 'admin' ? ' admin' : '');
+      say(data.role === 'admin' ? '已登录为管理员' : '已登录，可以进入对战布阵了', true);
+    } else {
+      say('');
+    }
+
+    $('admin-panel').style.display = data.role === 'admin' ? 'block' : 'none';
+    if (data.role === 'admin') loadUsers();
+
+    $('hint').innerHTML = '游客只能观看；注册用户可布阵、调人数、重新开始（各自独立，互不影响）。'
+      + (data.syncEnabled ? '<br>本站开启了「全员同步观战」（由服务端定场次）。' : '')
+      + '<br>账号总数 ' + (data.userCount || 0) + '。';
+    return data;
+  }
+
+  $('form').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const u = $('user').value.trim();
+    const p = $('pass').value;
+    if (!u || !p) return say('用户名和密码都要填');
+    $('submit').disabled = true;
+    say(mode === 'login' ? '正在登录…' : '正在注册…');
+    const path = mode === 'login' ? '/api/login' : '/api/register';
+    const { ok, data } = await api(path, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ user: u, pass: p }),
+    });
+    $('submit').disabled = false;
+    if (ok && data.ok) {
+      say(mode === 'login' ? '登录成功，正在进入…' : '注册成功，正在进入…', true);
+      $('pass').value = '';
+      setTimeout(() => { location.href = './'; }, 500);
+    } else {
+      say(data.error || '失败，请重试');
+    }
+  });
+
+  $('enter').onclick = () => { location.href = './'; };
+  $('logout').onclick = async () => {
+    await api('/api/logout', { method: 'POST' });
+    location.reload();
+  };
+
+  async function loadUsers() {
+    const { ok, data } = await api('/api/admin/users');
+    if (!ok) return;
+    $('user-count').textContent = data.users.length + ' 个账号';
+    $('users').innerHTML = '';
+    data.users.sort((a, b) => (a.role === b.role ? a.createdAt - b.createdAt : (a.role === 'admin' ? -1 : 1)));
+    data.users.forEach((u) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      const left = document.createElement('span');
+      left.innerHTML = u.name + ' <span class="tag' + (u.role === 'admin' ? ' admin' : u.banned ? ' banned' : '') + '">'
+        + (u.role === 'admin' ? '管理员' : u.banned ? '已封禁' : '用户') + '</span>';
+      const right = document.createElement('span');
+      if (u.role !== 'admin') {
+        const b = document.createElement('button');
+        b.className = 'tiny ghost';
+        b.textContent = u.banned ? '解封' : '封禁';
+        b.onclick = async () => {
+          await api('/api/admin/ban', {
+            method: 'POST', headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ user: u.name, banned: !u.banned }),
+          });
+          loadUsers();
+        };
+        const d = document.createElement('button');
+        d.className = 'tiny ghost';
+        d.style.marginLeft = '6px';
+        d.textContent = '删除';
+        d.onclick = async () => {
+          if (!confirm('确定删除账号 ' + u.name + '？')) return;
+          await api('/api/admin/delete', {
+            method: 'POST', headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ user: u.name }),
+          });
+          loadUsers();
+        };
+        right.appendChild(b);
+        right.appendChild(d);
+      }
+      row.appendChild(left);
+      row.appendChild(right);
+      $('users').appendChild(row);
+    });
+  }
+  $('reload-users').onclick = loadUsers;
+
+  setTab(location.hash === '#reg' ? 'reg' : 'login');
+  refresh();
+})();
+</script>
+</body>
+</html>

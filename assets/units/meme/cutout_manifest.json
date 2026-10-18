@@ -1,0 +1,152 @@
+[
+  {
+    "id": "tomori",
+    "name": "凑企鹅（高松灯企鹅）",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.862,
+    "coverage": 0.29,
+    "opaque_ratio": 0.304,
+    "file": "assets/units/meme/tomori.png"
+  },
+  {
+    "id": "xujiayin",
+    "name": "许家印（娘化）",
+    "model": "u2net",
+    "source": "src",
+    "score": 1.883,
+    "coverage": 0.375,
+    "opaque_ratio": 0.386,
+    "file": "assets/units/meme/xujiayin.png"
+  },
+  {
+    "id": "kun",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.881,
+    "coverage": 0.495,
+    "opaque_ratio": 0.543,
+    "file": "assets/units/meme/kun.png"
+  },
+  {
+    "id": "dingzhen",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.844,
+    "coverage": 0.393,
+    "opaque_ratio": 0.496,
+    "file": "assets/units/meme/dingzhen.png"
+  },
+  {
+    "id": "bao",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.834,
+    "coverage": 0.374,
+    "opaque_ratio": 0.453,
+    "file": "assets/units/meme/bao.png"
+  },
+  {
+    "id": "sunge",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.808,
+    "coverage": 0.393,
+    "opaque_ratio": 0.477,
+    "file": "assets/units/meme/sunge.png"
+  },
+  {
+    "id": "bili",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.831,
+    "coverage": 0.44,
+    "opaque_ratio": 0.525,
+    "file": "assets/units/meme/bili.png"
+  },
+  {
+    "id": "yingma",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.113,
+    "coverage": 0.095,
+    "opaque_ratio": 0.012,
+    "file": "assets/units/meme/yingma.png"
+  },
+  {
+    "id": "oligei",
+    "name": "",
+    "model": "isnet-anime",
+    "source": "current",
+    "score": 1.697,
+    "coverage": 0.209,
+    "opaque_ratio": 0.392,
+    "file": "assets/units/meme/oligei.png"
+  },
+  {
+    "id": "fawang",
+    "name": "",
+    "model": "isnet-anime",
+    "source": "current",
+    "score": 1.752,
+    "coverage": 0.307,
+    "opaque_ratio": 0.342,
+    "file": "assets/units/meme/fawang.png"
+  },
+  {
+    "id": "liulaoshi",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.78,
+    "coverage": 0.346,
+    "opaque_ratio": 0.416,
+    "file": "assets/units/meme/liulaoshi.png"
+  },
+  {
+    "id": "daxiang",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.859,
+    "coverage": 0.335,
+    "opaque_ratio": 0.442,
+    "file": "assets/units/meme/daxiang.png"
+  },
+  {
+    "id": "xiongmao",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.489,
+    "coverage": 0.338,
+    "opaque_ratio": 0.711,
+    "file": "assets/units/meme/xiongmao.png"
+  },
+  {
+    "id": "zhenxiang",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.778,
+    "coverage": 0.352,
+    "opaque_ratio": 0.391,
+    "file": "assets/units/meme/zhenxiang.png"
+  },
+  {
+    "id": "chongwang",
+    "name": "",
+    "model": "u2net",
+    "source": "current",
+    "score": 1.822,
+    "coverage": 0.407,
+    "opaque_ratio": 0.446,
+    "file": "assets/units/meme/chongwang.png"
+  }
+]

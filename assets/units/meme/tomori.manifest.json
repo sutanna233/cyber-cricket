@@ -1,0 +1,156 @@
+{
+  "id": "tomori",
+  "queries": [
+    "高松灯 企鹅 表情包",
+    "高松灯企鹅",
+    "高松灯 企鹅 MyGO 梗图",
+    "高松灯 企鹅 立绘",
+    "MyGO 高松灯 企鹅 表情"
+  ],
+  "candidates": [
+    {
+      "rank": 1,
+      "score": 4.142,
+      "url": "https://p6.itc.cn/q_70/images03/20210528/a0e266578a5141e18a8f694d7cc527f1.png",
+      "src_size": [
+        1080,
+        1112
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.777,
+      "file": "tomori_1.png"
+    },
+    {
+      "rank": 2,
+      "score": 4.085,
+      "url": "https://pic4.zhimg.com/v2-8060916d54937e6d1e50b94398995bd7_b.jpg",
+      "src_size": [
+        361,
+        383
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.756,
+      "file": "tomori_2.png"
+    },
+    {
+      "rank": 3,
+      "score": 4.0,
+      "url": "https://cdn.pmphai.com/resource/file/59259774792192001650527936296/d1f4303ea8bd43dbbf87492934995647.jpg",
+      "src_size": [
+        1891,
+        1519
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.618,
+      "file": "tomori_3.png"
+    },
+    {
+      "rank": 4,
+      "score": 3.704,
+      "url": "https://img1.dxycdn.com/2019/0220/087/3329980825734600640-47.png",
+      "src_size": [
+        640,
+        633
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.784,
+      "file": "tomori_4.png"
+    },
+    {
+      "rank": 5,
+      "score": 3.6,
+      "url": "https://pic2.zhimg.com/v2-3efea948f6332f53bc6aa8febaecaa6d_r.jpg",
+      "src_size": [
+        609,
+        461
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.364,
+      "file": "tomori_5.png"
+    },
+    {
+      "rank": 6,
+      "score": 3.559,
+      "url": "https://pic.nximg.cn/file/20260113/34189657_225839203105_2.jpg",
+      "src_size": [
+        683,
+        1024
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.457,
+      "file": "tomori_6.png"
+    },
+    {
+      "rank": 7,
+      "score": 3.558,
+      "url": "https://i2.chuimg.com/fff3e22451ec4dbbb7d5dca0124f4c51_2160w_2160h.jpg?imageView2/2/w/660/interlace/1/q/90",
+      "src_size": [
+        660,
+        660
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.807,
+      "file": "tomori_7.png"
+    },
+    {
+      "rank": 8,
+      "score": 3.349,
+      "url": "https://i2.chuimg.com/12572673eed3443195dd2475dbe13465_1836w_2448h.jpg?imageView2/2/w/660/interlace/1/q/75",
+      "src_size": [
+        660,
+        880
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.523,
+      "file": "tomori_8.png"
+    },
+    {
+      "rank": 9,
+      "score": 3.347,
+      "url": "https://i2.chuimg.com/98f6e53546654361a4d692faa5407a3e_1920w_2560h.jpg?imageView2/2/w/660/interlace/1/q/75",
+      "src_size": [
+        660,
+        880
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.595,
+      "file": "tomori_9.png"
+    },
+    {
+      "rank": 10,
+      "score": 3.337,
+      "url": "https://www.mroyal.cn/news/upload/image/20201019/16030995723961607.jpg",
+      "src_size": [
+        881,
+        681
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.614,
+      "file": "tomori_10.png"
+    },
+    {
+      "rank": 11,
+      "score": 3.32,
+      "url": "https://pic.nximg.cn/file/20201018/14136094_151441092897_2.jpg",
+      "src_size": [
+        768,
+        1024
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.577,
+      "file": "tomori_11.png"
+    },
+    {
+      "rank": 12,
+      "score": 3.238,
+      "url": "https://pic.nximg.cn/file/20250321/492209_104510521106_2.jpg",
+      "src_size": [
+        1024,
+        768
+      ],
+      "cutout": true,
+      "opaque_ratio": 0.595,
+      "file": "tomori_12.png"
+    }
+  ]
+}

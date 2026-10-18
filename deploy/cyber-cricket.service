@@ -1,0 +1,28 @@
+[Unit]
+Description=Cyber Cricket (赛博斗蛐蛐) static game server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cyber-cricket
+ExecStart=/usr/bin/node server.js --host 127.0.0.1 --port 8130 --mode view
+Environment=NODE_ENV=production
+# 管理员账号（改成你自己的强密码；secret 用 openssl rand -hex 24 生成）
+Environment=CC_ADMIN_USER=admin
+Environment=CC_ADMIN_PASS=CHANGE_ME_STRONG_PASSWORD
+Environment=CC_SECRET=CHANGE_ME_RANDOM_HEX
+Environment=CC_SESSION_DAYS=7
+Restart=always
+RestartSec=3
+# 轻量加固
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/opt/cyber-cricket
+# 只读运行，不需要写任何文件
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

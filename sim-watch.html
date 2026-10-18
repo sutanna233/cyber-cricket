@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>赛博斗蛐蛐 · 观战与测试台</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background:#0c0e14; color:#dfe6ef; font-family:"Microsoft YaHei","Segoe UI",sans-serif; }
+  #wrap { display:flex; gap:12px; padding:12px; align-items:flex-start; }
+  #left { flex:0 0 960px; }
+  canvas#game { display:block; width:960px; height:600px; background:#000; border:2px solid #2b3145; border-radius:8px; }
+  #bar { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+  button { background:#1b2233; color:#cfe3ff; border:1px solid #35507a; border-radius:6px; padding:6px 12px; cursor:pointer; font-size:13px; }
+  button:hover { background:#243050; }
+  button.on { background:#2b6cb0; border-color:#4aa3ff; color:#fff; }
+  button.small { padding:3px 8px; font-size:12px; }
+  #right { flex:1 1 auto; min-width:420px; max-width:560px; display:flex; flex-direction:column; gap:10px; }
+  .panel { background:#12161f; border:1px solid #26304a; border-radius:8px; padding:10px; }
+  .panel h3 { font-size:13px; color:#7fe3ff; margin-bottom:8px; font-weight:600; letter-spacing:1px; }
+  .row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:6px; font-size:12px; }
+  input[type=number], input[type=text] { background:#0b0f16; color:#dfe6ef; border:1px solid #2b3852; border-radius:5px; padding:4px 6px; width:90px; font-size:12px; }
+  .units { display:flex; flex-wrap:wrap; gap:4px; }
+  .u { width:54px; cursor:pointer; text-align:center; border:1px solid #2b3852; border-radius:6px; padding:2px; background:#0f131b; font-size:10px; color:#9fb0c8; }
+  .u img { width:48px; height:48px; object-fit:contain; display:block; }
+  .u.sel { border-color:#4aa3ff; background:#152647; color:#fff; }
+  #log, #batlog { height:150px; overflow:auto; background:#080b11; border:1px solid #1e2740; border-radius:6px; padding:6px; font-family:Consolas,monospace; font-size:11px; line-height:1.5; }
+  #batlog { height:200px; }
+  .k { color:#7fe3ff; } .g { color:#7bff8a; } .r { color:#ff8080; } .y { color:#ffd166; } .d { color:#7a8797; }
+  #stats { font-size:12px; line-height:1.7; color:#c3cfe0; }
+  #units-hp { font-size:11px; font-family:Consolas,monospace; line-height:1.6; max-height:120px; overflow:auto; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="left">
+    <canvas id="game" width="960" height="600"></canvas>
+    <div id="bar">
+      <button id="btn-play">暂停</button>
+      <button id="btn-step">单步 (1 tick)</button>
+      <button id="btn-step1s">前进 1 秒</button>
+      <span class="d">倍速</span>
+      <button class="spd small" data-spd="1">1×</button>
+      <button class="spd small" data-spd="2">2×</button>
+      <button class="spd small" data-spd="4">4×</button>
+      <button class="spd small" data-spd="10">10×</button>
+      <button id="btn-restart">重开本场</button>
+      <button id="btn-autonext">自动连打</button>
+      <span id="phase-readout" class="d"></span>
+    </div>
+  </div>
+
+  <div id="right">
+    <div class="panel">
+      <h3>阵容与种子</h3>
+      <div class="row">
+        <span>seed</span><input type="number" id="seed" value="20261019">
+        <span>左方(玩家)已选 <b id="cnt-a">0</b></span>
+        <span>右方(敌方)已选 <b id="cnt-b">0</b></span>
+        <button class="small" id="btn-rand">随机满编</button>
+      </div>
+      <div class="row"><span style="width:52px">左方</span><div class="units" id="units-a"></div></div>
+      <div class="row"><span style="width:52px">右方</span><div class="units" id="units-b"></div></div>
+      <div class="row"><span class="d">点角色卡切换上场；留空则自动从池中随机满编</span></div>
+    </div>
+
+    <div class="panel">
+      <h3>实时状态</h3>
+      <div id="stats">—</div>
+      <div id="units-hp"></div>
+    </div>
+
+    <div class="panel">
+      <h3>事件流（战斗日志）</h3>
+      <div id="log"></div>
+    </div>
+
+    <div class="panel">
+      <h3>批量测试（无头跑，实时滚动）</h3>
+      <div class="row">
+        <span>1v1</span><input type="number" id="n1" value="100">
+        <span>6v6</span><input type="number" id="n6" value="60">
+        <button id="btn-batch">开始批测</button>
+        <button id="btn-batch-stop">停止</button>
+      </div>
+      <div class="row"><span id="batch-progress" class="d">未开始</span></div>
+      <div id="batlog"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/util.js"></script>
+<script src="js/fighters.js"></script>
+<script src="js/waves.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/board.js"></script>
+<script src="js/render.js"></script>
+<script src="js/simwatch.js"></script>
+</body>
+</html>
