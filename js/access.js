@@ -85,17 +85,14 @@
       if (st.phase && st.phase !== 'placing') return false;   // 只有摆阵阶段才动阵容
       const lu = CC.board.lineup();
       if (isDemo(lu)) { demoApplied = true; return true; }
-      // 观战/限权模式下场上一定是"自动随机满编"，可以直接换掉；
-      // 完整操作模式下只有在空场时才预置，避免覆盖用户自己的摆阵
+      // 演示阵容必须用"原始方法"（此时 place/clear/setSize 已被包成游客禁用版）
+      const B = rawBoard || CC.board;
       const canReplace = (mode !== 'play') || !(lu.A.length + lu.B.length);
       if (!canReplace && !force) return false;
-      if (typeof CC.board.clear === 'function') CC.board.clear();
-      if (typeof CC.board.setSize === 'function') {
-        CC.board.setSize('A', 1);
-        CC.board.setSize('B', 1);
-      }
-      const okA = CC.board.place(DEMO.A, 0);      // 左方第一槽
-      const okB = CC.board.place(DEMO.B, 6);      // 右方第一槽（全局索引从 6 起）
+      if (typeof B.clear === 'function') B.clear();
+      if (typeof B.setSize === 'function') { B.setSize('A', 1); B.setSize('B', 1); }
+      const okA = B.place(DEMO.A, 0);      // 左方第一槽
+      const okB = B.place(DEMO.B, 6);      // 右方第一槽（全局索引从 6 起）
       demoApplied = !!(okA || okB);
       return demoApplied;
     } catch (e) { return false; }
@@ -158,6 +155,9 @@
     }
   }
 
+  let rawBoard = null;      // 未被包装的原始方法（演示阵容用；游客拿不到）
+  let rawMain = null;
+
   /** 把被禁用的写操作原地包一层（不替换模块对象，避免破坏主程序持有的引用） */
   function harden() {
     try {
@@ -166,6 +166,7 @@
       if (!B && !M) return false;
 
       if (B && !B.__ccGuarded) {
+        rawBoard = { place: B.place, remove: B.remove, clear: B.clear, setSize: B.setSize };
         const wrap = (name, allowed) => {
           if (typeof B[name] !== 'function') return;
           const orig = B[name];
@@ -183,6 +184,7 @@
       }
 
       if (M && !M.__ccGuarded) {
+        rawMain = { restart: M.restart, setPaused: M.setPaused, togglePause: M.togglePause };
         const wrapM = (name, allowed) => {
           if (typeof M[name] !== 'function') return;
           const orig = M[name];
