@@ -20,7 +20,18 @@
     return best;
   }
 
-  function targetRange(e) { return e.unit.stats.range; }
+  // 面板 range 兼用于旧普攻；弹道主攻角色应按主攻技能的安全距离站位。
+  // 刺客与召唤物继续沿用自身定位，混合近战连段也不会被误判成远程。
+  function targetRange(e) {
+    const base = e.unit.stats.range;
+    if (e.isMinion || e.unit.role === 'assassin') return base;
+    const firstHit = e.unit.s1 && e.unit.s1.steps.find((s) => s.dmg > 0);
+    if (!firstHit || firstHit.kind !== 'projectile') return base;
+    const policy = e.unit.policy && e.unit.policy.s1;
+    const reach = policy && policy.when === 'enemyInRange' ? policy.range || 200
+      : (firstHit.speed || 430) * (firstHit.life || 2);
+    return Math.max(base, Math.min(460, reach * 0.75));
+  }
 
   function hasBuff(e, kind) { return e.buffs.some((b) => b.kind === kind && b.t < b.dur); }
 
@@ -222,9 +233,10 @@
     const threatDistance = U.dist(e.x, e.z, threat.x, threat.z);
 
     // 真远程受近身威胁才后撤；近战辅助残血也要进技能范围，而不是逃到打不到人。
-    if (hpRatio < 0.32 && targetRange(e) > 150 && (role === 'ranged' || role === 'support')
+    if (hpRatio < 0.32 && targetRange(e) > 150
         && threatDistance < targetRange(e) * 0.85 && (e.noDmgT || 0) < 5) {
-      return { mode: 'retreat', targetId: target.id, threatId: threat.id, wantRange: targetRange(e) };
+      return { mode: 'retreat', targetId: target.id, threatId: threat.id, wantRange: targetRange(e),
+        ranged: true, attackRange: targetRange(e) };
     }
 
     // 绕后：刺客优先切后排
@@ -233,8 +245,9 @@
     }
 
     // 远程/辅助：只有真远程才拉距离风筝；近战范围的辅助（如张维为）必须贴上去打
-    if ((role === 'ranged' || role === 'support') && targetRange(e) > 150) {
-      return { mode: 'kite', targetId: target.id, threatId: threat.id, wantRange: Math.max(140, targetRange(e) * 0.7) };
+    if (targetRange(e) > 150) {
+      return { mode: 'kite', targetId: target.id, threatId: threat.id,
+        wantRange: Math.max(140, targetRange(e) * 0.85), ranged: true, attackRange: targetRange(e) };
     }
 
     // 坦克/近战：先咬最近的目标，优先前排

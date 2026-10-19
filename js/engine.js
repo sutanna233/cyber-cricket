@@ -827,21 +827,25 @@
 
       // 移动与普攻
       const d = U.dist(e.x, e.z, tgt.x, tgt.z);
-      const want = e.plan.wantRange || rangeOf(e);
-      // 停步距离必须落在技能判定范围内（之前多算了 +8，导致近战永远差一点点打不到人）
-      const atkRange = Math.max(20, e.unit.stats.range + tgt.unit.radius * 0.5 - 6);
       const sp = speedOf(e) * (e.stuck > 1.2 ? 1.8 : 1);
       const dx = tgt.x - e.x, dz = tgt.z - e.z;
       const len = Math.hypot(dx, dz) || 1;
       const mx = dx / len, mz = dz / len;
 
-      // 反僵死：长期没有位移、或超过 5 秒没打出伤害 → 强制压上（远程也一样）
+      // 反僵死：远程适度缩短距离寻找命中机会，不能退化为按旧普攻范围贴脸。
       if ((e.stuck > 2.5 && e.plan.mode !== 'approach') || e.noDmgT > 5) {
-        e.plan = { mode: 'approach', targetId: tgt.id, wantRange: rangeOf(e) };
+        const ranged = !!e.plan.ranged;
+        const reach = e.plan.attackRange || rangeOf(e);
+        e.plan = { mode: 'approach', targetId: tgt.id, ranged, attackRange: reach,
+          wantRange: ranged ? Math.max(140, reach * 0.65) : rangeOf(e) };
         e.stuck = 0;
         e._fleeing = false;
         e._kiting = false;
       }
+
+      const want = e.plan.wantRange || rangeOf(e);
+      // 远程按战术距离停步，近战则必须进入实际攻击范围。
+      const atkRange = e.plan.ranged ? want : Math.max(20, e.unit.stats.range + tgt.unit.radius * 0.5 - 6);
 
       // 后撤/风筝必须有空间，否则会被夹在墙角永远出不来
       const threat = foes(e).find((o) => o.id === e.plan.threatId) || tgt;
