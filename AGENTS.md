@@ -42,4 +42,4 @@ Never commit `data/`, `.env` files, or tokens. Configure `CC_ADMIN_PASS`, `CC_SE
 
 ## Agent Notes
 
-Reply to the user in Chinese. AI changes must preserve seeded replay and resource-collecting character behavior; validate skill conditions, targeting, movement, and battle convergence with fixed seeds. Keep development test scripts in ignored `tools/` or `tests/`.
+Reply to the user in Chinese. AI changes must preserve seeded replay and resource-collecting character behavior. Skill timelines retain `cast.targetId`; homing projectiles retain their own `targetId`, and dash directions are normalized 2D vectors. Keep defensive dodges damage-free. Local regression commands are `node tools/_aicheck/regression.js` and `node tools/_aicheck/matrix.js`; these development scripts remain ignored. See `docs/AI-VALIDATION.md` for validation scope and results.

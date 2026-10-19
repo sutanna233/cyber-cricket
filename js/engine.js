@@ -271,7 +271,14 @@
       const list = foes(src).slice();
       if (!list.length) return [];
       const wantBack = step.preferBack || (src.unit.role === 'assassin' && (opt && opt.flank));
+      const target = castTarget(src);
+      const targetInArc = target && inArc(src, target, step.range || rangeOf(src), step.arc || 110);
       list.sort((a, b) => {
+        // 先命中 AI 正在追的目标，其余敌人仍参与范围判定。
+        if (targetInArc) {
+          if (a === target) return -1;
+          if (b === target) return 1;
+        }
         const da = U.dist(src.x, src.z, a.x, a.z) + (a.lane === (wantBack ? 1 : 0) ? -60 : 60);
         const db = U.dist(src.x, src.z, b.x, b.z) + (b.lane === (wantBack ? 1 : 0) ? -60 : 60);
         return da - db;
@@ -316,7 +323,7 @@
         }
         case 'projectile': {
           // 朝目标方向发射（含 z 轴分量）+ 轻微追踪，否则目标错位就永远打不中
-          const t = nearestFoe(src);
+          const t = castTarget(src);
           let dx = src.facing, dz = 0;
           if (t) {
             const tdx = t.x - src.x, tdz = t.z - src.z;
@@ -328,6 +335,7 @@
             id: battle._eid++, ownerId: src.id, side: src.side, skill: opt.skillKey || 'basic',
             x: src.x + dx * 20, z: src.z + dz * 20, h: src.h + 34,
             vx: dx * sp, vz: dz * sp, speed: sp, vh: 0, homing: !!t,
+            targetId: t ? t.id : 0,
             dmg: step.dmg, life: step.life || 2, radius: step.radius || 24,
             sprite: step.sprite || 'spark', scale: step.scale || 0.9,
             pierce: !!step.pierce, bounces: step.bounces || 0, effects: step.effects || [], hits: 0, arcH: step.arcH || 60,
@@ -336,16 +344,19 @@
           break;
         }
         case 'dash': {
-          const dir = src.facing;
+          const target = castTarget(src, step.preferBack);
+          const dx = target ? target.x - src.x : src.facing;
+          const dz = target ? target.z - src.z : 0;
+          const len = Math.hypot(dx, dz) || 1;
           src.state = 'dash';
           src.stateT = 0;
-          src.dash = { dir, dur: step.dur || 0.3, t: 0, step };
+          src.dash = { dir: dx / len, dirZ: dz / len, dur: step.dur || 0.3, t: 0, step };
           if (CC.assets && CC.assets.play) CC.assets.play('dash');
           push({ type: 'dash', unitId: src.id, x: src.x, z: src.z, h: src.h });
           break;
         }
         case 'aoe': {
-          const at = step.at === 'target' ? (nearestFoe(src) || src) : src;
+          const at = step.at === 'target' ? (castTarget(src) || src) : src;
           const zone = {
             id: battle._eid++, ownerId: src.id, side: src.side, skill: opt.skillKey || 'ult',
             x: at.x, z: at.z, radius: step.radius, dmg: step.dmg, sprite: step.sprite || 'boom',
@@ -433,7 +444,7 @@
           const have = src.stacks[kind] || 0;
           const n = Math.max(step.minCount || 1, Math.min(have, step.maxDrops || 12));
           src.stacks[kind] = 0;
-          const foe = nearestFoe(src);
+          const foe = castTarget(src);
           const cx = foe ? foe.x : src.x, cz = foe ? foe.z : src.z;
           battle.rains.push({
             id: battle._eid++, ownerId: src.id, side: src.side, skill: opt.skillKey || 's2',
@@ -452,7 +463,7 @@
         }
         case 'pull': {
           // 引力拖拽：把范围内的敌人朝一点拽过去（许家印「两万亿」的起手）
-          const center = step.at === 'target' ? (nearestFoe(src) || src) : src;
+          const center = step.at === 'target' ? (castTarget(src) || src) : src;
           const cx = center.x, cz = center.z;
           const radius = step.radius || 280;
           let pulled = 0;
@@ -527,6 +538,53 @@
       return best;
     }
 
+    function castTarget(e, preferBack) {
+      const list = foes(e);
+      const id = (e.cast && e.cast.targetId) || e.targetId;
+      const selected = list.find((o) => o.id === id);
+      if (selected && (!preferBack || selected.lane === 1)) return selected;
+      const back = preferBack ? list.filter((o) => o.lane === 1) : [];
+      const pool = back.length ? back : list;
+      return pool.sort((a, b) => U.dist2(e.x, e.z, a.x, a.z) - U.dist2(e.x, e.z, b.x, b.z))[0] || null;
+    }
+
+    /** 在场地内选择闪避落点，惩罚仍在敌方预警范围内的方向。 */
+    function startDodge(e, dx, dz, distance, duration, kind) {
+      const len = Math.hypot(dx, dz) || 1;
+      dx /= len; dz /= len;
+      let best = null, bestScore = -Infinity;
+      for (let i = 0; i < 16; i++) {
+        const angle = i * Math.PI / 8;
+        const ux = Math.cos(angle), uz = Math.sin(angle);
+        const x = U.clamp(e.x + ux * distance, 60, W - 60);
+        const z = U.clamp(e.z + uz * distance, 70, D - 70);
+        const travel = U.dist(e.x, e.z, x, z);
+        if (travel < distance * 0.5) continue;
+        let score = (ux * dx + uz * dz) * 35 + travel * 0.1;
+        for (const zone of battle.zones) {
+          if (zone.side === e.side || zone.done) continue;
+          const margin = U.dist(x, z, zone.x, zone.z) - zone.radius - e.unit.radius * 0.5;
+          score += Math.min(0, margin) * 5;
+        }
+        // 同时比较两侧，别从一个弹道闪进另一个弹道。
+        for (const p of battle.projectiles) {
+          if (p.side === e.side || p.lob) continue;
+          const gap = U.dist(x, z, p.x + p.vx * duration, p.z + p.vz * duration);
+          score -= Math.max(0, (p.radius || 24) + e.unit.radius - gap) * 3;
+        }
+        if (score > bestScore) { bestScore = score; best = { x, z }; }
+      }
+      if (!best) return false;
+      const x = best.x - e.x, z = best.z - e.z;
+      const travel = Math.hypot(x, z);
+      e.state = 'dash';
+      e.dash = { dir: x / travel, dirZ: z / travel, dur: duration, t: 0,
+        step: { dist: travel, dmg: 0, radius: 10 } };
+      e.dodgeCd = DODGE_CD;
+      push({ type: 'dodge', unitId: e.id, x: e.x, z: e.z, kind });
+      return true;
+    }
+
     function knockback(src, dst, mag, up) {
       const dx = dst.x - src.x, dz = dst.z - src.z;
       const len = Math.hypot(dx, dz) || 1;
@@ -562,6 +620,7 @@
       }
       e.cast = {
         key, skill: sk, steps: (sk.steps || []).slice(), idx: 0, t: 0,
+        targetId: e.targetId,
         charging: charge > 0, chargeT: 0, chargeDur: charge,
       };
       e.state = charge > 0 ? 'charge' : (key === 'ult' ? 'ult' : 'cast');
@@ -635,7 +694,7 @@
         e.x = U.clamp(e.x, 60, W - 60);
         e.z = U.clamp(e.z, 70, D - 70);
         // 路径伤害
-        for (const o of foes(e)) {
+        for (const o of d.step.dmg > 0 ? foes(e) : []) {
           if (!o.alive) continue;
           if (U.dist(e.x, e.z, o.x, o.z) < (d.step.radius || 46) + o.unit.radius * 0.5) {
             if (!(o._dashHit && o._dashHit === d)) {
@@ -658,7 +717,7 @@
         dbg('cast');
         const c = e.cast;
         // 蓄力/施法期间持续转向目标（否则对手绕圈就会导致整段前摇空掉）
-        const liveFoe = nearestFoe(e);
+        const liveFoe = castTarget(e);
         if (liveFoe) e.facing = liveFoe.x >= e.x ? 1 : -1;
         if (c.charging) {
           c.chargeT += dt;
@@ -698,7 +757,8 @@
       if (U.dist2(e.x, e.z, e.lastX, e.lastZ) < 4) e.stuck += dt; else { e.stuck = 0; e.lastX = e.x; e.lastZ = e.z; }
 
       // AI 决策
-      if (e.deciding <= 0 && CC.ai) {
+      const deadTarget = e.plan && e.plan.targetId && !foes(e).some((o) => o.id === e.plan.targetId);
+      if ((e.deciding <= 0 || deadTarget) && CC.ai) {
         e.deciding = 0.25;
         e.plan = CC.ai.decide(battle, e);
       }
@@ -715,31 +775,25 @@
       // 躲避：先躲 AOE 预警圈，再预判侧闪飞行道具（捡石头途中同样会闪）
       if (e.dodgeCd <= 0 && !hasBuff(e, 'invuln')) {
         for (const z of battle.zones) {
-          if (z.side === e.side || z.done || z.t > z.warn) continue;
-          if (U.dist(e.x, e.z, z.x, z.z) < z.radius * 0.9) {
+          if (z.side === e.side || z.done) continue;
+          if (U.dist(e.x, e.z, z.x, z.z) < z.radius + e.unit.radius * 0.5) {
             dbg('dodge');
-            const away = e.x >= z.x ? 1 : -1;
-            e.state = 'dash';
-            e.dash = { dir: away, dirZ: 0, dur: 0.22, t: 0, step: { dist: 190, dmg: 0, radius: 10 } };
-            e.dodgeCd = DODGE_CD;
-            push({ type: 'dodge', unitId: e.id, x: e.x, z: e.z, kind: 'zone' });
-            return;
+            const dx = e.x - z.x, dz = e.z - z.z;
+            if (startDodge(e, dx || (dz ? 0 : e.facing), dz, 190, 0.22, 'zone')) return;
           }
         }
         for (const p of battle.projectiles) {
-          if (p.side === e.side) continue;
+          if (p.side === e.side || p.lob) continue;
           const d = U.dist(p.x, p.z, e.x, e.z);
           if (d > 230) continue;
-          const future = U.dist(p.x + p.vx * 0.25, p.z + p.vz * 0.25, e.x, e.z);
-          if (future > d - 4) continue;                    // 没有在靠近，不用闪
           const dx = e.x - p.x, dz = e.z - p.z;
-          const l = Math.hypot(dx, dz) || 1;
-          const px = -dz / l, pz = dx / l;                 // 垂直方向侧闪
-          e.state = 'dash';
-          e.dash = { dir: px >= 0 ? 1 : -1, dirZ: pz, dur: 0.2, t: 0, step: { dist: 180, dmg: 0, radius: 10 } };
-          e.dodgeCd = DODGE_CD;
-          push({ type: 'dodge', unitId: e.id, x: e.x, z: e.z, kind: 'projectile' });
-          return;
+          const speed2 = p.vx * p.vx + p.vz * p.vz;
+          if (speed2 <= 0) continue;
+          const impactT = (dx * p.vx + dz * p.vz) / speed2;
+          if (impactT <= 0 || impactT > 0.35 || impactT > p.life) continue;
+          const miss = U.dist(p.x + p.vx * impactT, p.z + p.vz * impactT, e.x, e.z);
+          if (miss > (p.radius || 24) + e.unit.radius * 0.6 + 12) continue;
+          if (startDodge(e, -p.vz, p.vx, 180, 0.2, 'projectile')) return;
         }
       }
 
@@ -792,27 +846,30 @@
       }
 
       // 后撤/风筝必须有空间，否则会被夹在墙角永远出不来
-      const backX = e.x - mx * 90, backZ = e.z - mz * 90;
+      const threat = foes(e).find((o) => o.id === e.plan.threatId) || tgt;
+      const threatD = U.dist(e.x, e.z, threat.x, threat.z);
+      const fleeX = (e.x - threat.x) / (threatD || 1), fleeZ = (e.z - threat.z) / (threatD || 1);
+      const backX = e.x + fleeX * 90, backZ = e.z + fleeZ * 90;
       const hasSpace = backX > 60 && backX < W - 60 && backZ > 70 && backZ < D - 70;
 
       // —— 用迟滞开关代替"逐帧比大小"，否则会在阈值上来回抖动导致原地不动 ——
       if (e.plan.mode === 'kite') {
-        if (d < want * 0.7) e._kiting = true;
-        if (d > want * 1.15) e._kiting = false;
+        if (threatD < want * 0.7) e._kiting = true;
+        if (threatD > want * 1.15) e._kiting = false;
       } else e._kiting = false;
       if (e.plan.mode === 'retreat') {
-        if (d < 320) e._fleeing = true;
-        if (d > 470 || e.noDmgT > 5) e._fleeing = false;
+        if (threatD < want * 0.85) e._fleeing = true;
+        if (threatD > want * 1.15 || e.noDmgT > 5) e._fleeing = false;
       } else e._fleeing = false;
 
       if (e._kiting && hasSpace) {
-        e.x -= mx * sp * dt;                       // 太近就退
-        e.z -= mz * sp * dt;
+        e.x += fleeX * sp * dt;                    // 远离最近的威胁，不是背对锁定目标乱退
+        e.z += fleeZ * sp * dt;
         e.state = 'walk';
         battle.dbg.kite++;
       } else if (e._fleeing && hasSpace) {
-        e.x -= mx * sp * dt;                       // 后撤但不逃到天涯
-        e.z -= mz * sp * dt;
+        e.x += fleeX * sp * dt;
+        e.z += fleeZ * sp * dt;
         e.state = 'walk';
         battle.dbg.retreat++;
       } else if (d > atkRange) {
@@ -829,10 +886,13 @@
         }
         if (e._orbitDir === undefined) e._orbitDir = (e.id % 2 === 0) ? 1 : -1;
         // 靠墙时反转绕圈方向，避免两个近战互相绕到墙角卡死
-        const nearWallX = e.x < 150 || e.x > W - 150;
-        const nearWallZ = e.z < 150 || e.z > D - 150;
-        if (nearWallX || nearWallZ) e._orbitDir = -e._orbitDir;
         const px = -mz, pz = mx;                    // 垂直于"我→目标"的方向
+        const clearance = (sign) => Math.min(e.x + px * sign * 80 - 50,
+          W - 50 - (e.x + px * sign * 80), e.z + pz * sign * 80 - 60,
+          D - 60 - (e.z + pz * sign * 80));
+        if (clearance(e._orbitDir) < 60 && clearance(-e._orbitDir) > clearance(e._orbitDir) + 10) {
+          e._orbitDir = -e._orbitDir;
+        }
         const drift = speedOf(e) * 0.33;
         e.x += px * e._orbitDir * drift * dt;
         e.z += pz * e._orbitDir * drift * dt;
@@ -926,11 +986,13 @@
           }
           continue;
         }
-        // 轻微追踪：每帧把速度方向朝最近的敌人转一点，保证能命中走位中的目标
+        // 追踪 AI 锁定目标；目标死亡后再就近重选，弹跳时保留新的目标。
         if (p.homing) {
-          let near = null, bd = Infinity;
-          for (const o of enemySide) {
+          let near = enemySide.find((o) => o.alive && o.id === p.targetId && o._projIgnore !== p.id);
+          let bd = Infinity;
+          for (const o of near ? [] : enemySide) {
             if (!o.alive) continue;
+            if (o._projIgnore === p.id) continue;
             const d2 = U.dist2(p.x, p.z, o.x, o.z);
             if (d2 < bd) { bd = d2; near = o; }
           }
@@ -962,6 +1024,7 @@
               p.bounces--;
               const next = enemySide.find((x) => x.alive && x !== o && x._projIgnore !== p.id);
               if (next) {
+                p.targetId = next.id;
                 const dx = next.x - p.x, dz = next.z - p.z;
                 const l = Math.hypot(dx, dz) || 1;
                 p.vx = (dx / l) * p.speed;

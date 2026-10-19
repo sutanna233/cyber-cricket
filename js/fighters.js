@@ -221,7 +221,7 @@
         steps: [melee({ dmg: 1.5, range: 130, arc: 200, hits: 2, t: 0.3, knock: 150 })],
         line: '一次不够，就赢两次。' },
       lines: ['永远可以相信。', '这个数据很有意思。', '赢麻了。'], barks: { hit: '对', taken: '呃', cast: '赢了！' },
-      policy: { s1: { when: 'always' }, s2: { when: 'alliesBelow', n: 4 },
+      policy: { s1: { when: 'always' }, s2: { when: 'lowestAllyHpBelow', v: 0.75 },
         ult: { when: 'energyFull' } },
       texture: { key: 'yingma', scale: 1.0 },
     },
