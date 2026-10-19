@@ -5,17 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>管理员 · 对战录像导出</title>
   <style>
-    body{margin:20px;background:#080e1d;color:#e7f4ff;font:15px system-ui,sans-serif}main{max-width:980px;margin:auto}
-    canvas,video{display:block;width:100%;max-width:960px;background:#020611;border:1px solid #33516d;border-radius:12px;margin:16px 0}
+    body{margin:20px;background:#080e1d;color:#e7f4ff;font:15px system-ui,sans-serif}main{max-width:980px;min-width:0;margin:auto}
+    canvas,video{display:block;box-sizing:border-box;width:100%;max-width:960px;height:auto;background:#020611;border:1px solid #33516d;border-radius:12px;margin:16px 0}
     button,input,a{font:inherit}button,a{padding:8px 14px;margin:4px;border-radius:6px}button{cursor:pointer}input{width:150px;padding:8px}
     a{color:#8fe8ff}#status{min-height:24px;color:#acebc2}#error{color:#ffa6a6}.hidden{display:none}
-    fieldset{border:1px solid #33516d;border-radius:10px;padding:16px;margin:16px 0;background:#101a2d}
+    form,fieldset,details,.settings,.settings label{min-width:0;max-width:100%}
+    fieldset{min-inline-size:0;border:1px solid #33516d;border-radius:10px;padding:16px;margin:16px 0;background:#101a2d}
     legend{font-weight:700;color:#aee8ff}details{margin-top:14px}summary{cursor:pointer;color:#bce6ff}
-    .settings{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+    .settings{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:16px}
     .settings label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#b9ccdf}
-    .settings input,.settings select{box-sizing:border-box;width:100%;padding:9px;background:#080e1d;border:1px solid #3a536f;border-radius:5px;color:#eef6ff;font:14px system-ui}
+    .settings input,.settings select{box-sizing:border-box;min-width:0;width:100%;max-width:100%;padding:9px;background:#080e1d;border:1px solid #3a536f;border-radius:5px;color:#eef6ff;font:14px system-ui}
     .settings .wide{grid-column:1/-1}input[type=checkbox]{width:auto}.hint{font-size:13px;color:#98abc5;line-height:1.6}
-    @media(max-width:600px){body{margin:12px}.settings{grid-template-columns:1fr}.settings .wide{grid-column:auto}}
+    #status,#error,#lineup,.hint,.settings label span{overflow-wrap:anywhere}
+    @media(max-width:600px),(pointer:coarse){
+      button,input:not([type=checkbox]),select{box-sizing:border-box;min-height:44px;max-width:100%;font-size:16px}
+      .settings input,.settings select{min-height:44px;font-size:16px}
+      fieldset>label,details>p>label{display:flex;align-items:center;gap:10px;min-height:44px;line-height:1.5}
+      input[type=checkbox]{flex:0 0 20px;width:20px;height:20px;margin:0}
+      summary{box-sizing:border-box;min-height:44px;padding:10px 0;line-height:24px}
+    }
+    @media(max-width:600px){
+      body{margin:12px;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+      h1{font-size:clamp(24px,7vw,30px);overflow-wrap:anywhere}
+      fieldset{padding:12px}
+      .settings{grid-template-columns:minmax(0,1fr)}.settings .wide{grid-column:auto}
+      #export-form>label{display:flex;flex-direction:column;gap:6px;margin:12px 0;min-width:0}
+      #export-form>label input,#export-form>label select{width:100%}
+      button{display:block;width:100%;margin:8px 0;white-space:normal;overflow-wrap:anywhere}
+      .hint a,#downloads a{display:inline-block;box-sizing:border-box;max-width:100%;min-height:44px;margin:4px 0;padding:10px 12px;overflow-wrap:anywhere;vertical-align:middle}
+      #downloads a{display:block;width:100%;text-align:center}
+    }
   </style>
 </head>
 <body><main>
@@ -54,6 +73,6 @@
 </main>
 <script src="js/util.js"></script><script src="js/fighters.js?v=22"></script><script src="js/waves.js?v=13"></script>
 <script src="js/assets.js?v=26"></script><script src="js/sprites.js?v=22"></script><script src="js/engine.js?v=23"></script>
-<script src="js/ai.js?v=22"></script><script src="js/battle.js?v=13"></script><script src="js/render.js?v=25"></script>
+<script src="js/ai.js?v=22"></script><script src="js/battle.js?v=14"></script><script src="js/render.js?v=25"></script>
 <script src="js/recording-report.js?v=1"></script><script src="js/webm.js?v=13"></script><script src="js/commentary-settings.js?v=1"></script><script src="js/commentary-export.js?v=2"></script><script src="js/recorder.js?v=27"></script>
 </body></html>

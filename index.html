@@ -7,7 +7,7 @@
   <title>赛博斗蛐蛐 · 放置 ARPG</title>
   <!-- 相对路径：直接双击 file:// 打开也不白屏 -->
   <link rel="stylesheet" href="styles.css?v=13" />
-  <link rel="stylesheet" href="mobile.css?v=2" />
+  <link rel="stylesheet" href="mobile.css?v=4" />
 </head>
 
 <body>
@@ -50,11 +50,15 @@
         </div>
 
         <!-- 战报面板 -->
-        <div id="report" class="cc-panel cc-report hidden">
+        <div id="report" class="cc-panel cc-report hidden" role="region" aria-labelledby="rep-title">
           <div id="rep-title" class="cc-rep-title">左方</div>
           <div id="rep-sub" class="cc-rep-sub">第 1 场 · 对局等级 1.0 · 用时 0:00</div>
           <div id="rep-lines" class="cc-rep-lines"></div>
-          <div id="rep-foot" class="cc-rep-foot">3 秒后自动重开一场（沿用左右双方布阵）</div>
+          <div id="rep-foot" class="cc-rep-foot">战报会保留，查看完可返回布阵或再来一局。</div>
+          <div id="report-actions" class="cc-report-actions hidden">
+            <button id="btn-report-back" class="cc-btn ghost" type="button" title="返回布阵，保留当前阵容和已完成场数">返回布阵</button>
+            <button id="btn-report-rematch" class="cc-btn" type="button" title="沿用当前阵容，立即开始新的一局">再来一局</button>
+          </div>
         </div>
 
         <!-- 全局错误：红屏面板 -->
@@ -99,7 +103,7 @@
 
     <!-- ================= 底部提示 ================= -->
     <footer class="cc-foot">
-      <div id="status" class="cc-status">左 / 右任一侧都能摆阵 · 空格 或 按钮 暂停/继续 · 重新开始 · 停手 5 秒自动开打 · 空的一侧自动随机满编</div>
+      <div id="status" class="cc-status">左 / 右任一侧都能摆阵 · 布阵完成后点「开始对战」 · 空格 或 按钮 暂停/继续 · 空的一侧自动随机满编</div>
       <div id="notice" class="cc-notice hidden"></div>
     </footer>
   </div>
@@ -113,14 +117,14 @@
   <script src="js/sprites.js?v=22"></script>
   <script src="js/engine.js?v=23"></script>
   <script src="js/ai.js?v=22"></script>
-  <script src="js/battle.js?v=13"></script>
+  <script src="js/battle.js?v=14"></script>
   <script src="js/board.js?v=13"></script>
   <script src="js/render.js?v=25"></script>
-  <script src="js/ui.js?v=13"></script>
+  <script src="js/ui.js?v=15"></script>
   <script src="js/input.js?v=14"></script>
-  <script src="js/main.js?v=13"></script>
+  <script src="js/main.js?v=14"></script>
 <script src="js/access.js?v=13"></script>
-  <script src="js/mobile.js"></script>
+  <script src="js/mobile.js?v=2"></script>
 
   <!-- 启动（main.js 已定义 boot；此处容错调用） -->
   <script>

@@ -124,17 +124,21 @@
       const duration = b.stats.duration || b.time;
       // 上帝视角：只有"哪一方赢了"，没有玩家的输赢
       const winner = b.result === 'A' || b.result === 'B' ? b.result : null;      // 'A' | 'B' | null
-      const survivors = winner ? b[winner].filter((e) => e.alive && !e.isDecoy).length : 0;
+      // 战场数组会移除尸体；人数与评分始终依据原始参赛者，排除召唤物和诱饵。
+      const participants = (b.participants || b.A.concat(b.B)).filter((e) => !e.isMinion && !e.isDecoy);
+      const totalUnitsBySide = { A: participants.filter((e) => e.side === 'A').length,
+        B: participants.filter((e) => e.side === 'B').length };
+      const survivors = winner ? participants.filter((e) => e.side === winner && e.alive).length : 0;
       const loser = winner === 'A' ? 'B' : winner === 'B' ? 'A' : null;
-      const loserTotal = loser ? Math.max(1, b[loser].length) : 1;
+      const loserTotal = loser ? totalUnitsBySide[loser] : 0;
       // 战况评分：赢得越干净越高
       let grade = 'C';
       if (winner) {
-        const ratio = survivors / Math.max(1, survivors + (loser ? b[loser].length : 0));
+        const ratio = survivors / Math.max(1, survivors + loserTotal);
         const s = ratio * 2 + (duration < 30 ? 0.5 : 0) + (duration > 90 ? -0.3 : 0);
         grade = s > 1.4 ? 'S' : s > 0.95 ? 'A' : s > 0.55 ? 'B' : 'C';
       } else grade = 'B';
-      const champion = b.mode === 'brawl' && b.participants.find((e) => e.id === b.winnerId);
+      const champion = b.mode === 'brawl' && participants.find((e) => e.id === b.winnerId);
       return {
         mode: b.mode, winnerId: b.winnerId || null,
         champion: champion ? champion.unit.name + ' #' + champion.id : null,
@@ -148,7 +152,8 @@
         maxCombo: b.stats.maxCombo, casts: b.stats.casts.slice(0, 40),
         picked: Object.assign({}, b.stats.picked),
         mvp, mvpDmg: best > 0 ? best : 0, grade,
-        survivors: champion ? 1 : survivors, totalUnits: Math.max(b.A.length, b.B.length, loserTotal) || 1,
+        survivors: champion ? 1 : survivors, totalUnitsBySide,
+        totalUnits: Math.max(totalUnitsBySide.A, totalUnitsBySide.B) || 1,
         hash: match.hash(),
       };
     };

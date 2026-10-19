@@ -1,121 +1,161 @@
-/* ===========================================================
-   赛博斗蛐蛐 · 手机端适配（在 styles.css 之后加载，只做响应式覆盖）
-   -----------------------------------------------------------
-   · 触摸设备：禁止拖动时页面滚动/缩放，扩大点按目标
-   · ≤900px（手机竖屏 / 窄窗口）：画布铺满宽度、单位池移到画布下方横向滚动
-   · 横屏矮屏：单位池变成右侧窄栏
-   =========================================================== */
-
-/* ---------- 触摸设备通用 ---------- */
+/* 手机布局由本样式表统一控制；画布、完整战报和单位池按顺序排列。 */
 @media (pointer: coarse), (hover: none) {
-  html, body { overscroll-behavior: none; }
-  .cc-app { -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
-  #stage { touch-action: none; }                       /* 画布上拖拽不触发页面滚动 */
+  .cc-app { -webkit-tap-highlight-color: transparent; }
+  #stage { touch-action: none; }
+  .cc-card { -webkit-user-select: none; user-select: none; }
   .cc-btn, .cc-side, .cc-step, button, a { touch-action: manipulation; }
-  .cc-bench-list { touch-action: pan-x; -webkit-overflow-scrolling: touch; }
 }
 
-/* ---------- 手机竖屏 / 窄窗口 ---------- */
-@media (max-width: 900px) {
-  body { align-items: stretch !important; }
+/* 矮横屏也采用上下布局，保留完整画布宽度和可滚动的结算信息。 */
+@media (max-width: 900px), (max-width: 1000px) and (max-height: 520px) and (orientation: landscape) {
+  html, body { height: auto; min-height: 100%; }
+  body { overflow-wrap: anywhere; }
   .cc-app {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 6px 6px 10px !important;
-    gap: 8px !important;
-    flex-direction: column !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 12px max(8px, env(safe-area-inset-left));
+    gap: 10px;
   }
 
-  /* 顶部状态条：允许换行、吸顶、字号收小 */
   .cc-hud {
-    position: sticky !important;
-    top: 0;
-    z-index: 30;
-    flex-wrap: wrap !important;
-    gap: 4px !important;
-    font-size: 12px !important;
-    padding: 6px 8px !important;
-    backdrop-filter: blur(6px);
+    position: static;
+    min-width: 0;
+    padding: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
   }
-  .cc-hud .cc-title { font-size: 14px !important; }
-  .cc-hud .cc-stat { font-size: 11px !important; padding: 1px 6px !important; }
-  .cc-hud .cc-btn { min-height: 34px !important; padding: 6px 12px !important; font-size: 12px !important; }
-
-  /* 画布：等比铺满宽度 */
-  .cc-stage { flex-direction: column !important; width: 100% !important; gap: 8px !important; }
-  .cc-stage-canvas { width: 100% !important; }
-  #stage {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 960 / 600;
-    border-radius: 10px;
+  .hud-left, .hud-mid, .hud-right {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
   }
+  .hud-left { gap: 6px; }
+  .cc-logo { font-size: 17px; letter-spacing: 1px; }
+  .cc-sub { font-size: 10px; letter-spacing: 1px; }
+  .hud-mid { flex: 1 1 100%; width: 100%; gap: 6px; }
+  .cc-stat { max-width: 100%; flex-wrap: wrap; padding: 4px 7px; font-size: 12px; gap: 4px; }
+  .cc-stat b { font-size: 10px; }
+  .hud-right { width: 100%; gap: 8px; align-items: center; }
+  .hud-right > .cc-btn { flex: 1 1 calc(50% - 4px); min-width: 0; }
+  .cc-app button, .cc-app .cc-btn, .cc-app .cc-side {
+    min-height: 44px;
+    max-width: 100%;
+    padding: 8px 10px;
+    font-size: 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #cc-audio-controls { width: 100%; min-width: 0; justify-content: space-between; }
+  #cc-audio-controls label { min-height: 44px; min-width: 0; max-width: 100%; }
+  #cc-audio-controls input[type="range"] { min-height: 44px !important; }
 
-  /* 单位池：移到画布下方，卡片横向滚动 */
+  .cc-stage { flex-direction: column; flex-wrap: nowrap; width: 100%; min-width: 0; gap: 10px; }
+  .cc-stage-canvas {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: auto;
+    overflow: visible;
+    transform: none;
+  }
+  #stage { width: 100%; height: auto; max-height: none; aspect-ratio: 960 / 600; border-radius: 11px; }
+
+  /* 报告在画布下方占据实际高度，不再作为被画布裁切的绝对定位浮层。 */
+  .cc-stage-canvas .cc-report, .cc-stage-canvas .cc-error {
+    position: static;
+    inset: auto;
+    width: auto;
+    max-width: 100%;
+    max-height: none;
+    overflow: visible;
+    margin: 10px 0 0;
+    padding: 12px;
+    touch-action: pan-y pinch-zoom;
+    overflow-wrap: anywhere;
+  }
+  .cc-rep-title { display: block; max-width: 100%; font-size: 18px; letter-spacing: 1px; }
+  .cc-rep-sub { display: block; margin: 6px 0 0; font-size: 12px; line-height: 1.6; }
+  .cc-rep-lines { gap: 6px; margin-top: 10px; min-width: 0; }
+  .cc-rep-row {
+    display: grid;
+    grid-template-columns: minmax(60px, max-content) minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+    padding-bottom: 6px;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .cc-rep-row .k { max-width: 84px; white-space: normal; }
+  .cc-rep-row .v { min-width: 0; white-space: normal; overflow-wrap: anywhere; text-align: left; }
+  .cc-rep-foot { margin-top: 10px; text-align: left; font-size: 12px; line-height: 1.6; }
+  .cc-report-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .cc-report-actions .cc-btn { flex: 1 1 120px; min-width: 0; }
+  .cc-mask-box { max-width: calc(100% - 16px); flex-wrap: wrap; justify-content: center; gap: 4px 10px; }
+  .cc-err-stack { max-width: 100%; }
+  .cc-err-line { overflow-wrap: anywhere; }
+
   .cc-bench {
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: none !important;
-    padding: 8px !important;
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    max-height: none;
+    padding: 6px;
   }
-  .cc-bench-title { font-size: 12px !important; }
-  .cc-bench-tools { flex-wrap: wrap !important; gap: 6px !important; }
+  /* 摆阵时先看到紧邻画布的角色，再看人数和导出设置。 */
+  .cc-bench > * { order: 2; }
+  .cc-bench-title { order: 0; padding: 6px 8px; font-size: 12px; }
+  .cc-bench-head { min-width: 0; flex-wrap: wrap; gap: 4px 8px; }
+  .cc-bench-side { font-size: 10px; }
+  .cc-bench-hint { display: none; }
+  .cc-bench-tools { padding: 8px; gap: 8px; min-width: 0; }
+  .cc-size { flex: 1 1 170px; min-width: 0; max-width: 100%; flex-wrap: wrap; }
+  .cc-app .cc-step { width: 44px; height: 44px; min-width: 44px; padding: 0; font-size: 18px; }
   .cc-bench-list {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)) !important;
-    gap: 6px !important;
-    max-height: 50vh;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 4px !important;
+    order: 1;
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: clamp(88px, 25vw, 112px);
+    gap: 6px;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px;
+    touch-action: pan-x pinch-zoom;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
   }
-  .cc-bench-hint { display: none !important; }
-  .cc-card { min-height: 96px; }
-  .cc-bench { padding: 6px !important; }
+  .cc-card { min-width: 0; min-height: 96px; }
+  .cc-name { overflow-wrap: anywhere; }
+  .cc-meta { white-space: normal; overflow-wrap: anywhere; }
+  .cc-bench > label { display: flex; align-items: center; gap: 6px; min-height: 44px; line-height: 1.6; }
+  #export-controls { max-width: 100%; overflow-wrap: anywhere; }
+  #export-controls label { display: inline-block; max-width: 100%; margin-bottom: 6px; }
+  #export-controls input { min-height: 44px; max-width: 100%; }
+  .cc-foot { min-width: 0; }
+  .cc-status { display: none; }
+  .cc-notice { overflow-wrap: anywhere; }
 
-  /* 面板与按钮：手指好点 */
-  .cc-report, .cc-panel, .cc-mask { max-height: 62vh; overflow: auto; }
-  .cc-rep-lines { font-size: 13px !important; line-height: 1.8 !important; }
-  button, .cc-btn { min-height: 40px; }
-
-  /* 桌面操作提示在手机上是噪音 */
-  .cc-foot, .cc-status { display: none !important; }
-
-  /* 底部给权限徽章留出空间，别压住卡片 */
-  .cc-app { padding-bottom: 34px !important; }
+  /* 权限标记留在页面末尾，避免固定底栏遮住战报、按钮和安全区。 */
   #cc-access-badge {
-    position: fixed !important;
-    left: 0; right: 0; bottom: 0;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 6px 8px;
-    font-size: 10.5px !important;
-    background: rgba(10, 14, 22, .92);
+    position: static !important;
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 6px max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
     border-top: 1px solid #23304a;
-    opacity: 1;
+    background: rgba(10, 14, 22, 0.94);
+    text-align: center;
+    font-size: 11px !important;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    opacity: 1 !important;
   }
-  #cc-access-badge a { color: #7fe3ff; text-decoration: none; padding: 2px 6px; border: 1px solid #33507a; border-radius: 6px; }
+  #cc-access-badge a { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; padding: 0 8px; }
 }
-
-/* ---------- 手机横屏（矮屏）：单位池改成右侧窄栏 ---------- */
-@media (max-width: 1000px) and (max-height: 520px) and (orientation: landscape) {
-  .cc-app { flex-direction: column !important; }
-  .cc-stage { flex-direction: row !important; align-items: stretch !important; }
-  .cc-stage-canvas { flex: 1 1 auto !important; width: auto !important; }
-  #stage { width: 100% !important; height: auto !important; max-height: 78vh; aspect-ratio: 960 / 600; }
-  .cc-bench { flex: 0 0 210px !important; width: 210px !important; }
-  .cc-bench-list {
-    display: flex !important; flex-wrap: wrap !important; overflow-y: auto !important;
-    max-height: 52vh; gap: 6px !important;
-  }
-  .cc-bench-list > * { width: 62px !important; }
-  .cc-hud { position: static !important; }
-}
-
-/* ---------- 小提示：横屏体验更好 ---------- */
-#cc-rotate-tip {
-  position: fixed; left: 50%; bottom: 46px; transform: translateX(-50%);
-  background: rgba(16, 21, 32, .94); border: 1px solid #35507a; color: #cfe3ff;
-  padding: 8px 14px; border-radius: 10px; font-size: 12.5px; z-index: 60;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, .45);
-}
-#cc-rotate-tip.hidden { display: none; }

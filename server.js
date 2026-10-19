@@ -189,7 +189,7 @@ function roundInfo() {
 if (roundState.enabled) { startRound(1); setInterval(() => { if (Date.now() >= roundState.nextAt) startRound(roundState.round + 1); }, 500); }
 
 // ---------------- 静态文件 ----------------
-const PUBLIC_ROOT_FILES = new Set(['index.html', 'admin.html', 'account.html', 'sim-watch.html', 'replay-export.html', 'styles.css', 'favicon.ico']);
+const PUBLIC_ROOT_FILES = new Set(['index.html', 'admin.html', 'account.html', 'sim-watch.html', 'replay-export.html', 'styles.css', 'mobile.css', 'favicon.ico']);
 const PUBLIC_DIRS = ['js/', 'assets/'];
 
 function isPublic(rel) {

@@ -197,11 +197,15 @@
     const rep = report || {};
     const rows = [];
     const total = Math.max(1, Math.round(Number(rep.totalUnits) || 6));
+    const sideTotal = (side) => {
+      const value = rep.totalUnitsBySide && rep.totalUnitsBySide[side];
+      return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? Math.round(value) : total;
+    };
     const surv = Math.max(0, Math.round(Number(rep.survivors) || 0));
     const leftAlive = rep.winner === 'A' ? surv : 0;
     const rightAlive = rep.winner === 'B' ? surv : 0;
     if (rep.mode === 'brawl') rows.push(['乱斗结果', rep.champion || '同归于尽']);
-    else rows.push(['存活', '左 ' + leftAlive + ' / ' + total + '　右 ' + rightAlive + ' / ' + total]);
+    else rows.push(['存活', '左 ' + leftAlive + ' / ' + sideTotal('A') + '　右 ' + rightAlive + ' / ' + sideTotal('B')]);
 
     const dmg = rep.dmgByUnit || {};
     const ids = Object.keys(dmg).sort((a, b) => (Number(dmg[b]) || 0) - (Number(dmg[a]) || 0));
@@ -272,15 +276,44 @@
         append(lines, row);
       });
     }
-    const manualStart = CC.main && !CC.main.state.autoStart && (!CC.access || CC.access.caps.place);
-    setText(els.repFoot, manualStart ? '3 秒后回到布阵，点击开始对战继续' : '3 秒后自动重开一场（沿用左右双方布阵）');
+    syncReportActions();
     show(panel, true);
+    scrollReportHeading();
     return state.report;
+  }
+
+  function syncReportActions() {
+    const M = CC.main;
+    const canControl = !CC.access || !!(CC.access.caps && CC.access.caps.place);
+    const automatic = M && typeof M.reportAutoAdvances === 'function' ? M.reportAutoAdvances()
+      : !!(M && M.state && M.state.autoStart) || !canControl;
+    setText(els.repFoot, automatic ? '3 秒后自动重开一场（沿用当前布阵）'
+      : '战报会保留，查看完可返回布阵或再来一局。');
+    show(els.reportActions, canControl && !!state.report);
+    if (els.reportBack) els.reportBack.disabled = !canControl || !state.report;
+    if (els.reportRematch) els.reportRematch.disabled = !canControl || !state.report;
+    return { automatic, canControl };
+  }
+
+  function scrollReportHeading() {
+    const M = CC.main, s = M && M.state;
+    if (!s || s.autoStart || (CC.access && !(CC.access.caps && CC.access.caps.place))
+        || s.shot || s.fastForward || (s.query && s.query.shot)) return;
+    const width = Number(globalThis.innerWidth), height = Number(globalThis.innerHeight);
+    if (!(width > 0 && height > 0 && (width <= 900 || (width <= 1000 && height <= 520 && width > height)))) return;
+    const heading = els.repTitle || els.report;
+    if (!heading || typeof heading.scrollIntoView !== 'function') return;
+    try {
+      const rect = typeof heading.getBoundingClientRect === 'function' ? heading.getBoundingClientRect() : null;
+      if (rect && rect.top >= 0 && rect.bottom <= height) return;
+      heading.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
+    } catch (e) { /* older browsers may not support the options object */ }
   }
 
   function hideReport() {
     show(els.report, false);
     state.report = null;
+    syncReportActions();
   }
 
   // ---------- 状态栏 ----------
@@ -427,6 +460,9 @@
     els.repSub = byId('rep-sub');
     els.repLines = byId('rep-lines');
     els.repFoot = byId('rep-foot');
+    els.reportActions = byId('report-actions');
+    els.reportBack = byId('btn-report-back');
+    els.reportRematch = byId('btn-report-rematch');
     els.errorPanel = byId('errorPanel');
     els.errMsg = byId('err-msg');
     els.errStack = byId('err-stack');
@@ -440,6 +476,14 @@
     on(els.btnRestart, 'click', (ev) => {
       if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
       if (typeof handlers.onRestart === 'function') handlers.onRestart();
+    });
+    on(els.reportBack, 'click', (ev) => {
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+      if (typeof handlers.onReportBack === 'function') handlers.onReportBack();
+    });
+    on(els.reportRematch, 'click', (ev) => {
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+      if (typeof handlers.onReportRematch === 'function') handlers.onReportRematch();
     });
     on(els.btnMode, 'click', () => {
       if (typeof handlers.onMode === 'function') handlers.onMode();
@@ -494,7 +538,7 @@
   }
 
   CC.ui = {
-    init, renderBench, showReport, hideReport,
+    init, renderBench, showReport, hideReport, syncReportActions,
     setPhase, setStatus, setPaused, setStats, setSide, setSideSize, notice,
     showError, hideError,
     els, state, cardIdFromEvent, SIDE_LABEL,

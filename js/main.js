@@ -1,6 +1,6 @@
 /* ===========================================================
    赛博斗蛐蛐 · 主装配与主循环（main）—— 上帝视角观赛/摆阵
-   阶段状态机：摆阵(placing) → 对战(fighting) → 战报(report) → 自动重开一场
+   阶段状态机：摆阵(placing) → 对战(fighting) → 战报(report) → 手动继续 / 自动连场
    玩家可做的：给左右任一侧摆阵（含人数 1~6）、暂停/继续（空格或按钮）、重新开始
    —— 无倍速、无跳过、无应援、无装备/掉落/成长
    截图钩子（仅 ?shot= 时生效）：?shot=placing|fighting|paused|report&seed=123&speed=4
@@ -15,7 +15,7 @@
 
   const CONFIG = {
     countdownSeconds: 5,     // 停手自动开打
-    reportSeconds: 3,        // 战报停留
+    reportSeconds: 3,        // 自动模式 / 游客的战报停留，手动玩家可一直阅读
     maxFrameDt: 0.05,
     debugSpeedMax: 16,
     placeShotCount: 3,       // ?shot=placing 时每侧预置的单位数（便于截图看清布阵）
@@ -556,14 +556,49 @@
     return state.phase;
   }
 
-  // 战报 3 秒后：自动重开一场（沿用左右双方布阵）
+  function canControlReport() {
+    return !CC.access || !!(CC.access.caps && CC.access.caps.place);
+  }
+
+  function reportAutoAdvances() {
+    return state.autoStart || !canControlReport();
+  }
+
+  // 自动模式 / 游客 3 秒后连场；手动玩家通过战报按钮继续。
   function advanceFromReport() {
+    if (state.phase !== 'report') return false;
     safe(() => ui().hideReport(), 'hideReport');
     state.report = null;
     state.winner = null;
     state.match = null;
-    if (!state.autoStart && (!CC.access || CC.access.caps.place)) toPlacing();
+    if (!reportAutoAdvances()) toPlacing();
     else startFight();
+    return true;
+  }
+
+  function handleReportBack() {
+    if (state.phase !== 'report' || !canControlReport()) return false;
+    setPaused(false);
+    toPlacing(); render();
+    return true;
+  }
+
+  function handleReportRematch() {
+    if (state.phase !== 'report' || !canControlReport()) return false;
+    setPaused(false);
+    startFight(); render();
+    return true;
+  }
+
+  function handleAutoStart(enabled) {
+    state.autoStart = !!enabled;
+    const B = board();
+    if (B) B.setAutoStart(CONFIG.countdownSeconds);
+    if (state.phase === 'report') {
+      state.reportTimer = CONFIG.reportSeconds;
+      if (ui() && ui().syncReportActions) safe(() => ui().syncReportActions(), 'reportActions');
+    }
+    state.hudSig = ''; updateHud();
   }
 
   // ---------- 帧推进 ----------
@@ -586,6 +621,7 @@
       return;
     }
     if (state.phase === 'report') {
+      if (!reportAutoAdvances()) return;
       state.reportTimer -= dt;
       if (state.reportTimer <= 0) advanceFromReport();
     }
@@ -1046,11 +1082,13 @@
       onMove: handleMove,
       onStart: handleStart,
       onExport: handleExport,
-      onAutoStart: function (enabled) { state.autoStart = !!enabled; board().setAutoStart(CONFIG.countdownSeconds); state.hudSig = ''; updateHud(); },
+      onAutoStart: handleAutoStart,
       onMode: function () { handleMode(state.gameMode === 'brawl' ? 'team' : 'brawl'); },
       onRemove: handleRemove,
       onPause: togglePause,
       onRestart: restart,
+      onReportBack: handleReportBack,
+      onReportRematch: handleReportRematch,
       onSide: handleSide,
       onSize: handleSize,
       onPickBench: function (id) { if (CC.input && CC.input.selectBench) CC.input.selectBench(id); },
@@ -1142,7 +1180,8 @@
     boot, tick, step,
     startLoop, stopLoop,
     setPaused, togglePause, restart,
-    startFight, toPlacing, enterReport, advanceFromReport, fillEmptySides,
+    startFight, toPlacing, enterReport, advanceFromReport, reportAutoAdvances, fillEmptySides,
+    handleReportBack, handleReportRematch, handleAutoStart,
     handlePlace, handleMove, handleStart, handleExport, handleMode, handleRemove, handleSide, handleSize,
     canPlace, saveNow, loadSave, save: () => saveNow(),
     applyShot, defineDebug, fail,

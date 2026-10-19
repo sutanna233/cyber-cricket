@@ -1,0 +1,389 @@
+{
+  "date": "2026-10-20",
+  "checks": {
+    "mobileBehavior": 11,
+    "reportReading": 15,
+    "reportParticipants": 11,
+    "recordingReport": 9,
+    "total": 46
+  },
+  "reportReading": [
+    "manual reports remain visible after a full minute and retain report rows and match",
+    "return-to-placement button preserves formation and completed round count",
+    "rematch button starts a new seed immediately with the same formation",
+    "report action handlers ignore repeated clicks and calls outside the report phase",
+    "automatic players retain the three-second report cycle",
+    "visitors still advance automatically and cannot use report actions",
+    "auto-start changes during a report update controls and reset the three-second timer",
+    "pause freezes automatic report time and normal cycling resumes afterwards",
+    "manual report actions clear pause so the next screen is immediately usable",
+    "manual mobile report scrolls its offscreen heading once but never while reading",
+    "report scrolling skips spectators automatic play desktop shots and fast-forward",
+    "already visible headings are not scrolled and short landscape mobile is supported",
+    "unavailable placement capability defaults to spectator-safe report controls",
+    "missing optional UI nodes and unsupported scroll APIs do not interrupt a report",
+    "index provides accessible explicit report actions and cache-busted changed modules"
+  ],
+  "reportParticipants": [
+    "6v6 report retains original denominators after only three winners remain",
+    "opposite winner uses the same original 6v6 counts",
+    "6v1 display uses separate side totals while preserving compatible maximum total",
+    "1v6 winner on the smaller side keeps the original larger-side denominator",
+    "alive minions and decoys never count as original participants or survivors",
+    "corpse cleanup cannot change report totals survivors or grade",
+    "reading a report cannot modify combat state RNG or hash",
+    "legacy reports without per-side totals retain the old compatible rendering",
+    "draw reports preserve both original totals and brawl keeps its champion row",
+    "real 6v6 and 6v1 completed matches report original counts with unchanged hashes",
+    "main page refreshes battle module cache version"
+  ],
+  "browser": {
+    "date": "2026-10-20",
+    "cases": [
+      {
+        "buttons": [
+          {
+            "height": 44,
+            "label": "返回布阵",
+            "width": 162
+          },
+          {
+            "height": 44,
+            "label": "再来一局",
+            "width": 162
+          }
+        ],
+        "canvas": {
+          "height": 223.5,
+          "width": 357.6000061035156
+        },
+        "clientWidth": 375,
+        "hasError": false,
+        "report": {
+          "clientHeight": 412,
+          "height": 413.6000061035156,
+          "position": "static",
+          "scrollHeight": 412,
+          "width": 357.6000061035156
+        },
+        "scrollWidth": 375,
+        "stage": {
+          "height": 648.7000122070312,
+          "overflow": "visible",
+          "width": 359.20001220703125
+        },
+        "viewport": {
+          "height": 844,
+          "width": 390
+        }
+      },
+      {
+        "buttons": [
+          {
+            "height": 44,
+            "label": "返回布阵",
+            "width": 126.8000030517578
+          },
+          {
+            "height": 44,
+            "label": "再来一局",
+            "width": 126.8000030517578
+          }
+        ],
+        "canvas": {
+          "height": 179.5,
+          "width": 287.20001220703125
+        },
+        "clientWidth": 305,
+        "hasError": false,
+        "report": {
+          "clientHeight": 432,
+          "height": 433.3999938964844,
+          "position": "static",
+          "scrollHeight": 432,
+          "width": 287.20001220703125
+        },
+        "scrollWidth": 305,
+        "stage": {
+          "height": 624.5,
+          "overflow": "visible",
+          "width": 288.8000183105469
+        },
+        "viewport": {
+          "height": 740,
+          "width": 320
+        }
+      },
+      {
+        "buttons": [
+          {
+            "height": 44,
+            "label": "返回布阵",
+            "width": 388.8000183105469
+          },
+          {
+            "height": 44,
+            "label": "再来一局",
+            "width": 388.8000183105469
+          }
+        ],
+        "canvas": {
+          "height": 507,
+          "width": 811.2000122070312
+        },
+        "clientWidth": 829,
+        "hasError": false,
+        "report": {
+          "clientHeight": 392,
+          "height": 393.8000183105469,
+          "position": "static",
+          "scrollHeight": 392,
+          "width": 811.2000122070312
+        },
+        "scrollWidth": 829,
+        "stage": {
+          "height": 912.4000244140624,
+          "overflow": "visible",
+          "width": 812.7999877929688
+        },
+        "viewport": {
+          "height": 390,
+          "width": 844
+        }
+      },
+      {
+        "buttons": [
+          {
+            "height": 32.79999923706055,
+            "label": "返回布阵",
+            "width": 88.80000305175781
+          },
+          {
+            "height": 32.79999923706055,
+            "label": "再来一局",
+            "width": 88.80000305175781
+          }
+        ],
+        "canvas": {
+          "height": 580.25,
+          "width": 928.4000244140624
+        },
+        "clientWidth": 1280,
+        "hasError": false,
+        "report": {
+          "clientHeight": 184,
+          "height": 186,
+          "position": "absolute",
+          "scrollHeight": 215,
+          "width": 724.1500244140625
+        },
+        "scrollWidth": 1280,
+        "stage": {
+          "height": 581.25,
+          "overflow": "hidden",
+          "width": 930
+        },
+        "viewport": {
+          "height": 800,
+          "width": 1280
+        }
+      }
+    ],
+    "exportPage": {
+      "canvas": {
+        "displayHeight": 176.10000610351562,
+        "displayWidth": 280.8000183105469,
+        "height": 600,
+        "width": 960
+      },
+      "clientWidth": 305,
+      "columns": "255.2px",
+      "controls": [
+        {
+          "height": 44,
+          "id": "seed",
+          "width": 280.8000183105469
+        },
+        {
+          "height": 44,
+          "id": "record-format",
+          "width": 280.8000183105469
+        },
+        {
+          "height": 44,
+          "id": "commentary-preset",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "commentary-model",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "commentary-base",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "commentary-key",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "speech-model",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "speech-speed",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "speech-base",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "speech-voice",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "speech-key",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "commentary-save",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "commentary-clear",
+          "width": 255.1999969482422
+        },
+        {
+          "height": 44,
+          "id": "record",
+          "width": 280.8000183105469
+        },
+        {
+          "height": 44,
+          "id": "cancel",
+          "width": 280.8000183105469
+        }
+      ],
+      "scrollWidth": 305,
+      "width": 320
+    },
+    "mobileCssHttpStatus": 200,
+    "actualHandsetTested": false
+  },
+  "limits": "使用真实桌面浏览器视口模拟，未实测手机Safari或触摸硬件；未重新导出音视频，无付费模型调用。",
+  "sourceSha256": {
+    "server.js": "87c26c73bdb7b60715a0f065c5ac4c290a64683f3031d96ac8c95567aab66a22",
+    "mobile.css": "0f73bdbecd7a7805ca3561541b9649537619f69baa6ee0795e259effb23e2565",
+    "js/mobile.js": "d8c89d6d3865ca4a8299c1efb1750dde9d0659d8ac64f6c4c9475b0ee6636b99",
+    "js/main.js": "16abce02be861e9bb793528bdd7d928bccb734c35bd7f4d0866bbb16d44b3640",
+    "js/ui.js": "f8e747d6de6ad5eb85c522c93426e0f0b8ac705727a8771df3154d75f91dd4e5",
+    "js/battle.js": "640db9d233a11a2f6888c13b6d7951d6c81eef1b7fadc8ee171af44362f5e8eb",
+    "index.html": "54a349dcc2eb99d49e22603246c9289a97d2863b8c07de4133ebd0f2c030b9d7",
+    "replay-export.html": "bfd6ffe602342c54cd8c28283908dcccd1b74a3cefa1113b9750cf08dd0096c7",
+    "sim-watch.html": "b1d7377e9c650672f4b53e788b2eb5aec5e8e180ab94b85dae4fdb6bab8923e2"
+  },
+  "placement": {
+    "cases": [
+      {
+        "benchTop": 525.5,
+        "canvas": {
+          "bottom": 514.7000122070312,
+          "height": 223.5,
+          "top": 291.20001220703125,
+          "width": 357.6000061035156
+        },
+        "canvasToCard": 49.20001220703125,
+        "clientWidth": 375,
+        "firstCard": {
+          "height": 153.1999969482422,
+          "top": 563.9000244140625,
+          "width": 97.5999984741211
+        },
+        "height": 844,
+        "list": {
+          "clientWidth": 346,
+          "left": 14.800000190734863,
+          "scrollLeft": 0,
+          "scrollWidth": 520,
+          "top": 561.9000244140625,
+          "width": 345.6000061035156
+        },
+        "overflowX": "auto",
+        "scrollWidth": 375,
+        "settingsTop": 738.2999877929688,
+        "width": 390
+      },
+      {
+        "benchTop": 481.5,
+        "canvas": {
+          "bottom": 470.7000122070313,
+          "height": 179.5,
+          "top": 291.20001220703125,
+          "width": 287.20001220703125
+        },
+        "canvasToCard": 51.20001220703125,
+        "clientWidth": 305,
+        "firstCard": {
+          "height": 143.60000610351562,
+          "top": 521.9000244140625,
+          "width": 88
+        },
+        "height": 740,
+        "list": {
+          "clientWidth": 275,
+          "left": 14.800000190734863,
+          "scrollLeft": 174.39999389648438,
+          "scrollWidth": 472,
+          "top": 517.9000244140625,
+          "width": 275.20001220703125
+        },
+        "overflowX": "auto",
+        "scrollWidth": 305,
+        "settingsTop": 684.7000122070312,
+        "width": 320
+      },
+      {
+        "benchTop": 779,
+        "canvas": {
+          "bottom": 768.2000122070312,
+          "height": 507,
+          "top": 261.20001220703125,
+          "width": 811.2000122070312
+        },
+        "canvasToCard": 51.20001220703125,
+        "clientWidth": 829,
+        "firstCard": {
+          "height": 152.40000915527344,
+          "top": 819.4000244140625,
+          "width": 112
+        },
+        "height": 390,
+        "list": {
+          "clientWidth": 799,
+          "left": 14.800000190734863,
+          "scrollLeft": 0,
+          "scrollWidth": 799,
+          "top": 815.4000244140625,
+          "width": 799.2000122070312
+        },
+        "overflowX": "auto",
+        "scrollWidth": 829,
+        "settingsTop": 975.7999877929688,
+        "width": 844
+      }
+    ],
+    "horizontalScrollVerified": true,
+    "pageOverflowObserved": false
+  }
+}

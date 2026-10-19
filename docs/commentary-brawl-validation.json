@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-20",
+  "scope": "乱斗称谓与角色、技能、淘汰及冠军事实绑定",
+  "checks": {
+    "facts": 17,
+    "model": 26,
+    "brawlAndIdentity": 40,
+    "service": 24,
+    "total": 107
+  },
+  "brawlAndIdentity": {
+    "passed": 40,
+    "failed": 0,
+    "checks": [
+      "real twelve-player seed has duplicate fighter identities and exact champion",
+      "brawl facts omit sides, original teams, slots and A/B aggregate keys recursively",
+      "brawl situation states identify surviving individuals instead of two sides",
+      "team facts retain sides, teams and A/B situation totals",
+      "every real fact carries a short verified statement with exact actor target and champion identities",
+      "brawl prompt says every fighter acts independently and duplicate IDs identify players",
+      "first accidental team phrase is corrected by exactly one automatic retry",
+      "persistent mode mistakes fail after two calls without a third request",
+      "brawl guard rejects A队 even after retry",
+      "brawl guard rejects B 方 even after retry",
+      "brawl guard rejects 全角 A 与全角空格 even after retry",
+      "brawl guard rejects 全角 B 与细空格 even after retry",
+      "brawl guard rejects 小写 A 阵营 even after retry",
+      "brawl guard rejects B阵营 even after retry",
+      "brawl guard rejects 左方 even after retry",
+      "brawl guard rejects 右方 even after retry",
+      "brawl guard rejects 左侧阵营 even after retry",
+      "brawl guard rejects 右侧阵营 even after retry",
+      "brawl guard rejects 队友 even after retry",
+      "brawl guard rejects 友军 even after retry",
+      "brawl guard rejects 己方 even after retry",
+      "brawl guard rejects 敌方 even after retry",
+      "team A/B squads and ally terms remain legal without a retry",
+      "Are you OK, two contestants and both participants do not trigger team guards",
+      "cancellation during correction aborts second HTTP call without leaking credentials",
+      "provider error on correction remains sanitized and never retries again",
+      "malformed provider JSON is not retried as a mode mistake",
+      "grounded output replaces event token with exact SU7 actor KO identities and champion",
+      "first identity mismatch is repaired by one retry using the verified statement",
+      "identity guard rejects penguin falsely driving SU7 after at most two calls",
+      "identity guard rejects wrong champion named outside the event after at most two calls",
+      "identity guard rejects KO actor and victim reversed outside the event after at most two calls",
+      "identity guard rejects duplicate numeric identity outside event after at most two calls",
+      "identity guard rejects hash-prefixed instance ID outside event after at most two calls",
+      "identity guard rejects full-width hash-prefixed instance ID outside event after at most two calls",
+      "identity guard rejects missing verified event token after at most two calls",
+      "identity guard rejects duplicated verified event token after at most two calls",
+      "identity guard rejects skill name outside event after at most two calls",
+      "mode and identity violations share one correction budget in either order",
+      "real service rejects persistent brawl mode errors before any TTS request or audio file"
+    ],
+    "failures": [],
+    "realProviderCalled": false,
+    "fakeLoopbackProviderOnly": true,
+    "serviceIntegration": true,
+    "speechCalls": 0,
+    "brawl": {
+      "seed": 20261020,
+      "originalPlayers": 12,
+      "durationTicks": 2941,
+      "finalHash": "22214c79",
+      "winnerId": 7
+    },
+    "team": {
+      "seed": 233,
+      "originalPlayers": 4,
+      "durationTicks": 1463,
+      "finalHash": "0feed91b"
+    }
+  },
+  "deterministicMatches": [
+    {
+      "seed": 233,
+      "mode": "solo",
+      "ticks": 2166,
+      "facts": 15,
+      "raw": 15,
+      "hash": "dee39f8a",
+      "result": "A"
+    },
+    {
+      "seed": 9,
+      "mode": "solo",
+      "ticks": 2583,
+      "facts": 18,
+      "raw": 18,
+      "hash": "a79cbbd4",
+      "result": "A"
+    },
+    {
+      "seed": 233,
+      "mode": "team",
+      "ticks": 1681,
+      "facts": 37,
+      "raw": 37,
+      "hash": "e466e420",
+      "result": "B"
+    },
+    {
+      "seed": 32,
+      "mode": "brawl",
+      "ticks": 2621,
+      "facts": 31,
+      "raw": 31,
+      "hash": "5c09c2dc",
+      "result": "brawl"
+    },
+    {
+      "seed": 32002,
+      "mode": "team",
+      "ticks": 3952,
+      "facts": 43,
+      "raw": 43,
+      "hash": "da2950bd",
+      "result": "A"
+    },
+    {
+      "seed": 20261020,
+      "mode": "brawl",
+      "ticks": 2941,
+      "facts": 70,
+      "raw": 70,
+      "hash": "22214c79",
+      "result": "brawl"
+    }
+  ],
+  "integration": {
+    "modelRequests": 6,
+    "speechRequests": 27,
+    "finalHash": "4251a2d8",
+    "scheduledSegments": 5
+  },
+  "paidProviderRequests": 0,
+  "limits": "使用本机HTTP替身验证模型和配音协议；未调用付费云API，未重新实录视频。角色关系由服务器核实短事实固定，自由点评仍由模型生成。",
+  "sourceSha256": {
+    "lib/commentary-facts.js": "ebd0bffa87525a344f09de81d1c1ad37599788a08f7f2fd6d64f6423e0de7655",
+    "lib/commentary-model.js": "8fcec04aaa19b6bcad3e0216492b44746304756518cff9296eadf318c896f8b2"
+  }
+}
