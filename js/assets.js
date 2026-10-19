@@ -430,12 +430,13 @@
   }
 
   // ---------------------------------------------------------------- 音频
-  const VOL = { master: 0.9, sfx: 1, music: 0.7 };
+  const VOL = { master: 0.3, sfx: 0.55, music: 0.3 };
   const AUD = {
     ctx: null, masterGain: null, sfxGain: null, musicGain: null,
     samples: {}, missing: {}, decoded: 0, failed: 0, enabled: false,
     noiseBuf: null, musicState: null, musicTimer: null, synthCount: 0, fileCount: 0,
     paused: false,
+    activeSounds: [], lastSound: {},
   };
 
   // 合成配方：{ 波形, 起始/结束频率, 时长, 音量, 噪声比, 扫频曲线 }
@@ -589,7 +590,8 @@
       src.buffer = buf;
       if (o.rate) src.playbackRate.value = o.rate;
       const g = ctx.createGain();
-      const vol = (o.vol === undefined ? 1 : o.vol) * VOL.sfx;
+      // sfxGain 已经应用音效总线音量，采样与合成音保持同一层增益。
+      const vol = o.vol === undefined ? 1 : o.vol;
       g.gain.value = vol;
       src.connect(g); g.connect(AUD.sfxGain || AUD.masterGain || ctx.destination);
       src.start(0);
@@ -753,12 +755,30 @@
   }
 
   // ---------------------------------------------------------------- 音频出口
+  function admitSound(name, buffer, opts) {
+    if (AUD.paused || VOL.master <= 0 || VOL.sfx <= 0) return false;
+    const ctx = audioCtx();
+    if (!ctx) return false;
+    const now = ctx.currentTime;
+    const group = name.indexOf('voice_') === 0 ? 'voice'
+      : name.indexOf('skill_') === 0 && name !== 'skill_cast' ? 'skill' : name;
+    const gap = group === 'voice' ? 3 : group === 'skill' ? 0.25 : 0.1;
+    if (AUD.lastSound[group] !== undefined && now - AUD.lastSound[group] < gap) return false;
+    AUD.activeSounds = AUD.activeSounds.filter((until) => until > now);
+    if (AUD.activeSounds.length >= 6) return false;
+    const duration = buffer ? buffer.duration / ((opts && opts.rate) || 1) : (RECIPES[name] || RECIPES.default).dur;
+    AUD.activeSounds.push(now + duration);
+    AUD.lastSound[group] = now;
+    return true;
+  }
+
   function play(name, opts) {
     const o = opts || {};
     try {
       if (AUD.paused) return null;
       const url = BASE + 'sfx/' + name + '.wav';
       const buf = AUD.samples[name];
+      if (!admitSound(name, buf, o)) return null;
       if (buf) return playSample(buf, o);
       if (!AUD.missing[name] && canFetchSample()) {
         // 先用振荡器顶上，文件到货后自动切到采样
@@ -771,10 +791,14 @@
   }
 
   function playVoice(unitId, opts) {
+    const o = opts || {};
     try {
       if (AUD.paused) return null;
       const key = 'voice_' + unitId;
-      if (AUD.samples[key]) return playSample(AUD.samples[key], opts);
+      if (AUD.samples[key]) {
+        if (!admitSound(key, AUD.samples[key], opts)) return null;
+        return playSample(AUD.samples[key], Object.assign({}, o, { vol: (o.vol === undefined ? 1 : o.vol) * 0.5 }));
+      }
       if (!AUD.missing[key] && canFetchSample()) {
         fetchSample(key, BASE + 'sfx/voice_' + unitId + '.wav', () => { });
       }
@@ -783,12 +807,16 @@
   }
 
   function playSkill(unitId, slot, opts) {
+    const o = opts || {};
     try {
       if (AUD.paused) return null;
       const s = String(slot === undefined || slot === null ? '1' : slot);
       const norm = (s === 's1' ? '1' : s === 's2' ? '2' : s === 'ult' ? 'ult' : s);
       const key = 'skill_' + unitId + '_' + norm;
-      if (AUD.samples[key]) return playSample(AUD.samples[key], opts);
+      if (AUD.samples[key]) {
+        if (!admitSound(key, AUD.samples[key], opts)) return null;
+        return playSample(AUD.samples[key], Object.assign({}, o, { vol: (o.vol === undefined ? 1 : o.vol) * 0.7 }));
+      }
       if (!AUD.missing[key] && canFetchSample()) {
         fetchSample(key, BASE + 'sfx/skill_' + unitId + '_' + norm + '.wav', () => { });
       }
@@ -865,9 +893,9 @@
   function setVolume(v) {
     const o = v || {};
     try {
-      if (o.master !== undefined) VOL.master = Math.max(0, Math.min(1, o.master));
-      if (o.sfx !== undefined) VOL.sfx = Math.max(0, Math.min(1, o.sfx));
-      if (o.music !== undefined) VOL.music = Math.max(0, Math.min(1, o.music));
+      if (Number.isFinite(o.master)) VOL.master = Math.max(0, Math.min(1, o.master));
+      if (Number.isFinite(o.sfx)) VOL.sfx = Math.max(0, Math.min(1, o.sfx));
+      if (Number.isFinite(o.music)) VOL.music = Math.max(0, Math.min(1, o.music));
       if (AUD.masterGain) AUD.masterGain.gain.value = VOL.master;
       if (AUD.sfxGain) AUD.sfxGain.gain.value = VOL.sfx;
       if (AUD.musicGain) AUD.musicGain.gain.value = VOL.music;

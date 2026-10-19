@@ -43,3 +43,5 @@ Never commit `data/`, `.env` files, or tokens. Configure `CC_ADMIN_PASS`, `CC_SE
 ## Agent Notes
 
 Reply to the user in Chinese. AI changes must preserve seeded replay and resource-collecting character behavior. Skill timelines retain `cast.targetId`; homing projectiles retain their own `targetId`, and dash directions are normalized 2D vectors. Keep defensive dodges damage-free. Local regression commands are `node tools/_aicheck/regression.js` and `node tools/_aicheck/matrix.js`; these development scripts remain ignored. See `docs/AI-VALIDATION.md` for validation scope and results.
+
+Keep default audio quiet: avoid duplicate engine/render sound playback, limit overlapping combat sounds and chatter, and retain user volume/mute preferences across reloads. Audio controls must remain available on mobile and in spectator mode.

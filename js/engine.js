@@ -351,7 +351,6 @@
           src.state = 'dash';
           src.stateT = 0;
           src.dash = { dir: dx / len, dirZ: dz / len, dur: step.dur || 0.3, t: 0, step };
-          if (CC.assets && CC.assets.play) CC.assets.play('dash');
           push({ type: 'dash', unitId: src.id, x: src.x, z: src.z, h: src.h });
           break;
         }
@@ -803,7 +802,6 @@
         if (key && canCast(e, key)) {
           dbg('skill:' + key);
           startCast(e, key);
-          if (CC.assets && CC.assets.play) CC.assets.play(key === 'ult' ? 'ult_release' : 'skill_cast');
           return;
         }
       }
