@@ -13,7 +13,7 @@
 </head>
 <body><main>
   <h1>对战录像导出</h1>
-  <p>管理员专用 · 当前阵容与模式 · 960×600 / 30fps / 无声 WebM。保持页面打开，按对局时长生成。</p>
+  <p>管理员专用 · 当前阵容与模式 · 960×600 / 30fps / 有声 WebM（游戏音效、语音与背景音乐）。生成时不外放，保持页面打开，按对局时长生成。</p>
   <form id="export-form"><label>种子 <input id="seed" type="number" min="0" max="4294967295" step="1" required></label>
     <button id="record" type="submit">生成并下载录像</button><button id="cancel" type="button" disabled>取消导出</button>
   </form>
@@ -23,7 +23,7 @@
   <video id="preview" controls class="hidden"></video>
 </main>
 <script src="js/util.js"></script><script src="js/fighters.js?v=13"></script><script src="js/waves.js?v=13"></script>
-<script src="js/assets.js?v=13"></script><script src="js/sprites.js?v=13"></script><script src="js/engine.js?v=13"></script>
+<script src="js/assets.js?v=16"></script><script src="js/sprites.js?v=13"></script><script src="js/engine.js?v=13"></script>
 <script src="js/ai.js?v=13"></script><script src="js/battle.js?v=13"></script><script src="js/render.js?v=13"></script>
-<script src="js/webm.js?v=13"></script><script src="js/recorder.js?v=13"></script>
+<script src="js/webm.js?v=13"></script><script src="js/recorder.js?v=16"></script>
 </body></html>

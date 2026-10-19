@@ -893,6 +893,37 @@
     return !!(AUD.ctx || AUD.decoded > 0);
   }
 
+  // 录制游戏自己的混音；监听关闭时仍向录像输送音效、语音和音乐。
+  function captureAudio() {
+    const ctx = audioCtx();
+    if (!ctx || typeof ctx.createMediaStreamDestination !== 'function') throw new Error('浏览器不支持游戏音轨录制');
+    const destination = ctx.createMediaStreamDestination();
+    let stopped = false;
+    AUD.masterGain.connect(destination);
+    AUD.masterGain.disconnect(ctx.destination);
+    return {
+      stream: destination.stream,
+      activate: async function () {
+        if (stopped) return false;
+        AUD.paused = false;
+        if (ctx.state === 'running') return true;
+        return new Promise((resolve) => {
+          const timeout = setTimeout(() => resolve(false), 800);
+          Promise.resolve(ctx.resume()).then(() => {
+            clearTimeout(timeout); resolve(ctx.state === 'running');
+          }, () => { clearTimeout(timeout); resolve(false); });
+        });
+      },
+      stop: function () {
+        if (stopped) return;
+        stopped = true;
+        AUD.masterGain.disconnect(destination);
+        destination.stream.getTracks().forEach((track) => track.stop());
+        AUD.masterGain.connect(ctx.destination);
+      },
+    };
+  }
+
   function audioInfo() {
     return {
       webAudio: !!AUD.ctx,
@@ -921,6 +952,7 @@
     setVolume: setVolume,
     pauseAll: pauseAll,
     resumeAll: resumeAll,
+    captureAudio: captureAudio,
     // 渲染/UI 用到的附加接口（不影响契约）
     asset: asset,
     placeholder: placeholder,

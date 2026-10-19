@@ -25,7 +25,7 @@ Use two-space indentation, semicolons, single quotes, camelCase, and uppercase c
 
 ## Gameplay & Testing Guidelines
 
-Reply in Chinese. Preserve quiet audio defaults, concurrency limits, and persisted volume/mute controls. Ranged positioning follows damaging-skill reach.
+Reply in Chinese. Preserve quiet audio defaults, concurrency limits, and persisted volume/mute controls. Recordings must include the game's audio mix (effects, voices, music), keep live monitoring quiet, and verify a non-silent audio track in the downloaded file. Handle browser audio activation explicitly. Ranged positioning follows damaging-skill reach.
 
 Keep only `tomori`, `xujiayin`, `zhangxuefeng`, and `tiansuluo`. Preserve supplied transparent PNGs unchanged. Retain Tomori’s collection/stone skills plus independent flying kick. Xu’s 空城计 decoy inherits ownership and cannot determine victory. Zhang visibly runs, builds at most five pace stacks, and leaves **15-second** tracks; snacks grant two starting stacks. Tiansuluo uses 泡泡快递、泡泡陷阱、连锁啵啵.
 
