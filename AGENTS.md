@@ -39,3 +39,7 @@ Existing commits use short Chinese change summaries. Write focused Chinese messa
 ## Security & Configuration
 
 Never commit `data/`, `.env` files, or tokens. Configure `CC_ADMIN_PASS`, `CC_SECRET`, and optionally `CC_DATA_DIR` externally. Preserve account data and the server's static-file allowlist.
+
+## Agent Notes
+
+Reply to the user in Chinese. AI changes must preserve seeded replay and resource-collecting character behavior; validate skill conditions, targeting, movement, and battle convergence with fixed seeds. Keep development test scripts in ignored `tools/` or `tests/`.
