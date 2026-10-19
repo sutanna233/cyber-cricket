@@ -249,6 +249,45 @@ async function handleApi(req, res, pathname) {
   const ip = clientIp(req);
   const role = roleOf(req);
 
+  if (pathname === '/api/admin/commentary' || pathname.startsWith('/api/admin/commentary/')) {
+    if (role !== 'admin') return sendJson(res, 403, { ok: false, error: '仅管理员可以生成录像解说' });
+    // 密钥仅接受同站POST正文，不通过URL、日志或公开资源传递。
+    const origin = req.headers.origin;
+    if (origin) {
+      try { if (new URL(origin).host !== req.headers.host) throw new Error(); }
+      catch (_) { return sendJson(res, 403, { ok: false, error: '请求来源不匹配' }); }
+    }
+    try {
+      const commentary = require('./lib/commentary');
+      const owner = userOf(req).id;
+      if (pathname === '/api/admin/commentary' && req.method === 'POST') {
+        if (!simhost) throw new Error('模拟模块不可用');
+        const input = JSON.parse(await readBody(req, 32768));
+        const config = require('./lib/replay').makeConfig(input.replay || {}, simhost);
+        const job = commentary.create(owner, config, input.provider, input.speech);
+        return sendJson(res, 202, { ok: true, ...job });
+      }
+      const route = pathname.match(/^\/api\/admin\/commentary\/([a-f0-9]{32})(?:\/audio\/(\d{1,2}))?$/);
+      if (!route) return sendJson(res, 404, { ok: false, error: '解说任务不存在' });
+      if (req.method === 'GET' && route[2] !== undefined) {
+        const wav = await commentary.audio(route[1], Number(route[2]), owner);
+        res.writeHead(200, { 'Content-Type': 'audio/wav', 'Content-Length': wav.length,
+          'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' });
+        return res.end(wav);
+      }
+      if (req.method === 'GET') return sendJson(res, 200, { ok: true, ...commentary.get(route[1], owner) });
+      if (req.method === 'DELETE' && route[2] === undefined) {
+        await commentary.remove(route[1], owner);
+        return sendJson(res, 200, { ok: true });
+      }
+      return sendJson(res, 405, { ok: false, error: '不支持的解说操作' });
+    } catch (error) {
+      const message = error.name === 'CommentaryModelError' || error.name === 'CommentarySpeechError' || error.status
+        ? error.message : '无法创建录像解说，请检查填写的配置';
+      return sendJson(res, error.status || 400, { ok: false, error: message });
+    }
+  }
+
   if (pathname === '/api/admin/replay' && req.method === 'POST') {
     if (role !== 'admin') return sendJson(res, 403, { ok: false, error: '仅管理员可以导出录像' });
     try {
@@ -415,7 +454,7 @@ function listen(port, triesLeft) {
     console.log('  游客权限 : ' + PUBLIC_MODE + (PUBLIC_MODE === 'view' ? '（只能看）' : PUBLIC_MODE === 'pause' ? '（可暂停）' : '（完整操作，慎用）'));
     console.log('  注册     : ' + (ALLOW_REGISTER ? '已开启，账号页 /account.html' : '已关闭'));
     console.log('  账号总数 : ' + users.count() + '（用户库 ' + users.FILE + '）');
-    if (ADMIN_PASS) console.log('  管理员   : ' + ADMIN_USER + '（/account.html 登录）');
+    if (ADMIN_PASS || (localAdminEnabled && users.findByName(ADMIN_USER)?.role === 'admin')) console.log('  管理员   : ' + ADMIN_USER + '（/account.html 登录）');
     else console.log('  管理员   : 未设置（加 --admin-pass 你的密码 即可创建）');
     console.log('  同步观战 : ' + (roundState.enabled ? '已开启' : '未开启（各自玩各自的）'));
     console.log('  观战台   : http://' + shown + ':' + port + '/sim-watch.html');
@@ -423,4 +462,6 @@ function listen(port, triesLeft) {
 }
 
 bootstrapAdmin();
+const localAdminEnabled = !ADMIN_PASS && ['127.0.0.1', 'localhost', '::1'].includes(HOST);
+require('./lib/local-admin').ensureLocalAdmin(users, { enabled: localAdminEnabled, name: ADMIN_USER });
 listen(startPort, 5);

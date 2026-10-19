@@ -1,0 +1,21 @@
+{
+  "id": "leijun",
+  "file": "assets/units/meme/leijun.png",
+  "source": "user-supplied transparent PNG",
+  "source_file": "D:/Backup/Downloads/e6151174f2724bcb9f37f836108a67f8-removebg-preview.png",
+  "sha256": "05c7b28e02ae7e19ebf8900a8d49a362ebdacc3f26657b1c0828f3e7a17c05c2",
+  "dimensions": [
+    477,
+    294
+  ],
+  "cutout": true,
+  "modified": true,
+  "processing": "lossless transparent-padding crop; character pixels unchanged",
+  "source_sha256": "9ed089ee4951ae5d07b062105c09fb4a94a02b26ec6d8fe3bc1679fd18b92b25",
+  "source_crop": [
+    189,
+    80,
+    666,
+    374
+  ]
+}

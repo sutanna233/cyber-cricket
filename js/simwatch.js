@@ -33,7 +33,7 @@
       d.className = 'u';
       d.title = u.name + ' · 左键添加一个，右键移除一个（最多6个）';
       const img = document.createElement('img');
-      const p = 'assets/units/meme/' + u.id + '.png';
+      const p = CC.assets && CC.assets.unitPath ? CC.assets.unitPath(u.id) : 'assets/units/meme/' + u.id + '.png';
       img.src = p;
       img.onerror = () => { img.onerror = null; img.src = 'assets/units/' + u.id + '.png'; };
       d.appendChild(img);
@@ -123,6 +123,24 @@
     }
   }
 
+  const eventLogCursors = new WeakMap();
+  function logEvents(battle) {
+    let cursor = eventLogCursors.get(battle);
+    if (!cursor) { cursor = { seq: -Infinity, objects: new WeakSet() }; eventLogCursors.set(battle, cursor); }
+    for (const ev of battle.events) {
+      if (!ev || typeof ev !== 'object') continue;
+      if (typeof ev.seq === 'number' && Number.isFinite(ev.seq)) {
+        if (ev.seq <= cursor.seq) continue;
+        cursor.seq = ev.seq;
+      } else {
+        if (cursor.objects.has(ev)) continue;
+        cursor.objects.add(ev);
+      }
+      const line = describeEvent(battle, ev);
+      if (line) logLine(line);
+    }
+  }
+
   // ---------- 主循环 ----------
   let acc = 0;
   function frame(ts) {
@@ -139,10 +157,7 @@
     // 事件流
     if (S.match && S.match.battle) {
       const b = S.match.battle;
-      for (const ev of b.events) {
-        const line = describeEvent(b, ev);
-        if (line) logLine(line);
-      }
+      logEvents(b);
       updateStats(b);
     }
 
@@ -355,7 +370,7 @@
         const ticks = Math.round(t * 60);
         for (let i = 0; i < ticks && !S.match.battle.over; i++) S.match.battle.step();
         const b = S.match.battle;
-        for (const ev of b.events) { const l = describeEvent(b, ev); if (l) logLine(l); }
+        logEvents(b);
         updateStats(b);
         renderCanvas();
         document.title = 'READY t=' + b.time.toFixed(1) + ' hash=' + b.hash();

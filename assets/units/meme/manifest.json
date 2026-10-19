@@ -25,6 +25,27 @@
       "cutout": true,
       "modified": false,
       "sha256": "a9dc3a03a39f281bc9a1194ddd6d85af0f766eb116224625bc17c27965d57215"
+    },
+    "leijun": {
+      "id": "leijun",
+      "file": "assets/units/meme/leijun.png",
+      "source": "user-supplied transparent PNG",
+      "source_file": "D:/Backup/Downloads/e6151174f2724bcb9f37f836108a67f8-removebg-preview.png",
+      "sha256": "05c7b28e02ae7e19ebf8900a8d49a362ebdacc3f26657b1c0828f3e7a17c05c2",
+      "dimensions": [
+        477,
+        294
+      ],
+      "cutout": true,
+      "modified": true,
+      "processing": "lossless transparent-padding crop; character pixels unchanged",
+      "source_sha256": "9ed089ee4951ae5d07b062105c09fb4a94a02b26ec6d8fe3bc1679fd18b92b25",
+      "source_crop": [
+        189,
+        80,
+        666,
+        374
+      ]
     }
   },
   "generator": "tools/fetch_memes.py",
@@ -37,7 +58,7 @@
   "outline_rgb": "#14181f",
   "alt_per_unit": 2,
   "units_dir": "assets/units/meme",
-  "updated": "2026-10-19T00:22:39",
+  "updated": "2026-10-19T16:35:45+00:00",
   "backends": [
     "bing",
     "baidu"

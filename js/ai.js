@@ -8,8 +8,8 @@
   const CC = (globalThis.CC = globalThis.CC || {});
   const U = CC.util;
 
-  function foesOf(battle, e) { return battle.foes(e); }
-  function alliesOf(battle, e) { return battle.allies(e); }
+  function foesOf(battle, e) { return battle.foes(e).filter((o) => o.alive); }
+  function alliesOf(battle, e) { return battle.allies(e).filter((o) => o.alive); }
 
   function nearest(battle, e, list) {
     let best = null, bd = Infinity;
@@ -33,13 +33,72 @@
     return Math.max(base, Math.min(460, reach * 0.75));
   }
 
-  function hasBuff(e, kind) { return e.buffs.some((b) => b.kind === kind && b.t < b.dur); }
+  function hasBuff(e, kind) {
+    return (kind === 'superArmor' && !!e.su7) || e.buffs.some((b) => b.kind === kind && b.t < b.dur);
+  }
+
+  function commitTarget(e, target) {
+    if (!target) return;
+    e.targetId = target.id;
+    if (e.plan) e.plan.targetId = target.id;
+  }
+
+  // 只用已经公开的蓄力和距离估计音波到达时间，不预测闪避或随机命中。
+  function interruptTarget(battle, e) {
+    const sk = e.unit.s1, policy = e.unit.policy && e.unit.policy.s1;
+    if (!sk || !policy || e.cds.s1 > 0 || e.energy < (sk.cost || 0)) return null;
+    const step = sk.steps.find((s) => s.kind === 'projectile' && s.interrupt);
+    if (!step) return null;
+    const speed = step.speed || 430;
+    const reach = Math.min(speed * (step.life || 2) * 0.8,
+      policy.when === 'enemyInRange' ? policy.range || 200 : Math.max(targetRange(e), 420));
+    let best = null, bestSlack = Infinity;
+    for (const o of foesOf(battle, e)) {
+      const c = o.cast;
+      if (!c || !c.charging || hasBuff(o, 'invuln') || hasBuff(o, 'superArmor')
+          || (c.skill && c.skill.uninterruptible)) continue;
+      const distance = U.dist(e.x, e.z, o.x, o.z);
+      if (distance > reach + o.unit.radius * 0.5 - 4) continue;
+      const flight = Math.max(0, distance - 20 - (step.radius || 24) - o.unit.radius * 0.6) / speed;
+      const arrival = (sk.cast == null ? 0.5 : sk.cast) + (step.t || 0) + flight + 2 / 60;
+      const slack = c.chargeDur - c.chargeT - arrival;
+      if (slack > 0 && slack < bestSlack) { best = o; bestSlack = slack; }
+    }
+    return best;
+  }
+
+  function readyBubbleBurst(battle, e, sk) {
+    // 泡泡属于整队共享资源：队友的爆破尚未执行时，先让其结算，避免同时空交怒气。
+    if (alliesOf(battle, e).some((ally) => {
+      const cast = ally !== e && ally.cast;
+      if (!cast || !Array.isArray(cast.steps)) return false;
+      return cast.steps.slice(cast.charging ? 0 : (cast.idx || 0)).some((s) => s.kind === 'bubble_burst');
+    })) return false;
+    const step = sk.steps.find((s) => s.kind === 'bubble_burst');
+    const arrival = (sk.cast == null ? 1.4 : sk.cast) + (step.t || 0) + 2 / 60;
+    const marks = [];
+    for (const o of foesOf(battle, e)) {
+      if (hasBuff(o, 'invuln')) continue;
+      const b = o.buffs.find((v) => v.kind === 'bubble' && v.mag > 0 && v.dur - v.t > arrival);
+      if (b) {
+        if (o.hp / o.maxHp <= 0.2) return true;
+        marks.push(b);
+      }
+    }
+    if (!marks.length) return false;
+    if (marks.length >= 2 || marks.some((b) => b.mag >= 2)) return true;
+    const threat = nearest(battle, e, foesOf(battle, e));
+    const danger = e.hp / e.maxHp <= 0.35 || (e.hp / e.maxHp <= 0.55
+      && threat && U.dist(e.x, e.z, threat.x, threat.z) < 160);
+    return danger || marks.some((b) => b.dur - b.t <= arrival + 1 || b.t >= 2);
+  }
 
   /** 距离为主，角色偏好为辅；保留当前目标，避免每次决策都来回换人。 */
   function selectTarget(battle, e, list) {
     let best = null, bestScore = Infinity;
     const allies = alliesOf(battle, e);
-    for (const o of list) {
+    const available = list.filter((o) => o.alive && !hasBuff(o, 'invuln'));
+    for (const o of available.length ? available : list.filter((o) => o.alive)) {
       const d = U.dist(e.x, e.z, o.x, o.z);
       let score = d;
       if (e.unit.role === 'assassin') score -= o.lane === 1 ? 110 : 0;
@@ -59,16 +118,18 @@
   }
 
   /** 只有能打到人、补到血或收集到资源时才交技能；纯防御不在开局空放。 */
-  function usefulSkill(battle, e, sk, c) {
-    const foes = foesOf(battle, e);
-    const target = foes.find((o) => o.id === e.targetId) || nearest(battle, e, foes);
+  function usefulSkill(battle, e, sk, c, targetOverride) {
+    const foes = foesOf(battle, e).filter((o) => !hasBuff(o, 'invuln'));
+    const target = targetOverride && foes.includes(targetOverride) ? targetOverride
+      : foes.find((o) => o.id === e.targetId) || nearest(battle, e, foes);
     const steps = sk.steps || [];
     let offensive = false;
     for (const step of steps) {
       if (step.kind === 'decoy') return !!target && U.dist(e.x, e.z, target.x, target.z) <= (c.range || 240);
       if (step.kind === 'run_lap') return !!target && U.dist(e.x, e.z, target.x, target.z) <= 400;
       if (step.kind === 'bubble_trap') return !!target && U.dist(e.x, e.z, target.x, target.z) <= 340;
-      if (step.kind === 'bubble_burst') return foes.some((o) => hasBuff(o, 'bubble'));
+      if (step.kind === 'bubble_burst') return readyBubbleBurst(battle, e, sk);
+      if (step.kind === 'su7_drive') return !e.su7 && !!target;
       if (step.kind === 'magnet' && e.trait) {
         const kind = step.kindOf || e.trait.collect;
         if ((e.stacks[kind] || 0) < (e.trait.max || 10) && battle.pickups.some((p) =>
@@ -113,7 +174,7 @@
     const heal = steps.find((s) => s.kind === 'heal');
     if (heal) {
       const recipients = heal.at === 'allies' ? alliesOf(battle, e) : [e];
-      return recipients.some((a) => a.hp / a.maxHp < 0.9);
+      return recipients.some((a) => a.maxHp - a.hp >= Math.max(1, a.maxHp * (heal.amount || 0.12) * 0.5));
     }
     const foe = nearest(battle, e, foes);
     return !!foe && U.dist(e.x, e.z, foe.x, foe.z) < Math.max(180, targetRange(e));
@@ -171,9 +232,13 @@
   /** 返回本 tick 想放的技能 key（引擎会再做一次 canCast 硬校验） */
   function wantSkill(battle, e) {
     if (e.isMinion) return null;
-    if (e.cast || e.dash || e.run || hasBuff(e, 'seal')) return null;
+    if (e.cast || e.dash || e.run || e.su7 || hasBuff(e, 'seal')) return null;
     const p = e.unit.policy || {};
-    const order = ['ult', 's2', 's3', 's1'];
+    const foes = foesOf(battle, e);
+    const current = foes.find((o) => o.id === e.targetId && !hasBuff(o, 'invuln'));
+    const target = current || selectTarget(battle, e, foes.filter((o) => !hasBuff(o, 'invuln')));
+    const interrupt = interruptTarget(battle, e);
+    const order = interrupt ? ['ult', 's1', 's2', 's3'] : ['ult', 's2', 's3', 's1'];
     for (const key of order) {
       const sk = e.unit[key];
       if (!sk) continue;
@@ -181,14 +246,18 @@
       if (key !== 'ult' && ((e.cds[key] || 0) > 0 || e.energy < (sk.cost || 0))) continue;
       const c = p[key];
       if (!c) continue;
-      if (cond(battle, e, c) && usefulSkill(battle, e, sk, c)) return key;
+      const chosenTarget = key === 's1' && interrupt ? interrupt : target;
+      if (cond(battle, e, c) && usefulSkill(battle, e, sk, c, chosenTarget)) {
+        commitTarget(e, chosenTarget);
+        return key;
+      }
     }
     // 取消平A后，基础近战技仍要能主动出击（如王境泽的护盾+斩击）。
     // 不绕过治疗、防御技或石头库存条件，也不拿空挥代替移动。
     const basic = e.unit.s1;
     if (basic && e.cds.s1 <= 0 && p.s1 && p.s1.when === 'selfHpBelow'
         && basic.steps.some((s) => s.kind === 'melee' && s.dmg > 0)
-        && usefulSkill(battle, e, basic, p.s1)) return 's1';
+        && usefulSkill(battle, e, basic, p.s1, target)) { commitTarget(e, target); return 's1'; }
     return null;
   }
 
@@ -232,7 +301,7 @@
       }
     }
 
-    const target = selectTarget(battle, e, foes);
+    const target = interruptTarget(battle, e) || selectTarget(battle, e, foes);
     const threat = nearest(battle, e, foes);
     const threatDistance = U.dist(e.x, e.z, threat.x, threat.z);
 

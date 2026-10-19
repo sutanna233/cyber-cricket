@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-20",
+  "checks": {
+    "facts": 17,
+    "model": 26,
+    "speech": 47,
+    "service": 24,
+    "frontend": 19,
+    "resultCanvas": 9,
+    "localAdmin": 12,
+    "browserSettings": 19,
+    "eventConsumption": 11,
+    "sharedStatsAndPlacement": 12,
+    "recordingCodec": 13
+  },
+  "browser": {
+    "seed": 233,
+    "tick": 2542,
+    "hash": "0339fcc0",
+    "battleSeconds": 42.37,
+    "resolution": [
+      960,
+      600
+    ],
+    "baseline": {
+      "duration": 47.4,
+      "audioSampleRate": 48000,
+      "channels": 2,
+      "rms": 0.034151785079669206,
+      "openingRms": 0.04034528343133817,
+      "conclusionRms": 0.026184117051908345
+    },
+    "raisedNarration": {
+      "duration": 47.34,
+      "audioSampleRate": 48000,
+      "channels": 2,
+      "rms": 0.03967197657154987,
+      "openingRms": 0.06330830347766464,
+      "conclusionRms": 0.055030272870574444
+    },
+    "storageSaveReloadClear": true,
+    "localAdminLogin": true,
+    "downloadContainsSecrets": false,
+    "mp4": {
+      "seed": 1,
+      "lineup": "six Leijun versus one Xujiayin; short export fixture only",
+      "tick": 231,
+      "hash": "ba999c58",
+      "container": "ftyp",
+      "videoCodec": "H264-avc1",
+      "audioCodec": "AAC-mp4a",
+      "resolution": [
+        960,
+        600
+      ],
+      "bytes": 2654177,
+      "decodedVideoSeconds": 8.8613,
+      "decodedAudioSeconds": 8.831666666666667,
+      "audioSampleRate": 48000,
+      "audioChannels": 2,
+      "audioRms": 0.04751012348062319,
+      "conclusionRms": 0.05579039864379103,
+      "conclusionEnd": 6.066645833333333
+    }
+  },
+  "limitations": "Model and speech APIs validated with loopback HTTP substitutes and fixture voice. No paid provider calls or real MiniMax credential/quota/subjective voice-quality validation.",
+  "versions": {
+    "server.js": "67fffa760803d88d",
+    "lib/commentary.js": "c77a278fdd6b0fa8",
+    "lib/commentary-facts.js": "5c8c0aecbeca9aa4",
+    "lib/commentary-model.js": "5c59a473805d92bc",
+    "lib/commentary-speech.js": "5c4998ef608f6067",
+    "lib/local-admin.js": "47f4d043f920d48d",
+    "js/commentary-export.js": "28efd7004099e94c",
+    "js/commentary-settings.js": "a8387863c623a927",
+    "js/recording-report.js": "8461baf94bcabb99",
+    "js/assets.js": "9fd84c198ef696f4",
+    "js/render.js": "3d3eac39abdb8323",
+    "js/recorder.js": "f86a158526003a5c"
+  }
+}

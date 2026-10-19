@@ -50,6 +50,7 @@
 
   const MAX_PARTS = 340;
   const MAX_TEXTS = 80;
+  let eventCursors = new WeakMap();
 
   function rnd() {
     if (R.rng) return R.rng.next();
@@ -358,9 +359,18 @@
     const Sp = CC.sprites;
     const evs = battle && Array.isArray(battle.events) ? battle.events : null;
     if (!evs || !evs.length) return;
+    let cursor = eventCursors.get(battle);
+    if (!cursor) { cursor = { seq: -Infinity, objects: new WeakSet() }; eventCursors.set(battle, cursor); }
     for (let i = 0; i < evs.length; i++) {
       const ev = evs[i];
       if (!ev || typeof ev !== 'object') continue;
+      if (typeof ev.seq === 'number' && Number.isFinite(ev.seq)) {
+        if (ev.seq <= cursor.seq) continue;
+        cursor.seq = ev.seq;
+      } else {
+        if (cursor.objects.has(ev)) continue;
+        cursor.objects.add(ev);
+      }
       const type = ev.type || 'hit';
       const p = posOf(ev, by);
       if (type === 'hit') {
@@ -396,7 +406,8 @@
           if (CC.assets && CC.assets.play) CC.assets.play('ult_release');
         } else {
           addShake(4, 0.18);
-          spawn('slash_arc', p.x, p.z, 36, { size: 120, life: 0.22, grow: 0.3, alpha: 0.7, rot: ev.side === 'B' ? Math.PI : 0 });
+          if (tid === 'leijun') callout(p.x, p.z, p.h, nm, '#8be9ff');
+          else spawn('slash_arc', p.x, p.z, 36, { size: 120, life: 0.22, grow: 0.3, alpha: 0.7, rot: ev.side === 'B' ? Math.PI : 0 });
           announce(nm, ev.side === 'B' ? C.b : C.a);
           if (CC.assets && CC.assets.play) CC.assets.play('skill_cast', { vol: 0.85 });
         }
@@ -519,8 +530,8 @@
         if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.8 });
       } else if (type === 'bounce') {
         // 弹道反弹
-        spawn('spark', p.x, p.z, (ev.h || 30) + 10, { size: 32, life: 0.18, grow: 0.5 });
-        floatText(p.x, p.z, (ev.h || 30) + 26, '弹', { color: '#9ff2ff', life: 0.5, size: 11 });
+        spawn('spark', p.x, p.z, (ev.h || 30) + 10, { size: 32, life: 0.18, grow: 0.5, color: ev.phone ? '#ffb36b' : null });
+        floatText(p.x, p.z, (ev.h || 30) + 26, ev.phone ? '交个朋友' : '弹', { color: ev.phone ? '#ffb36b' : '#9ff2ff', life: 0.5, size: 11 });
         if (CC.assets && CC.assets.play) CC.assets.play('hit_light', { vol: 0.5, rate: 1.4 });
       } else if (type === 'pull') {
         // 引力拖拽：收缩圈 + 向心粒子
@@ -586,6 +597,31 @@
         if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.35 });
       } else if (type === 'pace_boost') {
         floatText(p.x, p.z, 95, '补给：下次配速 +2', { color: '#75ffae', life: 1.1, size: 16 });
+      } else if (type === 'leijunSonic') {
+        spawn('sonic_ring', p.x, p.z, p.h || 34, { size: 78, life: 0.4, alpha: 0.8, blend: 'source-over', color: '#8be9ff' });
+        if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.3, rate: 1.35 });
+      } else if (type === 'su7Start') {
+        callout(p.x, p.z, p.h, '小米 SU7 · 上车！', '#8be9ff');
+        spawn('ring', p.x, p.z, 3, { size: 90, life: 0.4, grow: 1.2, alpha: 0.55, layer: 'ground', color: '#8be9ff' });
+      } else if (type === 'su7Hit') {
+        const dx = ev.dx || 0, dz = ev.dz || 0;
+        spawn('sonic_ring', p.x, p.z, 14, { size: 72, life: 0.3, alpha: 0.9, color: '#8be9ff' });
+        for (let k = 0; k < 5; k++) {
+          spawn('shard', p.x, p.z, 18, { size: 10, life: 0.35, blend: 'source-over', color: '#b9f5ff',
+            vx: dx * 130 + rr(-90, 90), vz: dz * 130 + rr(-60, 60), vh: rr(60, 140) });
+        }
+        addShake(7, 0.2);
+      } else if (type === 'su7Skid') {
+        if ([ev.x1, ev.z1, ev.x2, ev.z2].every(Number.isFinite)) {
+          const ox = -(ev.dz || 0) * 20, oz = (ev.dx || 0) * 20;
+          for (let side = -1; side <= 1; side += 2) {
+            spawn('su7_skid', ev.x1 + ox * side, ev.z1 + oz * side, 0, { tx: ev.x2 + ox * side, tz: ev.z2 + oz * side,
+              life: 2, width: 2.6, alpha: 0.5, layer: 'ground', blend: 'source-over', color: '#18212b' });
+          }
+        }
+      } else if (type === 'su7End') {
+        if (ev.reason !== 'ko') callout(p.x, p.z, p.h, '到站，下车！', '#8be9ff');
+        spawn('dust', p.x, p.z, 4, { size: 70, life: 0.4, grow: 1.3, alpha: 0.5, layer: 'ground' });
       } else if (type === 'bubble_trap') {
         floatText(p.x, p.z, 20, '泡泡陷阱', { color: '#a3edff', life: 0.8, size: 16 });
       } else if (type === 'bubble_cage') {
@@ -1005,13 +1041,40 @@
     const Sp = CC.sprites, A = CC.assets;
     const size = (p.scale || 1) * 48;
     const pt = Sp.project(p.x, p.z, (p.h || 0));
+    const ang = Math.atan2(((p.vz || 0)) * Sp.VIEW.ZS, ((p.vx || 0)) * Sp.VIEW.SCALE) || 0;
+    if (p.phone || p.sonic) {
+      ctx.save(); ctx.translate(pt.sx, pt.sy); ctx.rotate(ang);
+      if (p.phone) {
+        ctx.strokeStyle = 'rgba(255,179,107,0.5)'; ctx.lineWidth = 2;
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath(); ctx.moveTo(-size * (0.45 + i * 0.18), (i - 1) * 5);
+          ctx.lineTo(-size * (0.75 + i * 0.18), (i - 1) * 5); ctx.stroke();
+        }
+        ctx.rotate(-0.35 + Math.sin(R.t * 12 + (p.id || 0)) * 0.18);
+        const w = size * 0.52, h = size * 0.78;
+        ctx.fillStyle = '#111b2e'; ctx.strokeStyle = '#ffd0a1'; ctx.lineWidth = 1.8;
+        Sp.roundRect(ctx, -w / 2, -h / 2, w, h, 4); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#428ba5';
+        Sp.roundRect(ctx, -w / 2 + 3, -h / 2 + 5, w - 6, h - 10, 2); ctx.fill();
+        ctx.fillStyle = '#ffb36b'; ctx.fillRect(-w / 2 + 3, h * 0.05, w - 6, h * 0.16);
+        ctx.fillStyle = '#d9f9ff'; Sp.ellipsePath(ctx, 0, -h / 2 + 2.5, 1.3, 1.3); ctx.fill();
+        ctx.fillStyle = 'rgba(235,253,255,0.65)'; ctx.fillRect(-w / 2 + 5, -h / 2 + 8, 2, h * 0.27);
+      } else {
+        ctx.lineWidth = 2.8; ctx.lineCap = 'round';
+        for (let i = 0; i < 3; i++) {
+          ctx.globalAlpha = 0.95 - i * 0.2;
+          ctx.strokeStyle = i === 0 ? '#ffca91' : '#8be9ff';
+          ctx.beginPath(); ctx.arc(-size * 0.3, 0, size * (0.18 + i * 0.16), -1.05, 1.05); ctx.stroke();
+        }
+      }
+      ctx.restore(); return;
+    }
     if (p.bubble) {
       ctx.save(); ctx.fillStyle = 'rgba(110,210,255,0.3)'; ctx.strokeStyle = '#c0f5ff'; ctx.lineWidth = 2.5;
       Sp.ellipsePath(ctx, pt.sx, pt.sy, 18, 18); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#fff'; Sp.ellipsePath(ctx, pt.sx - 6, pt.sy - 6, 4, 3); ctx.fill();
       ctx.restore(); return;
     }
-    const ang = Math.atan2(((p.vz || 0)) * Sp.VIEW.ZS, ((p.vx || 0)) * Sp.VIEW.SCALE) || 0;
     const key = p.sprite || 'spark';
     // 拖尾
     const tailLen = size * 2.2;
@@ -1041,6 +1104,24 @@
       const alpha = p.alpha * (1 - k);
       if (alpha <= 0.02) continue;
       if (p.delay && p.t < p.delay) continue;      // 延迟出场（落地那一瞬）
+      if (p.kind === 'su7_skid') {
+        const a = Sp.project(p.x, p.z, 0), b = Sp.project(p.tx, p.tz, 0);
+        ctx.save(); ctx.globalAlpha = alpha; ctx.strokeStyle = p.color; ctx.lineWidth = p.width;
+        ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+        ctx.restore(); continue;
+      }
+      if (p.kind === 'sonic_ring') {
+        const pt = Sp.project(p.x, p.z, p.h);
+        const radius = p.size * (0.15 + 0.85 * k);
+        ctx.save(); ctx.globalAlpha = alpha;
+        ctx.strokeStyle = p.color || '#8be9ff'; ctx.lineWidth = 1 + 2 * (1 - k);
+        Sp.ellipsePath(ctx, pt.sx, pt.sy, Sp.scaleX(radius), Sp.scaleZ(radius)); ctx.stroke();
+        if (k < 0.7) {
+          ctx.globalAlpha = alpha * 0.45;
+          Sp.ellipsePath(ctx, pt.sx, pt.sy, Sp.scaleX(radius * 0.73), Sp.scaleZ(radius * 0.73)); ctx.stroke();
+        }
+        ctx.restore(); continue;
+      }
       // 连线（偷怒气）
       if (p.kind === 'link') {
         const a = Sp.project(p.x, p.z, p.h);
@@ -1814,6 +1895,28 @@
     ctx.restore();
   }
 
+  function drawCommentary(ctx, line) {
+    if (!line || typeof line.text !== 'string' || !line.text) return;
+    ctx.save();
+    ctx.font = 'bold 17px ' + FONT;
+    ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+    const rows = []; let row = '';
+    for (const ch of Array.from(line.text).slice(0, 120)) {
+      if (row && ctx.measureText(row + ch).width > 832) { rows.push(row); row = ''; }
+      row += ch;
+    }
+    if (row) rows.push(row);
+    const lines = rows.slice(0, 2), height = 30 + lines.length * 25, y = H - height - 14;
+    ctx.fillStyle = 'rgba(4,10,22,0.92)';
+    ctx.fillRect(42, y, W - 84, height);
+    ctx.fillStyle = C.a; ctx.fillRect(42, y, 3, height);
+    ctx.font = '11px ' + FONT; ctx.fillStyle = '#9bdcec';
+    ctx.fillText('AI 解说', 58, y + 17);
+    ctx.font = 'bold 17px ' + FONT; ctx.fillStyle = '#f4f9ff';
+    lines.forEach((text, i) => ctx.fillText(text, 58, y + 40 + i * 25));
+    ctx.restore();
+  }
+
   function draw(match, view) {
     const v = view || {};
     const canvas = (v.canvas) || R.canvas;
@@ -1864,14 +1967,20 @@
       if (!ok) top.drawImage(R.buf, 0, 0);
     }
     // 暂停 / 战报 角标永远画在故障位移之上，保证可读
-    if (phase === 'report') drawReport(top, match, v);
+    if (phase === 'report') {
+      if (v.exportReport && CC.recordingReport) CC.recordingReport.draw(top, v.report || safeReport(match), battle);
+      else drawReport(top, match, v);
+    }
     if (paused) drawPaused(top);
+    // 仅录像页显式传入；正常游戏没有解说状态、字幕或播音。
+    drawCommentary(top, v.commentary);
     return { phase: phase, paused: paused, dt: dt, hitstop: stopped };
   }
 
   function hitstop() { return R.hitstopT > 0; }
 
   function reset() {
+    eventCursors = new WeakMap();
     R.parts.length = 0; R.texts.length = 0; R.banners.length = 0;
     R.hitstopT = 0; R.glitchT = 0; R.glitchAmp = 0; R.shake = { amp: 0, t: 0, dur: 1, x: 0, y: 0 };
     R.frame = 0; R.t = 0; R.lastSimT = 0; R.simT = 0;

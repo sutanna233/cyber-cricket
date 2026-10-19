@@ -1,6 +1,6 @@
 /* ===========================================================
    赛博斗蛐蛐 · 单位数据层
-   —— 两位角色的属性 / 技能 / 释放策略 / 台词 / 贴图键
+   —— 角色的属性 / 技能 / 释放策略 / 台词 / 贴图键
    —— 贴图：优先 assets/units/meme/<id>.png（真实 meme 抠图），
             缺图时回退 assets/units/<id>.png
    =========================================================== */
@@ -115,8 +115,8 @@
         weight: 1.0, range: 86, atkInterval: 0.6 },
       skills: [
         { key: 's1', name: '跑步·十公里结算', desc: '绕场跑圈留下持续15秒的减速跑道，积累五层配速，最后冲线重击', cd: 10, cost: 0, cast: 0.3,
-          steps: [{ kind: 'run_lap', dur: 2.4, radius: 105, speed: 510, dmg: 0.7, perPace: 0.09,
-            trailDmg: 0.07, trailLife: 15, finishDist: 520, knock: 210 }],
+          steps: [{ kind: 'run_lap', dur: 2.4, radius: 105, speed: 510, dmg: 0.75, perPace: 0.09,
+            trailDmg: 0.06, trailLife: 15, finishDist: 520, knock: 210 }],
           line: '十公里，跑完结算！' },
         { key: 's2', name: '雪碧巧乐兹', desc: '喝雪碧、吃巧乐兹，恢复生命并获得短暂护盾与续航', cd: 12, cost: 20, cast: 0.65,
           steps: [heal({ amount: 0.1 }), buff({ effects: [{ kind: 'shield', dur: 4, mag: 0.1 },
@@ -124,8 +124,8 @@
       ],
       ult: { key: 'ult', name: '全力跑步·最后一圈', desc: '以持续15秒的大跑道全力跑圈，冲线结算强化重击', cost: 100, cd: 0, cast: 0.65,
         steps: [buff({ effects: [{ kind: 'superArmor', dur: 1.3, mag: 1 }] }),
-          { kind: 'run_lap', dur: 2.7, radius: 125, speed: 580, dmg: 1.2, perPace: 0.12,
-            trailDmg: 0.1, trailLife: 15, finishDist: 580, knock: 280, t: 0.05 }],
+          { kind: 'run_lap', dur: 2.7, radius: 125, speed: 580, dmg: 1.3, perPace: 0.12,
+            trailDmg: 0.085, trailLife: 15, finishDist: 580, knock: 280, t: 0.05 }],
         line: '最后一圈，全力跑！' },
       policy: { s1: { when: 'enemyInRange', range: 300 }, s2: { when: 'selfHpBelow', v: 0.65 },
         ult: { when: 'energyFull' } },
@@ -147,28 +147,45 @@
           line: '踩进泡泡里吧。' },
       ],
       ult: { key: 'ult', name: '连锁啵啵', desc: '引爆带泡泡的敌人，每层泡泡增加爆炸伤害，并波及附近目标', cost: 100, cd: 0, cast: 1.0,
-        steps: [{ kind: 'bubble_burst', radius: 145, dmg: 0.7, perBubble: 0.35 }], line: '三个，两个，一个——啵！' },
+        steps: [{ kind: 'bubble_burst', radius: 220, dmg: 0.7, perBubble: 0.35 }], line: '三个，两个，一个——啵！' },
       policy: { s1: { when: 'enemyInRange', range: 420 }, s2: { when: 'enemyInRange', range: 320 },
         ult: { when: 'enemyBubbled' } },
       lines: ['啵。', '泡泡来了。'], barks: { hit: '啵', taken: '唔', cast: '泡泡！' },
       texture: { key: 'tiansuluo', scale: 1.0 },
     },
+    {
+      id: 'leijun', name: '雷军', title: 'Are you OK？', role: 'ranged', pos: 'back',
+      palette: ['#76cbff', '#142c59'],
+      stats: { hp: 1250, atk: 94, def: 48, spd: 190, crit: 0.08, critDmg: 1.6,
+        weight: 1.0, range: 300, atkInterval: 0.75 },
+      skills: [
+        { key: 's1', name: 'Are you OK？', desc: '发出音波，命中造成伤害并打断目标蓄力；霸体免疫打断', cd: 6, cost: 0, cast: 0.5,
+          steps: [proj({ dmg: 0.72, speed: 560, life: 1.1, radius: 28, sonic: true,
+            interrupt: true, sprite: 'ring', arcH: 0 })], line: 'Are you OK？' },
+        { key: 's2', name: '交个朋友', desc: '投出手机，在附近敌人之间最多弹射两次，同一目标只命中一次', cd: 8, cost: 0, cast: 0.65,
+          steps: [proj({ dmg: 0.34, speed: 510, life: 1.6, radius: 24, phone: true,
+            bounces: 2, sprite: 'spark', arcH: 0 })], line: '交个朋友！' },
+      ],
+      ult: { key: 'ult', name: 'SU7，启动！', desc: '召唤小米SU7并上车，连续冲撞敌人造成伤害和击退；驾驶时霸体，但仍会受伤',
+        cost: 100, cd: 0, cast: 1.4,
+        steps: [{ kind: 'su7_drive', dur: 4, speed: 650, radius: 62, dmg: 0.32,
+          hitCd: 0.65, knock: 210 }], line: 'SU7，启动！' },
+      policy: { s1: { when: 'enemyInRange', range: 420 }, s2: { when: 'enemyInRange', range: 420 },
+        ult: { when: 'energyFull' } },
+      lines: ['Are you OK？', 'Hello！'], barks: { hit: 'OK！', taken: '哦！', cast: '朋友们！' },
+      texture: { key: 'leijun', scale: 0.8 },
+    },
   ];
 
   // ---------- 平衡覆盖表 ----------
-  // 依据 tools/_simcheck/balance.js 的实测对位胜率调整（目标：每人 45%~55%）
-  // 规律：胜率 ≈ 输出能力，坦克血多但打不动 → 补攻；高速输出手太强 → 削血削攻
+  // 所有模式共用同一套基础数值；单挑、混编团战与乱斗共同验证。
+  // 样本、种子及限制见 docs/BALANCE.md。
   const BALANCE = {
-    tomori: { hp: 1800, atk: 138, def: 88 },
-    xujiayin: { hp: 1250, atk: 110, def: 44 },
-  };
-
-  // 单挑与团战分开校准，避免范围技在多人局的收益挤压单挑表现。
-  const MODE_BALANCE = {
-    tomori: { solo: { hp: 1.02, atk: 1.0 }, team: { hp: 1.13, atk: 1.08 } },
-    xujiayin: { solo: { hp: 1.1, atk: 1.07 }, team: { hp: 1.0, atk: 0.94 } },
-    zhangxuefeng: { solo: { hp: 1.02, atk: 1.02 }, team: { hp: 1.06, atk: 0.98 }, brawl: { hp: 1.3, atk: 1.08 } },
-    tiansuluo: { solo: { hp: 0.96, atk: 0.92 }, team: { hp: 1.04, atk: 0.99 } },
+    tomori: { hp: 1850, atk: 146, def: 88 },
+    xujiayin: { hp: 1300, atk: 110, def: 44 },
+    zhangxuefeng: { hp: 1320, atk: 78, def: 52 },
+    tiansuluo: { hp: 1300, atk: 91, def: 56 },
+    leijun: { hp: 1220, atk: 94, def: 48 },
   };
 
   // ---------- 手感调参表 ----------
@@ -185,7 +202,6 @@
 
   // ---------- 组装 ----------
   const DAMAGE_BASE = 1.0;          // 伤害基数（配合 coef/atk/def 计算）
-  const TEAM_HP_SCALE = 1.0;        // 团战模式血量缩放（1.0 = 与单挑同血量，避免集火秒人）
 
   const byId = {};
   const units = RAW.map((r) => {
@@ -206,7 +222,6 @@
       id: r.id, name: r.name, title: r.title, role: r.role, pos: r.pos,
       palette: r.palette, hidden: !!r.hidden,
       trait: r.trait || null,                    // 收集型单位的拾取特性（例如凑企鹅捡石头）
-      modeBalance: MODE_BALANCE[r.id] || {},
       stats: Object.assign({
         hp: 1000, atk: 90, def: 40, spd: 200, crit: 0.1, critDmg: 1.7,
         weight: 1, range: 80, atkInterval: 0.6,
@@ -242,6 +257,6 @@
   CC.fighters = {
     units, byId, get, all, playable, ids,
     basicAttackTimeline,
-    consts: { DAMAGE_BASE, TEAM_HP_SCALE },
+    consts: { DAMAGE_BASE },
   };
 })();

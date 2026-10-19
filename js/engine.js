@@ -20,7 +20,9 @@
   const SUSTAIN_SCALE = 0.72;        // 全局续航系数（回血/护盾/吸血统一压一档，防止打不死的僵局）
   const PICKUP_TTL = 90;            // 地上物件存活时间
   const PICKUP_RESPAWN = 1.6;       // 物件补充间隔
-  const PICKUP_MAX = 10;            // 场上同时存在的物件上限
+  const STONES_INITIAL = 8;         // 每只存活凑企鹅的开局石头数
+  const STONES_TARGET = 10;         // 每只存活凑企鹅的地面石头补充目标
+  const STONES_REFILL = 2;          // 每次补充时，每只存活凑企鹅最多刷新两块
   const W = 1200, D = 700;          // 擂台平面尺寸
   const DODGE_CD = 0.9;
 
@@ -32,6 +34,7 @@
     return m;
   }
   function hasBuff(e, kind) {
+    if (kind === 'superArmor' && e.su7) return true;
     for (let i = 0; i < e.buffs.length; i++) if (e.buffs[i].kind === kind && e.buffs[i].t < e.buffs[i].dur) return true;
     return false;
   }
@@ -69,7 +72,6 @@
     const teamA = opts.teamA || [];
     const teamB = opts.teamB || [];
     const mode = opts.mode || ((teamA.length > 1 || teamB.length > 1) ? 'team' : 'solo');
-    const hpScale = mode === 'team' || mode === 'brawl' ? CC.fighters.consts.TEAM_HP_SCALE : 1;
 
     const battle = {
       mode, seed: opts.seed == null ? 1 : opts.seed,
@@ -84,13 +86,12 @@
     function spawn(side, spec, idx) {
       const unit = CC.fighters.get(spec.id);
       if (!unit) return null;
-      const modeScale = (unit.modeBalance && (unit.modeBalance[mode] || (mode === 'brawl' && unit.modeBalance.team))) || {};
       const lane = spec.lane == null ? (unit.pos === 'back' ? 1 : 0) : spec.lane;
       // 默认站位与 board.js 的 LAYOUT 对齐（前排距中线 400 / 后排 480），保证开局有距离
       const defX = side === 'A' ? (lane === 0 ? 200 : 120) : (lane === 0 ? 1000 : 1080);
       const defZ = 200 + (idx % 3) * 150;
       const pos = spec.pos || [defX, defZ];
-      const hp = Math.max(1, Math.round(unit.stats.hp * hpScale * (spec.hpMul || 1) * (modeScale.hp || 1)));
+      const hp = Math.max(1, Math.round(unit.stats.hp * (spec.hpMul || 1)));
       const e = {
         id: battle._eid++, side, team: spec.team || side, unitId: unit.id, unit, slot: spec.slot == null ? idx : spec.slot, lane,
         x: pos[0], z: pos[1], h: 0, vx: 0, vz: 0, vh: 0,
@@ -100,7 +101,7 @@
         buffs: [], targetId: 0, combo: 0, comboT: 0,
         cast: null, hitstun: 0, deciding: 0, plan: null, dodgeCd: 0, stuck: 0, lastX: pos[0], lastZ: pos[1],
         isMinion: !!spec.isMinion, ownerId: spec.ownerId || 0, life: spec.life || 0,
-        atkMul: (spec.atkMul || 1) * (modeScale.atk || 1),
+        atkMul: spec.atkMul || 1,
         stacks: {},                 // 可拾取资源计数（例如 stone）
         trait: unit.trait || null,
         deadT: 0,
@@ -124,8 +125,11 @@
     battle.ramp = 1;
     battle.dbg = { kite: 0, retreat: 0, approach: 0, attack: 0, idle: 0, early: {} };
     function dbg(k) { battle.dbg.early[k] = (battle.dbg.early[k] || 0) + 1; }
-    // 开局在场上撒一批可拾取物（凑企鹅这类"收集型"单位的资源）
-    spawnPickup('stone', 8);
+    // 双方/乱斗统一按存活参战企鹅供给石头，召唤物不增加资源。
+    function stoneCollectors() {
+      return battle.participants.filter((e) => e.alive && !e.isMinion && e.unitId === 'tomori').length;
+    }
+    spawnPickup('stone', STONES_INITIAL * stoneCollectors());
 
     const all = () => battle.A.concat(battle.B);
     const foes = (e) => all().filter((o) => o.alive && o.team !== e.team);
@@ -229,7 +233,7 @@
       const skNow = dst.cast && dst.cast.skill;
       const immune = hasBuff(dst, 'superArmor') || (skNow && skNow.uninterruptible);
       if (dmg > 0 && dst.cast && dst.cast.charging && !immune
-          && dmg >= Math.max(1, dst.maxHp * INTERRUPT_MIN_RATIO)) {
+          && (opt.interrupt || dmg >= Math.max(1, dst.maxHp * INTERRUPT_MIN_RATIO))) {
         const key = dst.cast.key;
         const sk = dst.cast.skill || {};
         dst.cast = null;
@@ -250,6 +254,7 @@
     function kill(e, killer) {
       if (!e.alive) return;
       e.alive = false;
+      if (e.su7) finishSu7(e, 'ko');
       e.state = 'ko';
       e.stateT = 0;
       if (e.dash && e.dash.step.jumpHeight) { e.h = 0; e.vh = 0; }
@@ -283,6 +288,7 @@
       for (const ef of effects) {
         if (ef.chance != null && battle.rng.next() > ef.chance) continue;
         const self = ef.target === 'self' ? src : dst;
+        if (ef.kind === 'stun' && self.su7) continue;
         addBuff(self, ef.kind, ef.dur == null ? 1 : ef.dur, ef.mag == null ? 1 : ef.mag);
         if (ef.kind === 'stun') { self.hitstun = Math.max(self.hitstun, ef.dur || 1); self.state = 'stun'; self.stateT = 0; }
         push({ type: 'buff', kind: ef.kind, unitId: self.id, dur: ef.dur, mag: ef.mag,
@@ -370,11 +376,34 @@
             vx: dx * sp, vz: dz * sp, speed: sp, vh: 0, homing: !!t,
             targetId: t ? t.id : 0,
             bubble: !!step.bubble,
+            sonic: !!step.sonic, interrupt: !!step.interrupt,
+            phone: !!step.phone, hitIds: step.phone ? [] : null, bounceRange: step.bounceRange || 360,
             dmg: step.dmg, life: step.life || 2, radius: step.radius || 24,
             sprite: step.sprite || 'spark', scale: step.scale || 0.9,
             pierce: !!step.pierce, bounces: step.bounces || 0, effects: step.effects || [], hits: 0, arcH: step.arcH || 60,
           });
           push({ type: 'cast_fx', unitId: src.id, at: 'proj', x: src.x, z: src.z, h: src.h + 34 });
+          if (step.sonic) push({ type: 'leijunSonic', unitId: src.id, x: src.x, z: src.z,
+            h: src.h + 34, radius: step.radius || 24 });
+          break;
+        }
+        case 'su7_drive': {
+          const target = castTarget(src);
+          if (!target || src.su7) break;
+          const dx = target.x - src.x, dz = target.z - src.z;
+          const len = Math.hypot(dx, dz);
+          src.su7 = {
+            t: 0, dur: Math.max(0.5, step.dur || 4), speed: step.speed || 650, radius: step.radius || 62,
+            dx: len > 0.001 ? dx / len : src.facing, dz: len > 0.001 ? dz / len : 0,
+            targetId: target.id, lastHit: {}, retargetT: 0, skidT: 0,
+            trailX: src.x, trailZ: src.z, step, skill: opt.skillKey || 'ult',
+            hitTicks: Math.max(1, Math.ceil((step.hitCd || 0.65) / TICK - 1e-9)),
+          };
+          src.dash = null; src.run = null; src.hitstun = 0;
+          src.h = 0; src.vx = 0; src.vz = 0; src.vh = 0;
+          src.state = 'su7'; src.stateT = 0;
+          push({ type: 'su7Start', unitId: src.id, x: src.x, z: src.z, h: 0,
+            dx: src.su7.dx, dz: src.su7.dz, dur: src.su7.dur });
           break;
         }
         case 'bubble_trap': {
@@ -676,6 +705,7 @@
     }
 
     function knockback(src, dst, mag, up) {
+      if (dst.su7) return;
       const dx = dst.x - src.x, dz = dst.z - src.z;
       const len = Math.hypot(dx, dz) || 1;
       const k = 1 / Math.max(0.3, dst.unit.stats.weight);
@@ -686,7 +716,7 @@
 
     // ---------- 施法 ----------
     function canCast(e, key) {
-      if (!e.unit[key] || hasBuff(e, 'seal')) return false;
+      if (!e.unit[key] || e.su7 || hasBuff(e, 'seal')) return false;
       const sk = e.unit[key];
       if (key === 'ult') return e.energy >= (sk.cost || 100);
       return (e.cds[key] || 0) <= 0 && e.energy >= (sk.cost || 0);
@@ -737,6 +767,74 @@
       e.state = 'attack';
       e.stateT = 0;
       e.atkCd = e.unit.stats.atkInterval;
+    }
+
+    function finishSu7(e, reason) {
+      const d = e.su7;
+      if (!d) return;
+      e.su7 = null; e.cast = null; e.plan = null; e.deciding = 0;
+      e.h = 0; e.vx = 0; e.vz = 0; e.vh = 0; e.hitstun = 0; e.bubbleCageT = 0;
+      e.state = e.alive ? 'idle' : 'ko'; e.stateT = 0;
+      e.lastX = e.x; e.lastZ = e.z; e.stuck = 0;
+      push({ type: 'su7End', unitId: e.id, x: e.x, z: e.z, h: 0, dx: d.dx, dz: d.dz, reason });
+    }
+
+    function updateSu7(e, dt) {
+      const d = e.su7;
+      d.t += dt; d.retargetT -= dt; d.skidT += dt;
+      const targets = foes(e);
+      if (!targets.length) { finishSu7(e, 'no-target'); return; }
+      if (d.t >= d.dur - 1e-9) { finishSu7(e, 'timeout'); return; }
+      e.state = 'su7'; e.hitstun = 0; e.bubbleCageT = 0;
+      e.h = 0; e.vx = 0; e.vz = 0; e.vh = 0;
+      if (d.retargetT <= 0 || !targets.some((o) => o.id === d.targetId)) {
+        const ready = targets.filter((o) => d.lastHit[o.id] == null || battle.tick - d.lastHit[o.id] >= d.hitTicks);
+        ready.sort((a, b) => U.dist2(e.x, e.z, a.x, a.z) - U.dist2(e.x, e.z, b.x, b.z) || a.id - b.id);
+        d.targetId = ready.length ? ready[0].id : 0;
+        d.retargetT = 0.2;
+      }
+      const target = targets.find((o) => o.id === d.targetId);
+      if (target) {
+        const angle = Math.atan2(d.dz, d.dx);
+        const want = Math.atan2(target.z - e.z, target.x - e.x);
+        const delta = Math.atan2(Math.sin(want - angle), Math.cos(want - angle));
+        const turn = (d.step.turnRate || 5.5) * dt;
+        const heading = angle + U.clamp(delta, -turn, turn);
+        d.dx = Math.cos(heading); d.dz = Math.sin(heading);
+      }
+      const oldX = e.x, oldZ = e.z, travel = d.speed * dt;
+      const marginX = Math.max(80, d.radius), marginZ = Math.max(90, d.radius);
+      let nx = e.x + d.dx * travel, nz = e.z + d.dz * travel;
+      if (nx < marginX) { nx = marginX * 2 - nx; d.dx = Math.abs(d.dx); }
+      if (nx > W - marginX) { nx = (W - marginX) * 2 - nx; d.dx = -Math.abs(d.dx); }
+      if (nz < marginZ) { nz = marginZ * 2 - nz; d.dz = Math.abs(d.dz); }
+      if (nz > D - marginZ) { nz = (D - marginZ) * 2 - nz; d.dz = -Math.abs(d.dz); }
+      e.x = U.clamp(nx, marginX, W - marginX); e.z = U.clamp(nz, marginZ, D - marginZ);
+      e.facing = d.dx >= 0 ? 1 : -1;
+      const sx = e.x - oldX, sz = e.z - oldZ, length2 = sx * sx + sz * sz;
+      for (const o of targets) {
+        if (!o.alive || (d.lastHit[o.id] != null && battle.tick - d.lastHit[o.id] < d.hitTicks)) continue;
+        const along = length2 > 0 ? U.clamp(((o.x - oldX) * sx + (o.z - oldZ) * sz) / length2, 0, 1) : 0;
+        if (U.dist(oldX + sx * along, oldZ + sz * along, o.x, o.z) > d.radius + o.unit.radius * 0.6) continue;
+        d.lastHit[o.id] = battle.tick; d.retargetT = 0;
+        const dmg = applyDamage(e, o, d.step.dmg || 0.42, { skill: d.skill, melee: true });
+        if (dmg > 0) push({ type: 'su7Hit', unitId: e.id, targetId: o.id, x: o.x, z: o.z,
+          h: o.h + 25, dx: d.dx, dz: d.dz, dmg });
+        if (!e.alive) return;
+        if (dmg > 0 && o.alive) {
+          knockback({ x: o.x - d.dx * 20, z: o.z - d.dz * 20 }, o, d.step.knock || 210);
+          if (!hasBuff(o, 'superArmor')) {
+            o.hitstun = Math.max(o.hitstun, d.step.hitstun || 0.3); o.state = 'hurt'; o.stateT = 0;
+          }
+        }
+      }
+      if (!foes(e).length) { finishSu7(e, 'no-target'); return; }
+      if (d.skidT >= 0.08) {
+        d.skidT -= 0.08;
+        push({ type: 'su7Skid', unitId: e.id, x1: d.trailX, z1: d.trailZ, x2: e.x, z2: e.z,
+          x: e.x, z: e.z, dx: d.dx, dz: d.dz });
+        d.trailX = e.x; d.trailZ = e.z;
+      }
     }
 
     function finishRun(e) {
@@ -863,6 +961,7 @@
       }
       if (e.isDecoy) return;
 
+      if (e.su7) { updateSu7(e, dt); return; }
       if (e.run) { updateRun(e, dt); return; }
 
       // 冲刺
@@ -930,7 +1029,7 @@
         }
         if (c.idx >= c.steps.length) {
           const dur = c.skill && c.key !== 'basic' ? 0.55 : 0.25;
-          if (c.t >= dur && !e.run && !e.dash) { e.cast = null; e.state = 'idle'; }
+          if (c.t >= dur && !e.run && !e.dash && !e.su7) { e.cast = null; e.state = 'idle'; }
         }
         return;
       }
@@ -1116,7 +1215,7 @@
 
     // ---------- 地上可拾取物件（凑企鹅捡石头这类机制） ----------
     function spawnPickup(kind, count) {
-      for (let i = 0; i < (count || 1); i++) {
+      for (let i = 0; i < (count == null ? 1 : count); i++) {
         const p = {
           id: battle._eid++, kind: kind || 'stone',
           x: battle.rng.range(110, W - 110), z: battle.rng.range(90, D - 90), h: 0,
@@ -1153,13 +1252,14 @@
         p.t += dt;
         if (p.t > p.ttl) battle.pickups.splice(i, 1);
       }
-      // 场上保持一定数量，捡完会补
+      // 每只存活企鹅提供相同资源预算；阵亡后保留地上存量，只降低后续补充目标。
       battle._pickupT += dt;
-      if (battle._pickupT >= PICKUP_RESPAWN) {
+      if (battle._pickupT >= PICKUP_RESPAWN - 1e-9) {
         battle._pickupT = 0;
-        // 地面持续刷新石头：不够时一次补 2 个，保证"捡石头"的玩法一直有货
-        const need = PICKUP_MAX - battle.pickups.length;
-        if (need > 0) spawnPickup('stone', need >= 4 ? 2 : 1);
+        const collectors = stoneCollectors();
+        const stones = battle.pickups.filter((p) => p.kind === 'stone').length;
+        const need = STONES_TARGET * collectors - stones;
+        if (need > 0) spawnPickup('stone', Math.min(need, STONES_REFILL * collectors));
       }
       for (const e of all()) if (e.alive) tryCollect(e);
     }
@@ -1187,11 +1287,12 @@
         }
         // 追踪 AI 锁定目标；目标死亡后再就近重选，弹跳时保留新的目标。
         if (p.homing) {
-          let near = enemySide.find((o) => o.alive && o.id === p.targetId && o._projIgnore !== p.id);
+          const ignored = (o) => p.phone ? p.hitIds.includes(o.id) : o._projIgnore === p.id;
+          let near = enemySide.find((o) => o.alive && o.id === p.targetId && !ignored(o));
           let bd = Infinity;
           for (const o of near ? [] : enemySide) {
             if (!o.alive) continue;
-            if (o._projIgnore === p.id) continue;
+            if (ignored(o)) continue;
             const d2 = U.dist2(p.x, p.z, o.x, o.z);
             if (d2 < bd) { bd = d2; near = o; }
           }
@@ -1212,16 +1313,20 @@
         let hit = false;
         for (const o of enemySide) {
           if (!o.alive) continue;
-          if (o._projIgnore === p.id) continue;
+          if (p.phone ? p.hitIds.includes(o.id) : o._projIgnore === p.id) continue;
           if (U.dist(p.x, p.z, o.x, o.z) < p.radius + o.unit.radius * 0.6) {
-            applyDamage(owner, o, p.dmg, { skill: p.skill, knock: 40 });
+            if (p.phone) p.hitIds.push(o.id);
+            applyDamage(owner, o, p.dmg, { skill: p.skill, knock: 40, interrupt: p.interrupt });
             applyEffects(owner, o, p.effects, p);
             p.hits++;
             let consumed = !p.pierce;
             // 弹跳：命中后找一个新目标继续飞（孙笑川的「表情包连弹」）
             if (p.bounces > 0) {
               p.bounces--;
-              const next = enemySide.find((x) => x.alive && x !== o && x._projIgnore !== p.id);
+              const next = p.phone ? enemySide.filter((x) => x.alive && !p.hitIds.includes(x.id)
+                && U.dist(p.x, p.z, x.x, x.z) <= p.bounceRange)
+                .sort((a, b) => U.dist2(p.x, p.z, a.x, a.z) - U.dist2(p.x, p.z, b.x, b.z) || a.id - b.id)[0]
+                : enemySide.find((x) => x.alive && x !== o && x._projIgnore !== p.id);
               if (next) {
                 p.targetId = next.id;
                 const dx = next.x - p.x, dz = next.z - p.z;
@@ -1230,13 +1335,13 @@
                 p.vz = (dz / l) * p.speed;
                 p.homing = true;
                 p.life = Math.max(p.life, 1.2);
-                o._projIgnore = p.id;
+                if (!p.phone) o._projIgnore = p.id;
                 consumed = false;
-                push({ type: 'bounce', unitId: p.ownerId, x: p.x, z: p.z, to: next.id, left: p.bounces });
+                push({ type: 'bounce', unitId: p.ownerId, x: p.x, z: p.z, to: next.id, left: p.bounces, phone: !!p.phone });
               }
             }
             if (consumed) hit = true;
-            if (hit) break;
+            if (hit || p.phone) break;
           }
         }
         if (hit || p.life <= 0 || p.x < 0 || p.x > W || p.z < 40 || p.z > D - 40) battle.projectiles.splice(i, 1);
@@ -1357,6 +1462,8 @@
         for (let j = i + 1; j < list.length; j++) {
           const b = list[j];
           if (!b.alive) continue;
+          // 车辆通过路径碰撞结算伤害；普通单位互斥会抵消车速并将驾驶者堵在边界。
+          if (a.su7 || b.su7) continue;
           const dx = b.x - a.x, dz = b.z - a.z;
           const d = Math.hypot(dx, dz);
           const minD = (a.unit.radius + b.unit.radius) * 0.95;
@@ -1378,8 +1485,10 @@
       }
       for (const e of list) {
         if (!e.alive) continue;
-        e.x = U.clamp(e.x, 50, W - 50);
-        e.z = U.clamp(e.z, 60, D - 60);
+        const marginX = e.su7 ? Math.max(80, e.su7.radius) : 50;
+        const marginZ = e.su7 ? Math.max(90, e.su7.radius) : 60;
+        e.x = U.clamp(e.x, marginX, W - marginX);
+        e.z = U.clamp(e.z, marginZ, D - marginZ);
       }
       updateProjectiles(dt);
       updateZones(dt);
@@ -1398,7 +1507,10 @@
         }
       }
       checkEnd();
-      if (battle.over) battle.stats.duration = battle.time;
+      if (battle.over) {
+        for (const e of all()) if (e.su7) finishSu7(e, 'no-target');
+        battle.stats.duration = battle.time;
+      }
     };
 
     battle.hash = function () {
@@ -1410,9 +1522,16 @@
         if (e.unit.s3) parts.push('s3', Math.round(e.cds.s3 * 50));
         if (e.isDecoy) parts.push('decoy', e.ownerId, Math.round(e.life * 60));
         if (e.run) parts.push('run', Math.round(e.run.t * 60), Math.round(e.run.distance), e.run.pace);
+        if (e.su7) parts.push('su7', Math.round(e.su7.t * 60), Math.round(e.su7.dx * 10000),
+          Math.round(e.su7.dz * 10000), e.su7.targetId, Math.round(e.su7.retargetT * 60),
+          Object.keys(e.su7.lastHit).sort((a, b) => a - b).map((id) => id + ':' + e.su7.lastHit[id]).join(','));
         if (e.unitId === 'zhangxuefeng') parts.push(e.stacks.pace || 0, e.stacks.paceBoost || 0);
       }
       parts.push(battle.projectiles.length, battle.zones.length, battle.tracks.length, battle.bubbleTraps.length);
+      for (const p of battle.projectiles) {
+        if (p.phone || p.sonic) parts.push('leijunProj', p.id, p.targetId, Math.round(p.x * 50),
+          Math.round(p.z * 50), Math.round(p.life * 60), p.bounces, (p.hitIds || []).join(','));
+      }
       return U.hex8(U.hashParts(parts));
     };
 

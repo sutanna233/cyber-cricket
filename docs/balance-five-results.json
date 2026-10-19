@@ -1,0 +1,659 @@
+{
+  "checkedAt": "2026-10-19T17:00:02.518Z",
+  "seedStart": 43000,
+  "samples": 20,
+  "config": {
+    "stats": {
+      "tomori": {
+        "hp": 1850,
+        "atk": 146
+      },
+      "tiansuluo": {
+        "hp": 1300
+      },
+      "leijun": {
+        "hp": 1220
+      },
+      "xujiayin": {
+        "hp": 1300
+      },
+      "zhangxuefeng": {
+        "hp": 1320,
+        "atk": 78
+      }
+    },
+    "units": {
+      "zhangxuefeng": {
+        "s1": {
+          "steps": {
+            "0": {
+              "trailDmg": 0.06,
+              "dmg": 0.75
+            }
+          }
+        },
+        "ult": {
+          "steps": {
+            "1": {
+              "trailDmg": 0.085,
+              "dmg": 1.3
+            }
+          }
+        }
+      },
+      "tiansuluo": {
+        "ult": {
+          "steps": {
+            "0": {
+              "radius": 220
+            }
+          }
+        }
+      },
+      "leijun": {
+        "s1": {
+          "steps": {
+            "0": {
+              "dmg": 0.72
+            }
+          }
+        },
+        "s2": {
+          "steps": {
+            "0": {
+              "dmg": 0.34
+            }
+          }
+        },
+        "ult": {
+          "steps": {
+            "0": {
+              "dmg": 0.32
+            }
+          }
+        }
+      }
+    }
+  },
+  "versions": {
+    "fighters": "3616e57d631e9878",
+    "engine": "a1f940154084b32a",
+    "ai": "73ad103d34140c28",
+    "battle": "9f32b128747d4e9a"
+  },
+  "matrix": {
+    "after": {
+      "solo": {
+        "mode": "solo",
+        "count": 1,
+        "seeds": [
+          43000,
+          43001,
+          43002,
+          43003,
+          43004,
+          43005,
+          43006,
+          43007,
+          43008,
+          43009,
+          43010,
+          43011,
+          43012,
+          43013,
+          43014,
+          43015,
+          43016,
+          43017,
+          43018,
+          43019
+        ],
+        "matches": 400,
+        "unfinished": 0,
+        "nonfinite": 0,
+        "maxDuration": 75.95,
+        "meanDuration": 40.226208333333325,
+        "rows": {
+          "tomori": {
+            "matches": 160,
+            "wins": 92,
+            "losses": 68,
+            "draws": 0,
+            "winsA": 43,
+            "winsB": 49,
+            "rate": 0.575
+          },
+          "xujiayin": {
+            "matches": 160,
+            "wins": 63,
+            "losses": 97,
+            "draws": 0,
+            "winsA": 23,
+            "winsB": 40,
+            "rate": 0.39375
+          },
+          "zhangxuefeng": {
+            "matches": 160,
+            "wins": 90,
+            "losses": 70,
+            "draws": 0,
+            "winsA": 42,
+            "winsB": 48,
+            "rate": 0.5625
+          },
+          "tiansuluo": {
+            "matches": 160,
+            "wins": 102,
+            "losses": 58,
+            "draws": 0,
+            "winsA": 46,
+            "winsB": 56,
+            "rate": 0.6375
+          },
+          "leijun": {
+            "matches": 160,
+            "wins": 53,
+            "losses": 107,
+            "draws": 0,
+            "winsA": 13,
+            "winsB": 40,
+            "rate": 0.33125
+          }
+        },
+        "pairs": [
+          {
+            "a": "tomori",
+            "b": "xujiayin",
+            "matches": 40,
+            "winsA": 22,
+            "winsB": 18,
+            "draws": 0
+          },
+          {
+            "a": "tomori",
+            "b": "zhangxuefeng",
+            "matches": 40,
+            "winsA": 18,
+            "winsB": 22,
+            "draws": 0
+          },
+          {
+            "a": "tomori",
+            "b": "tiansuluo",
+            "matches": 40,
+            "winsA": 29,
+            "winsB": 11,
+            "draws": 0
+          },
+          {
+            "a": "tomori",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 23,
+            "winsB": 17,
+            "draws": 0
+          },
+          {
+            "a": "xujiayin",
+            "b": "zhangxuefeng",
+            "matches": 40,
+            "winsA": 11,
+            "winsB": 29,
+            "draws": 0
+          },
+          {
+            "a": "xujiayin",
+            "b": "tiansuluo",
+            "matches": 40,
+            "winsA": 4,
+            "winsB": 36,
+            "draws": 0
+          },
+          {
+            "a": "xujiayin",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 30,
+            "winsB": 10,
+            "draws": 0
+          },
+          {
+            "a": "zhangxuefeng",
+            "b": "tiansuluo",
+            "matches": 40,
+            "winsA": 0,
+            "winsB": 40,
+            "draws": 0
+          },
+          {
+            "a": "zhangxuefeng",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 39,
+            "winsB": 1,
+            "draws": 0
+          },
+          {
+            "a": "tiansuluo",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 15,
+            "winsB": 25,
+            "draws": 0
+          }
+        ]
+      },
+      "team": {
+        "mode": "team",
+        "count": 3,
+        "seeds": [
+          43000,
+          43001,
+          43002,
+          43003,
+          43004,
+          43005,
+          43006,
+          43007,
+          43008,
+          43009,
+          43010,
+          43011,
+          43012,
+          43013,
+          43014,
+          43015,
+          43016,
+          43017,
+          43018,
+          43019
+        ],
+        "matches": 400,
+        "unfinished": 0,
+        "nonfinite": 0,
+        "maxDuration": 88.23333333333333,
+        "meanDuration": 31.90183333333333,
+        "rows": {
+          "tomori": {
+            "matches": 160,
+            "wins": 47,
+            "losses": 113,
+            "draws": 0,
+            "winsA": 27,
+            "winsB": 20,
+            "rate": 0.29375
+          },
+          "xujiayin": {
+            "matches": 160,
+            "wins": 91,
+            "losses": 69,
+            "draws": 0,
+            "winsA": 48,
+            "winsB": 43,
+            "rate": 0.56875
+          },
+          "zhangxuefeng": {
+            "matches": 160,
+            "wins": 113,
+            "losses": 47,
+            "draws": 0,
+            "winsA": 63,
+            "winsB": 50,
+            "rate": 0.70625
+          },
+          "tiansuluo": {
+            "matches": 160,
+            "wins": 40,
+            "losses": 120,
+            "draws": 0,
+            "winsA": 20,
+            "winsB": 20,
+            "rate": 0.25
+          },
+          "leijun": {
+            "matches": 160,
+            "wins": 109,
+            "losses": 51,
+            "draws": 0,
+            "winsA": 55,
+            "winsB": 54,
+            "rate": 0.68125
+          }
+        },
+        "pairs": [
+          {
+            "a": "tomori",
+            "b": "xujiayin",
+            "matches": 40,
+            "winsA": 9,
+            "winsB": 31,
+            "draws": 0
+          },
+          {
+            "a": "tomori",
+            "b": "zhangxuefeng",
+            "matches": 40,
+            "winsA": 7,
+            "winsB": 33,
+            "draws": 0
+          },
+          {
+            "a": "tomori",
+            "b": "tiansuluo",
+            "matches": 40,
+            "winsA": 26,
+            "winsB": 14,
+            "draws": 0
+          },
+          {
+            "a": "tomori",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 5,
+            "winsB": 35,
+            "draws": 0
+          },
+          {
+            "a": "xujiayin",
+            "b": "zhangxuefeng",
+            "matches": 40,
+            "winsA": 17,
+            "winsB": 23,
+            "draws": 0
+          },
+          {
+            "a": "xujiayin",
+            "b": "tiansuluo",
+            "matches": 40,
+            "winsA": 33,
+            "winsB": 7,
+            "draws": 0
+          },
+          {
+            "a": "xujiayin",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 10,
+            "winsB": 30,
+            "draws": 0
+          },
+          {
+            "a": "zhangxuefeng",
+            "b": "tiansuluo",
+            "matches": 40,
+            "winsA": 22,
+            "winsB": 18,
+            "draws": 0
+          },
+          {
+            "a": "zhangxuefeng",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 35,
+            "winsB": 5,
+            "draws": 0
+          },
+          {
+            "a": "tiansuluo",
+            "b": "leijun",
+            "matches": 40,
+            "winsA": 1,
+            "winsB": 39,
+            "draws": 0
+          }
+        ]
+      }
+    }
+  },
+  "mixed": {
+    "3": {
+      "count": 3,
+      "seedStart": 68000,
+      "samples": 8,
+      "matches": 160,
+      "unfinished": 0,
+      "nonfinite": 0,
+      "maxDuration": 74.75,
+      "rows": {
+        "tomori": {
+          "wins": 28,
+          "matches": 64,
+          "rate": 0.4375
+        },
+        "xujiayin": {
+          "wins": 31,
+          "matches": 64,
+          "rate": 0.484375
+        },
+        "zhangxuefeng": {
+          "wins": 32,
+          "matches": 64,
+          "rate": 0.5
+        },
+        "tiansuluo": {
+          "wins": 34,
+          "matches": 64,
+          "rate": 0.53125
+        },
+        "leijun": {
+          "wins": 35,
+          "matches": 64,
+          "rate": 0.546875
+        }
+      }
+    },
+    "6": {
+      "count": 6,
+      "seedStart": 68000,
+      "samples": 8,
+      "matches": 160,
+      "unfinished": 0,
+      "nonfinite": 0,
+      "maxDuration": 75.33333333333333,
+      "rows": {
+        "tomori": {
+          "wins": 27,
+          "matches": 64,
+          "rate": 0.421875
+        },
+        "xujiayin": {
+          "wins": 26,
+          "matches": 64,
+          "rate": 0.40625
+        },
+        "zhangxuefeng": {
+          "wins": 29,
+          "matches": 64,
+          "rate": 0.453125
+        },
+        "tiansuluo": {
+          "wins": 35,
+          "matches": 64,
+          "rate": 0.546875
+        },
+        "leijun": {
+          "wins": 43,
+          "matches": 64,
+          "rate": 0.671875
+        }
+      }
+    }
+  },
+  "brawl": {
+    "samples": 50,
+    "seedStart": 78000,
+    "matches": 150,
+    "unfinished": 0,
+    "nonfinite": 0,
+    "maxDuration": 73.78333333333333,
+    "rows": {
+      "tomori": {
+        "appearances": 270,
+        "matches": 150,
+        "wins": 45,
+        "rate": 0.3
+      },
+      "xujiayin": {
+        "appearances": 270,
+        "matches": 150,
+        "wins": 20,
+        "rate": 0.13333333333333333
+      },
+      "zhangxuefeng": {
+        "appearances": 270,
+        "matches": 150,
+        "wins": 11,
+        "rate": 0.07333333333333333
+      },
+      "tiansuluo": {
+        "appearances": 270,
+        "matches": 150,
+        "wins": 31,
+        "rate": 0.20666666666666667
+      },
+      "leijun": {
+        "appearances": 270,
+        "matches": 150,
+        "wins": 43,
+        "rate": 0.2866666666666667
+      }
+    },
+    "sizes": [
+      {
+        "size": 5,
+        "matches": 50,
+        "wins": {
+          "tomori": 17,
+          "xujiayin": 3,
+          "zhangxuefeng": 4,
+          "tiansuluo": 7,
+          "leijun": 19
+        }
+      },
+      {
+        "size": 10,
+        "matches": 50,
+        "wins": {
+          "tomori": 12,
+          "xujiayin": 11,
+          "zhangxuefeng": 4,
+          "tiansuluo": 11,
+          "leijun": 12
+        }
+      },
+      {
+        "size": 12,
+        "matches": 50,
+        "wins": {
+          "tomori": 16,
+          "xujiayin": 6,
+          "zhangxuefeng": 3,
+          "tiansuluo": 13,
+          "leijun": 12
+        }
+      }
+    ]
+  },
+  "replay": [
+    {
+      "mode": "solo",
+      "seed": 72000,
+      "ticks": 1256,
+      "hash": "584a2719",
+      "checkpoints": 4
+    },
+    {
+      "mode": "solo",
+      "seed": 72001,
+      "ticks": 1998,
+      "hash": "de7f6468",
+      "checkpoints": 6
+    },
+    {
+      "mode": "team",
+      "seed": 72000,
+      "ticks": 1980,
+      "hash": "4e78adfc",
+      "checkpoints": 6
+    },
+    {
+      "mode": "team",
+      "seed": 72001,
+      "ticks": 2076,
+      "hash": "daae8667",
+      "checkpoints": 6
+    },
+    {
+      "mode": "brawl",
+      "seed": 72000,
+      "ticks": 2779,
+      "hash": "c9cc63aa",
+      "checkpoints": 9
+    },
+    {
+      "mode": "brawl",
+      "seed": 72001,
+      "ticks": 1968,
+      "hash": "75d5f650",
+      "checkpoints": 6
+    }
+  ],
+  "passed": true,
+  "sharedStats": {
+    "tomori": {
+      "hp": 1850,
+      "atk": 146,
+      "def": 88,
+      "spd": 168,
+      "crit": 0.06,
+      "critDmg": 1.6,
+      "weight": 1.45,
+      "range": 84,
+      "atkInterval": 0.66
+    },
+    "xujiayin": {
+      "hp": 1300,
+      "atk": 110,
+      "def": 44,
+      "spd": 196,
+      "crit": 0.16,
+      "critDmg": 1.9,
+      "weight": 1,
+      "range": 92,
+      "atkInterval": 0.58
+    },
+    "zhangxuefeng": {
+      "hp": 1320,
+      "atk": 78,
+      "def": 52,
+      "spd": 235,
+      "crit": 0.1,
+      "critDmg": 1.7,
+      "weight": 1,
+      "range": 86,
+      "atkInterval": 0.6
+    },
+    "tiansuluo": {
+      "hp": 1300,
+      "atk": 91,
+      "def": 56,
+      "spd": 190,
+      "crit": 0.08,
+      "critDmg": 1.6,
+      "weight": 0.9,
+      "range": 300,
+      "atkInterval": 0.75
+    },
+    "leijun": {
+      "hp": 1220,
+      "atk": 94,
+      "def": 48,
+      "spd": 190,
+      "crit": 0.08,
+      "critDmg": 1.6,
+      "weight": 1,
+      "range": 300,
+      "atkInterval": 0.75
+    }
+  }
+}

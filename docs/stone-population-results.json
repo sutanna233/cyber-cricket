@@ -1,0 +1,351 @@
+{
+  "checkedAt": "2026-10-19T17:14:25.368Z",
+  "engine": "815900b5b7d53f93",
+  "passed": 11,
+  "total": 11,
+  "limits": "Focused resource logic and cross-host full mutable state checks; replay fixtures capped at 900 ticks, not a new character balance survey or browser/render claim.",
+  "checks": [
+    {
+      "name": "opening supply is 8 per original penguin for 0, 1, 3, 12 in all modes",
+      "passed": true,
+      "detail": [
+        {
+          "mode": "solo",
+          "count": 0,
+          "stones": 0
+        },
+        {
+          "mode": "solo",
+          "count": 1,
+          "stones": 8
+        },
+        {
+          "mode": "solo",
+          "count": 3,
+          "stones": 24
+        },
+        {
+          "mode": "solo",
+          "count": 12,
+          "stones": 96
+        },
+        {
+          "mode": "team",
+          "count": 0,
+          "stones": 0
+        },
+        {
+          "mode": "team",
+          "count": 1,
+          "stones": 8
+        },
+        {
+          "mode": "team",
+          "count": 3,
+          "stones": 24
+        },
+        {
+          "mode": "team",
+          "count": 12,
+          "stones": 96
+        },
+        {
+          "mode": "brawl",
+          "count": 0,
+          "stones": 0
+        },
+        {
+          "mode": "brawl",
+          "count": 1,
+          "stones": 8
+        },
+        {
+          "mode": "brawl",
+          "count": 3,
+          "stones": 24
+        },
+        {
+          "mode": "brawl",
+          "count": 12,
+          "stones": 96
+        }
+      ]
+    },
+    {
+      "name": "shared supply counts either side and their combined population",
+      "passed": true,
+      "detail": [
+        {
+          "mode": "solo",
+          "A": 0,
+          "B": 3
+        },
+        {
+          "mode": "solo",
+          "A": 1,
+          "B": 2
+        },
+        {
+          "mode": "solo",
+          "A": 3,
+          "B": 0
+        },
+        {
+          "mode": "team",
+          "A": 0,
+          "B": 3
+        },
+        {
+          "mode": "team",
+          "A": 1,
+          "B": 2
+        },
+        {
+          "mode": "team",
+          "A": 3,
+          "B": 0
+        },
+        {
+          "mode": "brawl",
+          "A": 0,
+          "B": 3
+        },
+        {
+          "mode": "brawl",
+          "A": 1,
+          "B": 2
+        },
+        {
+          "mode": "brawl",
+          "A": 3,
+          "B": 0
+        }
+      ]
+    },
+    {
+      "name": "refill scales at 2 each and stops at target 10 each",
+      "passed": true,
+      "detail": [
+        {
+          "mode": "solo",
+          "count": 0,
+          "target": 0,
+          "refill": 0
+        },
+        {
+          "mode": "solo",
+          "count": 1,
+          "target": 10,
+          "refill": 2
+        },
+        {
+          "mode": "solo",
+          "count": 3,
+          "target": 30,
+          "refill": 6
+        },
+        {
+          "mode": "solo",
+          "count": 12,
+          "target": 120,
+          "refill": 24
+        },
+        {
+          "mode": "team",
+          "count": 0,
+          "target": 0,
+          "refill": 0
+        },
+        {
+          "mode": "team",
+          "count": 1,
+          "target": 10,
+          "refill": 2
+        },
+        {
+          "mode": "team",
+          "count": 3,
+          "target": 30,
+          "refill": 6
+        },
+        {
+          "mode": "team",
+          "count": 12,
+          "target": 120,
+          "refill": 24
+        },
+        {
+          "mode": "brawl",
+          "count": 0,
+          "target": 0,
+          "refill": 0
+        },
+        {
+          "mode": "brawl",
+          "count": 1,
+          "target": 10,
+          "refill": 2
+        },
+        {
+          "mode": "brawl",
+          "count": 3,
+          "target": 30,
+          "refill": 6
+        },
+        {
+          "mode": "brawl",
+          "count": 12,
+          "target": 120,
+          "refill": 24
+        }
+      ]
+    },
+    {
+      "name": "one missing stone refills only one and never exceeds target",
+      "passed": true
+    },
+    {
+      "name": "foreign pickups do not occupy the stone population budget",
+      "passed": true
+    },
+    {
+      "name": "death lowers subsequent refill without deleting existing stones",
+      "passed": true
+    },
+    {
+      "name": "original minions and later non-participant duplicates add no supply",
+      "passed": true
+    },
+    {
+      "name": "refill runs precisely every 96 fixed simulation ticks (1.6 seconds)",
+      "passed": true,
+      "detail": {
+        "firstRefillTick": 96,
+        "secondRefillTick": 192,
+        "seconds": 3.2
+      }
+    },
+    {
+      "name": "normal pickup still respects radius, stone kind and inventory cap",
+      "passed": true
+    },
+    {
+      "name": "expired pickups still disappear and zero penguins do not replace them",
+      "passed": true
+    },
+    {
+      "name": "VM host and browser-style host replay every mutable state field deterministically",
+      "passed": true,
+      "detail": [
+        {
+          "mode": "solo",
+          "count": 0,
+          "seed": 91200,
+          "steps": 900,
+          "hash": "86d3b521",
+          "finalStones": 0,
+          "over": false
+        },
+        {
+          "mode": "solo",
+          "count": 1,
+          "seed": 91201,
+          "steps": 900,
+          "hash": "5142381f",
+          "finalStones": 4,
+          "over": false
+        },
+        {
+          "mode": "solo",
+          "count": 3,
+          "seed": 91203,
+          "steps": 900,
+          "hash": "eeaaa6a4",
+          "finalStones": 15,
+          "over": false
+        },
+        {
+          "mode": "solo",
+          "count": 12,
+          "seed": 91212,
+          "steps": 900,
+          "hash": "5cf050e0",
+          "finalStones": 28,
+          "over": false
+        },
+        {
+          "mode": "team",
+          "count": 0,
+          "seed": 91200,
+          "steps": 900,
+          "hash": "36178767",
+          "finalStones": 0,
+          "over": false
+        },
+        {
+          "mode": "team",
+          "count": 1,
+          "seed": 91201,
+          "steps": 900,
+          "hash": "5f5dd31d",
+          "finalStones": 4,
+          "over": false
+        },
+        {
+          "mode": "team",
+          "count": 3,
+          "seed": 91203,
+          "steps": 900,
+          "hash": "0c6849d6",
+          "finalStones": 15,
+          "over": false
+        },
+        {
+          "mode": "team",
+          "count": 12,
+          "seed": 91212,
+          "steps": 900,
+          "hash": "eb4a77f2",
+          "finalStones": 28,
+          "over": false
+        },
+        {
+          "mode": "brawl",
+          "count": 0,
+          "seed": 91200,
+          "steps": 900,
+          "hash": "a7b675c1",
+          "finalStones": 0,
+          "over": false
+        },
+        {
+          "mode": "brawl",
+          "count": 1,
+          "seed": 91201,
+          "steps": 900,
+          "hash": "b2fc38c6",
+          "finalStones": 10,
+          "over": false
+        },
+        {
+          "mode": "brawl",
+          "count": 3,
+          "seed": 91203,
+          "steps": 900,
+          "hash": "4d504bda",
+          "finalStones": 26,
+          "over": false
+        },
+        {
+          "mode": "brawl",
+          "count": 12,
+          "seed": 91212,
+          "steps": 900,
+          "hash": "894939a0",
+          "finalStones": 59,
+          "over": false
+        }
+      ]
+    }
+  ]
+}

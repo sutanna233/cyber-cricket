@@ -9,21 +9,51 @@
     canvas,video{display:block;width:100%;max-width:960px;background:#020611;border:1px solid #33516d;border-radius:12px;margin:16px 0}
     button,input,a{font:inherit}button,a{padding:8px 14px;margin:4px;border-radius:6px}button{cursor:pointer}input{width:150px;padding:8px}
     a{color:#8fe8ff}#status{min-height:24px;color:#acebc2}#error{color:#ffa6a6}.hidden{display:none}
+    fieldset{border:1px solid #33516d;border-radius:10px;padding:16px;margin:16px 0;background:#101a2d}
+    legend{font-weight:700;color:#aee8ff}details{margin-top:14px}summary{cursor:pointer;color:#bce6ff}
+    .settings{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+    .settings label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#b9ccdf}
+    .settings input,.settings select{box-sizing:border-box;width:100%;padding:9px;background:#080e1d;border:1px solid #3a536f;border-radius:5px;color:#eef6ff;font:14px system-ui}
+    .settings .wide{grid-column:1/-1}input[type=checkbox]{width:auto}.hint{font-size:13px;color:#98abc5;line-height:1.6}
+    @media(max-width:600px){body{margin:12px}.settings{grid-template-columns:1fr}.settings .wide{grid-column:auto}}
   </style>
 </head>
 <body><main>
   <h1>对战录像导出</h1>
-  <p>管理员专用 · 当前阵容与模式 · 960×600 / 30fps / 有声 WebM（游戏音效、语音与背景音乐）。生成时不外放，保持页面打开，按对局时长生成。</p>
+  <p>管理员专用 · 当前阵容与模式 · 960×600 / 30fps / 有声 MP4 或 WebM。导出时可附大模型解说、自然配音和字幕；实际游戏不启用解说。生成时不外放，请保持页面打开。</p>
   <form id="export-form"><label>种子 <input id="seed" type="number" min="0" max="4294967295" step="1" required></label>
+    <label>录像格式 <select id="record-format"><option value="mp4">MP4（优先）</option><option value="webm">WebM</option></select></label>
+    <p id="format-support" class="hint" role="status"></p>
+    <fieldset><legend>录像解说</legend>
+      <label><input id="commentary-enabled" type="checkbox" checked> 生成自然语言解说、云端配音和字幕</label>
+      <details id="commentary-settings" open><summary>模型与声音设置</summary>
+        <div class="settings">
+          <label>接口预设<select id="commentary-preset"><option value="minimax">MiniMax Token Plan</option><option value="custom">自定义 OpenAI 兼容接口</option></select></label>
+          <label>语言模型<input id="commentary-model" value="MiniMax-M3.1-Flash" maxlength="200" autocomplete="off"></label>
+          <label class="wide">语言模型接口地址<input id="commentary-base" value="https://api.minimax.cn/v1" maxlength="2048" autocomplete="off" spellcheck="false"></label>
+          <label class="wide">语言模型 API Key<input id="commentary-key" type="password" placeholder="填写自己的密钥，仅用于本次导出" maxlength="8192" autocomplete="off"></label>
+          <label>MiniMax 语音模型<select id="speech-model"><option value="speech-2.8-hd">Speech 2.8 HD · 自然音质</option><option value="speech-2.8-turbo">Speech 2.8 Turbo · 快速生成</option></select></label>
+          <label>语速<input id="speech-speed" type="number" value="1.05" min="0.5" max="2" step="0.05"></label>
+          <label class="wide">配音接口地址<input id="speech-base" value="https://api.minimax.cn/v1" maxlength="2048" autocomplete="off" spellcheck="false"></label>
+          <label class="wide">音色 ID<input id="speech-voice" value="male-qn-qingse" maxlength="100" autocomplete="off"><span>默认青涩青年男声，也可填写平台提供的其他音色 ID。</span></label>
+        </div>
+        <p><label><input id="speech-reuse-key" type="checkbox" checked> 配音使用上面的同一密钥</label></p>
+        <div class="settings"><label class="wide">独立配音 API Key<input id="speech-key" type="password" placeholder="需要时填写独立语音密钥" maxlength="8192" autocomplete="off" disabled></label></div>
+        <p><label><input id="commentary-remember" type="checkbox"> 记住本机配置和密钥</label>
+          <button id="commentary-save" type="button">保存到本机浏览器</button><button id="commentary-clear" type="button">清除已保存配置</button></p>
+        <p id="commentary-settings-status" class="hint" role="status"></p>
+        <p class="hint">可选择将配置与密钥保存在当前浏览器；服务器不持久保存密钥，录像和回放JSON不含密钥。模型和配音权限以你的账户为准，可分别配置密钥。先复盘战况、生成解说和配音，再按事件时间录制，声音与画面同步。<a href="https://platform.minimax.cn/docs/api-reference/text-openai-api" target="_blank" rel="noopener noreferrer">模型文档</a> · <a href="https://platform.minimax.cn/docs/api-reference/speech-t2a-http" target="_blank" rel="noopener noreferrer">语音文档</a></p>
+      </details>
+    </fieldset>
     <button id="record" type="submit">生成并下载录像</button><button id="cancel" type="button" disabled>取消导出</button>
   </form>
   <p id="lineup"></p><p id="status" role="status">准备就绪</p><p id="error" role="alert"></p>
   <canvas id="recording" width="960" height="600" aria-label="录像画面"></canvas>
-  <div id="downloads" class="hidden"><a id="video-download" download>下载 WebM 录像</a><a id="replay-download" download>下载种子与阵容 JSON</a></div>
+  <div id="downloads" class="hidden"><a id="video-download" download>下载录像</a><a id="replay-download" download>下载种子与阵容 JSON</a></div>
   <video id="preview" controls class="hidden"></video>
 </main>
-<script src="js/util.js"></script><script src="js/fighters.js?v=13"></script><script src="js/waves.js?v=13"></script>
-<script src="js/assets.js?v=16"></script><script src="js/sprites.js?v=13"></script><script src="js/engine.js?v=13"></script>
-<script src="js/ai.js?v=13"></script><script src="js/battle.js?v=13"></script><script src="js/render.js?v=13"></script>
-<script src="js/webm.js?v=13"></script><script src="js/recorder.js?v=16"></script>
+<script src="js/util.js"></script><script src="js/fighters.js?v=22"></script><script src="js/waves.js?v=13"></script>
+<script src="js/assets.js?v=26"></script><script src="js/sprites.js?v=22"></script><script src="js/engine.js?v=23"></script>
+<script src="js/ai.js?v=22"></script><script src="js/battle.js?v=13"></script><script src="js/render.js?v=25"></script>
+<script src="js/recording-report.js?v=1"></script><script src="js/webm.js?v=13"></script><script src="js/commentary-settings.js?v=1"></script><script src="js/commentary-export.js?v=2"></script><script src="js/recorder.js?v=27"></script>
 </body></html>

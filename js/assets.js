@@ -19,15 +19,16 @@
   let BASE = 'assets/';
 
   // ---------------------------------------------------------------- 清单
-  const UNIT_IDS = ['tomori', 'xujiayin', 'zhangxuefeng', 'tiansuluo'];
+  const UNIT_IDS = ['tomori', 'xujiayin', 'zhangxuefeng', 'tiansuluo', 'leijun'];
 
   // 512×512 抠图里"真正有像素"的内容框（实测，tools/_rendercheck/measure*.ps1）
   // 渲染层按这些框裁切绘制，保证两位角色视觉体量一致。
   // <<<TEX_META_BEGIN>>> 由 tools/_rendercheck/gen_tex_meta.js 生成，勿手改
   // 口径：box = alpha>64 的内容包围盒；ratio = alpha>16 的非透明占比（与 tests/_loader 一致）
   // 重算：node tools/_rendercheck/gen_tex_meta.js    校验：--check
-  const TEX_META_STAMP = "2026-10-18T18:20:22.611Z";
+  const TEX_META_STAMP = "2026-10-19T16:35:45.222Z";
   const MEME_TEX = {
+    leijun: { box: [0, 2, 476, 293], ratio: 0.488184, w: 477, h: 294, sha: '05c7b28e02ae' },
     tiansuluo: { box: [112, 14, 413, 494], ratio: 0.454592, w: 500, h: 500 },
     zhangxuefeng: { box: [89, 5, 531, 396], ratio: 0.4153, w: 629, h: 397 },
     tomori: { box: [148, 31, 364, 497], ratio: 0.3043, w: 512, h: 512, size: 132749, mtime: 1792343268136, sha: "77ece0404248" },
@@ -161,12 +162,17 @@
   }
 
   // ---------------------------------------------------------------- 注册
+  function unitPath(id) {
+    const meta = MEME_TEX[id];
+    return BASE + 'units/meme/' + id + '.png' + (meta && meta.sha ? '?v=' + meta.sha : '');
+  }
+
   function registerUnit(id) {
     pool[id] = {
       key: id, kind: 'unit',
       // 查找顺序：meme 抠图 → 程序化兜底 → 运行时占位块（占位块不需要网络请求）
       candidates: [
-        { path: BASE + 'units/meme/' + id + '.png', source: 'meme' },
+        { path: unitPath(id), source: 'meme' },
         { path: BASE + 'units/' + id + '.png', source: 'fallback' },
       ],
       img: null, state: 'pending', usedPath: null, source: 'missing', rejected: [],
@@ -893,6 +899,43 @@
     return !!(AUD.ctx || AUD.decoded > 0);
   }
 
+  // 导出页专用：动态解说接入同一个主混音，实际游戏不会调用。
+  let narration = null;
+  function stopNarration() {
+    if (narration) { try { narration.src.stop(); } catch (e) { /* 已结束 */ } }
+    narration = null;
+    if (AUD.musicGain) AUD.musicGain.gain.value = VOL.music;
+    if (AUD.sfxGain) AUD.sfxGain.gain.value = VOL.sfx;
+  }
+  async function decodeNarration(bytes) {
+    const ctx = audioCtx();
+    if (!ctx || !ctx.decodeAudioData) throw new Error('浏览器无法解码解说语音');
+    return ctx.decodeAudioData(bytes);
+  }
+  function playNarration(buffer) {
+    const ctx = audioCtx();
+    if (!ctx || !buffer || AUD.paused) return null;
+    stopNarration();
+    const src = ctx.createBufferSource(), gain = ctx.createGain();
+    src.buffer = buffer;
+    gain.gain.value = 2.5;
+    src.connect(gain); gain.connect(AUD.masterGain);
+    const current = { src: src, gain: gain };
+    narration = current;
+    if (AUD.musicGain) AUD.musicGain.gain.value = VOL.music * 0.2;
+    if (AUD.sfxGain) AUD.sfxGain.gain.value = VOL.sfx * 0.55;
+    src.onended = function () {
+      try { src.disconnect(); gain.disconnect(); } catch (e) { /* 已释放 */ }
+      if (narration === current) {
+        narration = null;
+        if (AUD.musicGain) AUD.musicGain.gain.value = VOL.music;
+        if (AUD.sfxGain) AUD.sfxGain.gain.value = VOL.sfx;
+      }
+    };
+    src.start(0);
+    return current;
+  }
+
   // 录制游戏自己的混音；监听关闭时仍向录像输送音效、语音和音乐。
   function captureAudio() {
     const ctx = audioCtx();
@@ -953,11 +996,15 @@
     pauseAll: pauseAll,
     resumeAll: resumeAll,
     captureAudio: captureAudio,
+    decodeNarration: decodeNarration,
+    playNarration: playNarration,
+    stopNarration: stopNarration,
     // 渲染/UI 用到的附加接口（不影响契约）
     asset: asset,
     placeholder: placeholder,
     flash: flash,
     contentBox: contentBox,
+    unitPath: unitPath,
     fxSize: function (key) { return FX_META[key] || [128, 128]; },
     bgMeta: BG_META,
     sheetMeta: function () { return SHEET_META; },
@@ -973,7 +1020,7 @@
         const e = pool[k];
         if (e.kind === 'unit') {
           e.candidates = [
-            { path: BASE + 'units/meme/' + k + '.png', source: 'meme' },
+            { path: unitPath(k), source: 'meme' },
             { path: BASE + 'units/' + k + '.png', source: 'fallback' },
           ];
         } else if (e.kind === 'fx') e.candidates = [{ path: BASE + 'fx/' + k + '.png', source: 'fx' }];

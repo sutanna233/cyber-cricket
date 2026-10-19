@@ -158,7 +158,9 @@
       let box = null;
       if (A && A.contentBox) box = A.contentBox(key);
       if (box && box.w > 0 && box.h > 0) aspect = box.w / box.h;
-      else aspect = 0.86;
+      else if (box && box.x1 >= box.x0 && box.y1 >= box.y0) {
+        aspect = (box.x1 - box.x0 + 1) / (box.y1 - box.y0 + 1);
+      } else aspect = 0.86;
     }
     aspect = clamp(aspect, 0.5, 1.6);
     return { w: h * aspect, h: h };
@@ -346,6 +348,11 @@
   function drawShadow(ctx, ent, opt) {
     if (!ent) return;
     const o = opt || {};
+    if (ent.su7 && ent.alive !== false) {
+      const p = project(ent.x, ent.z, 0);
+      ctx.save(); ctx.fillStyle = 'rgba(3,6,16,0.45)';
+      ellipsePath(ctx, p.sx, p.sy, 78, 17); ctx.fill(); ctx.restore(); return;
+    }
     const s = spriteSize(ent, { scale: o.scale });
     const p = project(ent.x, ent.z, 0);
     const hh = typeof ent.h === 'number' ? ent.h : 0;
@@ -766,6 +773,84 @@
     ctx.restore();
   }
 
+  // 车内头像只在驾驶窗中绘制，常态角色不会再叠在车辆旁边。
+  function drawSu7(ctx, ent, opt) {
+    const o = opt || {}, drive = ent.su7 || {};
+    const t = o.t || 0, dx = drive.dx == null ? (ent.facing || 1) : drive.dx, dz = drive.dz || 0;
+    const facing = dx < 0 ? -1 : dx > 0 ? 1 : (ent.facing || 1);
+    const turn = clamp(Math.atan2(dz * VIEW.ZS, Math.abs(dx) * VIEW.SCALE) * facing, -0.38, 0.38);
+    const pt = project(ent.x, ent.z, 0);
+    ctx.save(); ctx.translate(pt.sx, pt.sy + Math.sin(t * 34) * 0.7);
+    ctx.rotate(turn); ctx.scale(facing, 1);
+    ctx.globalAlpha = o.alpha === undefined ? 1 : o.alpha;
+    ctx.strokeStyle = 'rgba(166,233,255,0.5)'; ctx.lineWidth = 2;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath(); ctx.moveTo(-81 - i * 5, -15 - i * 8); ctx.lineTo(-103 - i * 8, -15 - i * 8); ctx.stroke();
+    }
+    // 流线车身、溜背车顶和低矮引擎盖。
+    ctx.beginPath(); ctx.moveTo(-76, -10); ctx.lineTo(-72, -27);
+    ctx.quadraticCurveTo(-68, -32, -43, -34); ctx.lineTo(-23, -51);
+    ctx.quadraticCurveTo(5, -64, 36, -43); ctx.lineTo(47, -34);
+    ctx.quadraticCurveTo(69, -33, 77, -22); ctx.lineTo(78, -9);
+    ctx.quadraticCurveTo(73, -3, 60, -4); ctx.lineTo(-63, -4); ctx.closePath();
+    if (ctx.createLinearGradient) {
+      const paint = ctx.createLinearGradient(0, -56, 0, 0);
+      paint.addColorStop(0, '#b4f0f3'); paint.addColorStop(0.45, '#42b5cb'); paint.addColorStop(1, '#12647f');
+      ctx.fillStyle = paint;
+    } else ctx.fillStyle = '#42b5cb';
+    ctx.fill(); ctx.strokeStyle = '#b3f3ff'; ctx.lineWidth = 1.3; ctx.stroke();
+    ctx.fillStyle = '#132c3b';
+    ctx.beginPath(); ctx.moveTo(-36, -33); ctx.lineTo(-20, -47); ctx.lineTo(-9, -49);
+    ctx.lineTo(-9, -32); ctx.closePath(); ctx.fill();
+    // 驾驶窗及座椅。头像裁切保留原 PNG，不生成或改写素材。
+    ctx.beginPath(); ctx.moveTo(-4, -49); ctx.quadraticCurveTo(15, -51, 28, -41);
+    ctx.lineTo(37, -32); ctx.lineTo(-4, -32); ctx.closePath(); ctx.fill();
+    ctx.save(); ctx.clip();
+    ctx.fillStyle = '#0b192a'; ctx.fillRect(-4, -40, 12, 14);
+    const A = CC.assets, key = spriteKey(ent), img = A && A.texture ? A.texture(key) : null;
+    if (img) {
+      const box = A.contentBox ? A.contentBox(key) : null;
+      const bx = box && box.x0 !== undefined ? box.x0 : 0;
+      const by = box && box.y0 !== undefined ? box.y0 : 0;
+      const bw = box && box.x1 !== undefined ? box.x1 - bx + 1 : (img.naturalWidth || img.width || 1);
+      const bh = box && box.y1 !== undefined ? box.y1 - by + 1 : (img.naturalHeight || img.height || 1);
+      ctx.drawImage(img, bx + bw * 0.50, by + bh * 0.14, bw * 0.29, bh * 0.56, -3, -51, 35, 39);
+    } else {
+      ctx.fillStyle = '#e9bb8b'; ellipsePath(ctx, 13, -40, 7, 8); ctx.fill();
+    }
+    ctx.restore();
+    // 窗框遮住下身，方向盘与手位于车窗里，明确表现为坐着驾驶。
+    ctx.strokeStyle = '#102b39'; ctx.lineWidth = 2.1;
+    ctx.beginPath(); ctx.moveTo(-7, -49); ctx.lineTo(-7, -31); ctx.lineTo(38, -31); ctx.stroke();
+    ellipsePath(ctx, 28, -32, 5, 4); ctx.stroke();
+    ctx.strokeStyle = '#dfb68b'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(16, -30); ctx.lineTo(25, -31); ctx.stroke();
+    ctx.fillStyle = '#3a9db4'; rr(ctx, 33, -33, 10, 4, 2); ctx.fill();
+    // 侧裙、门缝、门把手和 SU7 标识。
+    ctx.strokeStyle = '#18778f'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-8, -30); ctx.lineTo(-9, -10); ctx.lineTo(37, -10); ctx.lineTo(41, -28); ctx.stroke();
+    ctx.strokeStyle = '#a2e7ed'; ctx.beginPath(); ctx.moveTo(-60, -20); ctx.lineTo(64, -20); ctx.stroke();
+    ctx.fillStyle = '#d1faff'; ctx.fillRect(22, -25, 8, 2);
+    ctx.save(); ctx.translate(4, -12); ctx.scale(facing, 1);
+    ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#e6fcff'; ctx.fillText('SU7', 0, 0);
+    ctx.restore();
+    ctx.fillStyle = '#082939'; ctx.fillRect(-62, -7, 126, 4);
+    // 两个可见车轮和旋转轮辐。
+    for (const wx of [-48, 51]) {
+      ctx.fillStyle = '#09111b'; ellipsePath(ctx, wx, -6, 11, 11); ctx.fill();
+      ctx.strokeStyle = '#7d9aa6'; ctx.lineWidth = 2; ellipsePath(ctx, wx, -6, 6.5, 6.5); ctx.stroke();
+      ctx.strokeStyle = '#e0f6ff'; ctx.lineWidth = 1.4;
+      for (let i = 0; i < 4; i++) {
+        const a = t * 22 + i * Math.PI / 2;
+        ctx.beginPath(); ctx.moveTo(wx, -6); ctx.lineTo(wx + Math.cos(a) * 5.5, -6 + Math.sin(a) * 5.5); ctx.stroke();
+      }
+    }
+    ctx.strokeStyle = '#d2fbff'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(63, -27); ctx.lineTo(73, -23); ctx.stroke();
+    ctx.strokeStyle = '#ff6379'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-72, -24); ctx.lineTo(-64, -23); ctx.stroke();
+    ctx.restore();
+  }
+
   // ---------------------------------------------------------------- 单位
   function drawUnit(ctx, ent, opt) {
     if (!ent) return;
@@ -785,6 +870,12 @@
     }
     const o = opt || {};
     const t = (o.t === undefined ? 0 : o.t);
+    if (ent.su7 && ent.alive !== false) {
+      drawSu7(ctx, ent, o);
+      if (o.showBars !== false) drawBars(ctx, ent, o);
+      drawMarked(ctx, ent, o); drawStacks(ctx, ent, o); drawBuffs(ctx, ent, o);
+      return;
+    }
     const key = spriteKey(ent);
     const A = CC.assets;
     let img = A && A.texture ? A.texture(key) : null;
