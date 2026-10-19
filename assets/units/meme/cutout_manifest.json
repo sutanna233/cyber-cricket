@@ -26,5 +26,13 @@
     "source": "user-supplied transparent PNG",
     "file": "assets/units/meme/zhangxuefeng.png",
     "coverage": 0.4153
+  },
+  {
+    "id": "tiansuluo",
+    "name": "天素罗",
+    "source": "user-supplied transparent PNG",
+    "opaque_ratio": 0.454592,
+    "file": "assets/units/meme/tiansuluo.png",
+    "sha256": "a9dc3a03a39f281bc9a1194ddd6d85af0f766eb116224625bc17c27965d57215"
   }
 ]

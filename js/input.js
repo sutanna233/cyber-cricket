@@ -39,7 +39,7 @@
   function dispatch(name, a, b) {
     const H = handlerTable();
     if (!H || typeof H[name] !== 'function') return false;
-    try { H[name](a, b); return true; } catch (e) {
+    try { return H[name](a, b) !== false; } catch (e) {
       const m = main();
       if (m && typeof m.fail === 'function') m.fail(e);
       return false;
@@ -83,9 +83,9 @@
 
   function ownSlots() {
     const b = boardMod();
-    if (!b || typeof b.slots !== 'function') return [];
+    if (!b || typeof b.allSlots !== 'function') return [];
     let list = [];
-    try { list = b.slots() || []; } catch (e) { list = []; }   // 当前摆阵侧「启用中」的槽位
+    try { list = b.allSlots() || []; } catch (e) { list = []; }   // 当前摆阵侧「启用中」的槽位
     return Array.isArray(list) ? list : [];
   }
 
@@ -138,7 +138,7 @@
       slotIndex: entry.index,
       index: entry.index,
       side: entry.side,
-      valid: !other,                       // 目标槽可落子（空槽，或拖着自己）
+      valid: !!carry || !other,                       // 目标槽可落子（空槽，或拖着自己）
       unitId: carry || entry.unitId || null,
       lane: entry.lane,
       occupied: !!entry.unitId,
@@ -176,8 +176,9 @@
     const sel = state.selected;
     if (!sel) return false;
     if (!canPlace()) return false;
-    const ok = dispatch('onPlace', sel.unitId, slotIndex);
-    if (ok) state.selected = null;
+    const ok = sel.from === 'slot'
+      ? dispatch('onMove', sel.slotIndex, slotIndex) : dispatch('onPlace', sel.unitId, slotIndex);
+    if (ok && sel.from === 'slot') state.selected = null;
     return ok;
   }
 
@@ -197,7 +198,9 @@
     if (!entry) return;
     updateHover(p.x, p.y);
     if (entry.unitId) {
-      state.dragging = { from: 'slot', unitId: entry.unitId, slotIndex: entry.index, moved: false };
+      const benchSelection = state.selected && state.selected.from === 'bench' ? state.selected : null;
+      state.dragging = { from: 'slot', unitId: entry.unitId, slotIndex: entry.index, moved: false,
+        startX: p.x, startY: p.y, benchSelection };
       state.selected = { from: 'slot', unitId: entry.unitId, slotIndex: entry.index };
       updateHover(p.x, p.y);
       return;
@@ -208,7 +211,7 @@
   function onPointerMove(ev) {
     const p = canvasPoint(ev);
     state.pointer.x = p.x; state.pointer.y = p.y; state.pointer.inside = true;
-    if (state.dragging) state.dragging.moved = true;
+    if (state.dragging && Math.hypot(p.x - state.dragging.startX, p.y - state.dragging.startY) >= 5) state.dragging.moved = true;
     updateHover(p.x, p.y);
   }
 
@@ -216,17 +219,19 @@
     if (!state.dragging) return;
     const drag = state.dragging;
     state.dragging = null;
-    if (!drag.moved) return;                     // 纯点击：保留选中
+    if (!drag.moved) {
+      if (drag.benchSelection) {
+        dispatch('onPlace', drag.benchSelection.unitId, drag.slotIndex);
+        state.selected = drag.benchSelection;
+      }
+      return;
+    }
     if (!canPlace()) return;
     if (overBench(ev)) { removeAt(drag.slotIndex); return; }   // 拖回单位池 = 移除
     const p = canvasPoint(ev);
     const entry = hitEntry(p.x, p.y);
     if (!entry) return;
-    if (!entry.unitId) { dispatch('onPlace', drag.unitId, entry.index); state.selected = null; return; }
-    if (entry.unitId === drag.unitId) return;                  // 原地放下
-    // 目标被占：先把目标槽移开，再放（等价交换位置）
-    dispatch('onRemove', entry.index);
-    dispatch('onPlace', drag.unitId, entry.index);
+    dispatch('onMove', drag.slotIndex, entry.index);
     state.selected = null;
   }
 
@@ -270,13 +275,14 @@
   function onDragStart(ev) {
     const id = unitIdFromEvent(ev);
     if (!id || !canPlace()) { if (ev && ev.preventDefault) ev.preventDefault(); return; }
+    const B = boardMod(); if (B && B.noteActivity) B.noteActivity();
     state.dragging = { from: 'bench', unitId: id, slotIndex: -1, moved: true };
     state.selected = { from: 'bench', unitId: id, slotIndex: -1 };
     if (ev) {
       if (ev.dataTransfer && typeof ev.dataTransfer.setData === 'function') {
         try { ev.dataTransfer.setData('text/plain', id); } catch (e) { /* ignore */ }
       }
-      if (typeof ev.preventDefault === 'function') ev.preventDefault();
+      if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'copy';
     }
   }
 
@@ -294,9 +300,14 @@
     const p = canvasPoint(ev);
     const entry = hitEntry(p.x, p.y);
     if (!entry) return;
-    if (entry.unitId && entry.unitId !== unitId) dispatch('onRemove', entry.index);
-    dispatch('onPlace', unitId, entry.index);
-    state.selected = null;
+    const selected = state.selected;
+    if (selected && selected.from === 'slot') {
+      dispatch('onMove', selected.slotIndex, entry.index);
+      state.selected = null;
+    } else {
+      dispatch('onPlace', unitId, entry.index);
+      state.selected = null;
+    }
   }
 
   function onBenchDrop(ev) {
@@ -343,6 +354,10 @@
         target.addEventListener(down, onPointerDown);
         target.addEventListener(move, onPointerMove);
         target.addEventListener(up, onPointerUp);
+        if (typeof document !== 'undefined' && document.addEventListener) {
+          document.addEventListener(move, (ev) => { if (state.dragging && ev.target !== target) onPointerMove(ev); });
+          document.addEventListener(up, (ev) => { if (state.dragging && ev.target !== target) onPointerUp(ev); });
+        }
         if (hasPointer) target.addEventListener('pointerleave', () => { state.hover = null; state.hoverIndex = null; state.pointer.inside = false; });
         else target.addEventListener('mouseleave', () => { state.hover = null; state.hoverIndex = null; state.pointer.inside = false; });
         target.addEventListener('dragover', (ev) => { if (ev && ev.preventDefault) ev.preventDefault(); });

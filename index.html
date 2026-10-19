@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>赛博斗蛐蛐 · 放置 ARPG</title>
   <!-- 相对路径：直接双击 file:// 打开也不白屏 -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=13" />
   <link rel="stylesheet" href="mobile.css?v=2" />
 </head>
 
@@ -25,10 +25,12 @@
         <span class="cc-stat"><b>存活</b><i>左</i><span id="alive-a">0</span><i>:</i><i>右</i><span id="alive-b">0</span></span>
         <span class="cc-stat"><b>对局计时</b><span id="match-time">0:00</span></span>
         <span class="cc-stat" id="autostart-wrap"><b>开打倒计时</b><span id="autostart">5.0</span><i>s</i></span>
-        <span class="cc-stat"><b>单位池</b><span id="bench-count">3/3</span></span>
+        <span class="cc-stat"><b>单位池</b><span id="bench-count">4/4</span></span>
       </div>
 
       <div class="hud-right">
+        <button id="btn-start" class="cc-btn" type="button">开始对战</button>
+        <button id="btn-mode" class="cc-btn ghost" type="button" title="切换阵营对战 / 每人各自为战的自由乱斗，并回到摆阵">模式：阵营对战</button>
         <button id="btn-pause" class="cc-btn" type="button" title="空格 或 点击：暂停 / 继续">暂停</button>
         <button id="btn-restart" class="cc-btn ghost" type="button" title="重新开始：场数归零，回到摆阵（保留两侧布阵与人数）">重新开始</button>
       </div>
@@ -66,15 +68,11 @@
       <!-- 单位池面板（上帝视角：左右任一侧都能摆，可调每侧人数） -->
       <aside id="bench" class="cc-bench">
         <h2 class="cc-bench-title">
-          <span class="cc-bench-head">单位池<span id="bench-side" class="cc-bench-side">左方布阵中</span></span>
-          <span class="cc-bench-hint">拖到擂台 · 或点击选中再点空位 · 拖回此处取消</span>
+          <span class="cc-bench-head">单位池<span id="bench-side" class="cc-bench-side">双方共用 · 可重复部署</span></span>
+          <span class="cc-bench-hint">同一角色可重复部署 · 点卡片后连续点空位 · 拖回此处取消</span>
         </h2>
 
         <div class="cc-bench-tools">
-          <div class="cc-side-switch">
-            <button id="side-A" class="cc-side on" type="button" title="给左方摆阵">左方</button>
-            <button id="side-B" class="cc-side" type="button" title="给右方摆阵">右方</button>
-          </div>
           <div class="cc-size">
             <b>左方人数</b>
             <button id="size-A-minus" class="cc-step" type="button" title="左方上场人数 −1">−</button>
@@ -89,6 +87,11 @@
           </div>
         </div>
 
+        <label style="padding:6px 12px"><input id="auto-start" type="checkbox"> 停手5秒自动开战</label>
+        <div id="export-controls" class="hidden" style="padding:6px 12px">
+          <label>录像种子 <input id="export-seed" type="number" min="0" max="4294967295" step="1" value="20261019" style="width:115px"></label>
+          <button id="btn-export" class="cc-btn ghost" type="button">导出录像</button>
+        </div>
         <div id="placing-hint" class="cc-placing-hint hidden"></div>
         <div id="benchList" class="cc-bench-list"></div>
       </aside>
@@ -103,20 +106,20 @@
 
   <!-- ============ 模块按契约顺序加载（经典 script，无构建/无 import） ============ -->
   <script src="js/util.js"></script>
-  <script src="js/fighters.js?v=5"></script>
-  <script src="js/waves.js?v=5"></script>
-  <script src="js/assets.js?v=5"></script>
+  <script src="js/fighters.js?v=13"></script>
+  <script src="js/waves.js?v=13"></script>
+  <script src="js/assets.js?v=13"></script>
   <script src="js/audio-controls.js?v=1"></script>
-  <script src="js/sprites.js?v=5"></script>
-  <script src="js/engine.js?v=5"></script>
-  <script src="js/ai.js?v=5"></script>
-  <script src="js/battle.js?v=5"></script>
-  <script src="js/board.js"></script>
-  <script src="js/render.js?v=5"></script>
-  <script src="js/ui.js?v=5"></script>
-  <script src="js/input.js"></script>
-  <script src="js/main.js"></script>
-<script src="js/access.js"></script>
+  <script src="js/sprites.js?v=13"></script>
+  <script src="js/engine.js?v=13"></script>
+  <script src="js/ai.js?v=13"></script>
+  <script src="js/battle.js?v=13"></script>
+  <script src="js/board.js?v=13"></script>
+  <script src="js/render.js?v=13"></script>
+  <script src="js/ui.js?v=13"></script>
+  <script src="js/input.js?v=14"></script>
+  <script src="js/main.js?v=13"></script>
+<script src="js/access.js?v=13"></script>
   <script src="js/mobile.js"></script>
 
   <!-- 启动（main.js 已定义 boot；此处容错调用） -->

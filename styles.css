@@ -461,3 +461,12 @@ body::before {
   .hud-mid { width: 100%; }
   .cc-bench { max-height: 420px; }
 }
+
+/* 桌面窄窗口仍并排展示角色池，避免拖放必须跨屏滚动。 */
+@media (min-width: 901px) and (max-width: 1340px) {
+  .cc-stage { flex-wrap: nowrap; }
+  .cc-stage-canvas { flex: 1 1 0; min-width: 0; width: auto; height: auto; aspect-ratio: 960 / 600; }
+  .cc-bench { flex: 0 0 300px; min-width: 300px; }
+}
+
+.cc-btn:disabled { opacity: 0.5; cursor: default; }

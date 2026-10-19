@@ -19,7 +19,7 @@
   let BASE = 'assets/';
 
   // ---------------------------------------------------------------- 清单
-  const UNIT_IDS = ['tomori', 'xujiayin', 'zhangxuefeng'];
+  const UNIT_IDS = ['tomori', 'xujiayin', 'zhangxuefeng', 'tiansuluo'];
 
   // 512×512 抠图里"真正有像素"的内容框（实测，tools/_rendercheck/measure*.ps1）
   // 渲染层按这些框裁切绘制，保证两位角色视觉体量一致。
@@ -28,6 +28,7 @@
   // 重算：node tools/_rendercheck/gen_tex_meta.js    校验：--check
   const TEX_META_STAMP = "2026-10-18T18:20:22.611Z";
   const MEME_TEX = {
+    tiansuluo: { box: [112, 14, 413, 494], ratio: 0.454592, w: 500, h: 500 },
     zhangxuefeng: { box: [89, 5, 531, 396], ratio: 0.4153, w: 629, h: 397 },
     tomori: { box: [148, 31, 364, 497], ratio: 0.3043, w: 512, h: 512, size: 132749, mtime: 1792343268136, sha: "77ece0404248" },
     xujiayin: { box: [51, 23, 460, 487], ratio: 0.3863, w: 512, h: 512, size: 193429, mtime: 1792343272958, sha: "d14dd4a7a7e3" },

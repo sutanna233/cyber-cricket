@@ -31,6 +31,7 @@
     opts = opts || {};
     const lu = normalizedLineup(opts.lineup);
     const match = {
+      mode: opts.mode || ((lu.A.length > 1 || lu.B.length > 1) ? 'team' : 'solo'),
       seed: opts.seed == null ? 1 : opts.seed,
       lineup: lu,
       paused: false,
@@ -48,7 +49,7 @@
     function build(seed) {
       match.battle = CC.engine.createBattle({
         seed, teamA: lu.A, teamB: lu.B,
-        mode: (lu.A.length > 1 || lu.B.length > 1) ? 'team' : 'solo',
+        mode: match.mode,
       });
       match.state = 'fighting';
       match.reportVisible = false;
@@ -122,7 +123,7 @@
       for (const id in dmg) if (dmg[id] > best) { best = dmg[id]; mvp = id; }
       const duration = b.stats.duration || b.time;
       // 上帝视角：只有"哪一方赢了"，没有玩家的输赢
-      const winner = b.result === 'draw' ? null : b.result;      // 'A' | 'B' | null
+      const winner = b.result === 'A' || b.result === 'B' ? b.result : null;      // 'A' | 'B' | null
       const survivors = winner ? b[winner].filter((e) => e.alive && !e.isDecoy).length : 0;
       const loser = winner === 'A' ? 'B' : winner === 'B' ? 'A' : null;
       const loserTotal = loser ? Math.max(1, b[loser].length) : 1;
@@ -133,10 +134,13 @@
         const s = ratio * 2 + (duration < 30 ? 0.5 : 0) + (duration > 90 ? -0.3 : 0);
         grade = s > 1.4 ? 'S' : s > 0.95 ? 'A' : s > 0.55 ? 'B' : 'C';
       } else grade = 'B';
+      const champion = b.mode === 'brawl' && b.participants.find((e) => e.id === b.winnerId);
       return {
+        mode: b.mode, winnerId: b.winnerId || null,
+        champion: champion ? champion.unit.name + ' #' + champion.id : null,
         winner,                       // 'A' | 'B' | null（中立）
         result: b.result, reason: b.endReason,
-        winnerLabel: winner === 'A' ? '左方' : winner === 'B' ? '右方' : '双方同归于尽',
+        winnerLabel: champion ? champion.unit.name + ' #' + champion.id : winner === 'A' ? '左方' : winner === 'B' ? '右方' : '双方同归于尽',
         duration: U.round2(duration), seconds: U.mmss(duration),
         dmgByUnit: dmg, killsByUnit: Object.assign({}, b.stats.killsByUnit),
         dmgBySideUnit: Object.assign({}, b.stats.dmgBySideUnit),
@@ -144,7 +148,7 @@
         maxCombo: b.stats.maxCombo, casts: b.stats.casts.slice(0, 40),
         picked: Object.assign({}, b.stats.picked),
         mvp, mvpDmg: best > 0 ? best : 0, grade,
-        survivors, totalUnits: Math.max(b.A.length, b.B.length, loserTotal) || 1,
+        survivors: champion ? 1 : survivors, totalUnits: Math.max(b.A.length, b.B.length, loserTotal) || 1,
         hash: match.hash(),
       };
     };

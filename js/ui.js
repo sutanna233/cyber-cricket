@@ -160,7 +160,8 @@
     card.setAttribute('data-unit', entry.id);
     card.setAttribute('tabindex', '-1');
     card.setAttribute('title', (unit.name || entry.id) + ' · ' + (unit.title || '') + ' · ' +
-      (unit.pos === 'back' ? '建议后排' : '建议前排'));
+      (unit.pos === 'back' ? '建议后排' : '建议前排') + '\n' +
+      ['s1', 's2', 's3', 'ult'].filter((key) => unit[key]).map((key) => unit[key].name + '：' + unit[key].desc).join('\n'));
 
     append(card, thumbFor(unit));
     append(card, el('div', 'cc-name', unit.name || entry.id));
@@ -186,6 +187,7 @@
 
   // ---------- 战报 ----------
   function reasonText(reason) {
+    if (reason === 'last-standing') return '最后存活者';
     if (reason === 'wipe') return '一方全灭';
     if (reason === 'double-ko') return '同归于尽';
     return reason ? String(reason) : '';
@@ -198,7 +200,8 @@
     const surv = Math.max(0, Math.round(Number(rep.survivors) || 0));
     const leftAlive = rep.winner === 'A' ? surv : 0;
     const rightAlive = rep.winner === 'B' ? surv : 0;
-    rows.push(['存活', '左 ' + leftAlive + ' / ' + total + '　右 ' + rightAlive + ' / ' + total]);
+    if (rep.mode === 'brawl') rows.push(['乱斗结果', rep.champion || '同归于尽']);
+    else rows.push(['存活', '左 ' + leftAlive + ' / ' + total + '　右 ' + rightAlive + ' / ' + total]);
 
     const dmg = rep.dmgByUnit || {};
     const ids = Object.keys(dmg).sort((a, b) => (Number(dmg[b]) || 0) - (Number(dmg[a]) || 0));
@@ -246,7 +249,7 @@
     const winner = rep.winner === 'A' || rep.winner === 'B' ? rep.winner : null;
     const panel = els.report;
     // 只说哪一边赢了：左方胜 / 右方胜 / 双方同归于尽
-    setText(els.repTitle, winnerLabelOf(rep) + (winner ? ' 胜' : ''));
+    setText(els.repTitle, winnerLabelOf(rep) + (rep.mode === 'brawl' && rep.champion ? ' · 乱斗冠军' : winner ? ' 胜' : ''));
     if (els.repTitle && els.repTitle.classList) {
       try {
         els.repTitle.classList.toggle('win', winner === 'A');
@@ -269,7 +272,8 @@
         append(lines, row);
       });
     }
-    setText(els.repFoot, '3 秒后自动重开一场（沿用左右双方布阵）');
+    const manualStart = CC.main && !CC.main.state.autoStart && (!CC.access || CC.access.caps.place);
+    setText(els.repFoot, manualStart ? '3 秒后回到布阵，点击开始对战继续' : '3 秒后自动重开一场（沿用左右双方布阵）');
     show(panel, true);
     return state.report;
   }
@@ -294,7 +298,7 @@
 
   function setSide(s) {
     state.side = String(s || 'A').toUpperCase() === 'B' ? 'B' : 'A';
-    setText(els.benchSide, SIDE_LABEL[state.side] + '布阵中');
+    setText(els.benchSide, '双方共用 · 可重复部署');
     if (els.sideA && els.sideA.classList) {
       try { els.sideA.classList.toggle('on', state.side === 'A'); } catch (e) { /* ignore */ }
     }
@@ -404,6 +408,12 @@
     els.noticeLine = byId('notice');
     els.btnPause = byId('btn-pause');
     els.btnRestart = byId('btn-restart');
+    els.btnMode = byId('btn-mode');
+    on(byId('btn-start'), 'click', () => { if (handlers.onStart) handlers.onStart(); });
+    on(byId('btn-export'), 'click', () => { if (handlers.onExport) handlers.onExport(); });
+    on(byId('auto-start'), 'change', (ev) => { if (handlers.onAutoStart) handlers.onAutoStart(ev.target.checked); });
+    const exportPanel = byId('export-controls');
+    if (exportPanel && globalThis.__CC_ROLE__ === 'admin') exportPanel.classList.remove('hidden');
     els.bench = byId('bench');
     els.benchList = byId('benchList');
     els.benchSide = byId('bench-side');
@@ -430,6 +440,9 @@
     on(els.btnRestart, 'click', (ev) => {
       if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
       if (typeof handlers.onRestart === 'function') handlers.onRestart();
+    });
+    on(els.btnMode, 'click', () => {
+      if (typeof handlers.onMode === 'function') handlers.onMode();
     });
     on(els.sideA, 'click', (ev) => {
       if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();

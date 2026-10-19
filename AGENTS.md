@@ -2,52 +2,37 @@
 
 ## Project Structure & Module Organization
 
-This is a dependency-free, vanilla JavaScript/Canvas auto-battler with an optional Node.js account server.
+This dependency-free JavaScript/Canvas auto-battler uses classic IIFEs sharing `globalThis.CC`.
 
-- `index.html`, `account.html`, and `sim-watch.html` provide gameplay, accounts, and the simulation workbench.
-- `js/` contains browser modules sharing `globalThis.CC`: combat (`engine.js`, `ai.js`, `battle.js`), rendering, input, UI, and mobile support.
-- `server.js` serves allowlisted files and account APIs; `lib/users.js` stores accounts, and `lib/simhost.js` runs deterministic headless battles.
-- `assets/` holds committed sprites, backgrounds, effects, and audio. `styles.css` and `mobile.css` define desktop and responsive layouts.
-- `deploy/` contains container, nginx, systemd, and deployment instructions; `docs/img/` contains documentation screenshots.
+- `js/`: fighters, deterministic combat/AI, rendering, placement, UI, and recording.
+- `index.html`, `account.html`, `sim-watch.html`, `replay-export.html`: gameplay, accounts, simulation workbench, and administrator recording.
+- `server.js`, `lib/`: allowlisted static hosting, accounts, headless simulation, and replay validation.
+- `assets/`: committed images/audio; `docs/`: validation and balance results; `deploy/`: production setup.
 
 ## Build, Test, and Development Commands
 
-Use Node.js 18+ (22 recommended). No package installation or build step is required.
+Use Node.js 18+; no dependency installation or build is required.
 
-- `node server.js`: serve locally at `http://127.0.0.1:8130`; occupied ports advance automatically, so check startup output.
-- `node server.js --port 8131 --mode view`: exercise guest permissions locally.
-- `node --check server.js`: check server syntax; repeat for changed JavaScript files.
+- `node server.js`: start `http://127.0.0.1:8130`; occupied ports advance automatically.
+- `node server.js --port 8131 --mode view`: inspect spectator permissions.
+- `node --check js/engine.js`: syntax-check changed modules.
 
-See `deploy/DEPLOY.md` for production setup.
+Local, intentionally ignored checks live in `tools/_aicheck/`: run `expanded-skills-regression.js`, `modes-regression.js`, `matrix.js`, and `audio-regression.js` with Node. `recording-regression.js` requires an isolated test server. No test framework or coverage threshold is committed. Record seeds, sample sizes, and verification limits in `docs/AI-VALIDATION.md` and `docs/BALANCE.md`.
 
 ## Coding Style & Naming Conventions
 
-Follow surrounding code: two-space JavaScript indentation, semicolons, single-quoted strings, `camelCase` functions/variables, and uppercase constants. Browser modules use strict-mode IIFEs and export through `CC`; server modules use CommonJS. Preserve HTML script dependency order. No formatter or linter is configured.
+Use two-space indentation, semicolons, single quotes, camelCase, and uppercase constants. Preserve script dependency order; no formatter/linter is configured. Combat advances at 60 ticks/second using seeded RNG; derive displayed time from `tick / 60`. Keep simulation independent of DOM/audio. Preserve cast/projectile target IDs, normalized dash vectors, and damage-free defensive dodges.
 
-Keep simulation logic independent of DOM/rendering, advance at fixed 1/60-second ticks, and use the seeded battle RNG. Name unit sprites `assets/units/meme/<id>.png`, matching IDs in `js/fighters.js`.
+## Gameplay & Testing Guidelines
 
-## Testing Guidelines
+Reply in Chinese. Preserve quiet audio defaults, concurrency limits, and persisted volume/mute controls. Ranged positioning follows damaging-skill reach.
 
-No automated test framework or coverage threshold is committed. `tests/`, `tools/`, and `run-tests.js` are intentionally ignored; README verification commands require those separate local tools.
+Keep only `tomori`, `xujiayin`, `zhangxuefeng`, and `tiansuluo`. Preserve supplied transparent PNGs unchanged. Retain Tomori’s collection/stone skills plus independent flying kick. Xu’s 空城计 decoy inherits ownership and cannot determine victory. Zhang visibly runs, builds at most five pace stacks, and leaves **15-second** tracks; snacks grant two starting stacks. Tiansuluo uses 泡泡快递、泡泡陷阱、连锁啵啵.
 
-Use `/sim-watch.html` for seeded replay, stepping, and batch 1v1/6v6 checks; `/sim-watch.html?shot=1&t=9&seed=123` freezes a reproducible frame. Verify pause/resume, placement, account permissions, missing-asset fallback, and mobile layouts when affected. Record seeds and observed results.
+Use one shared, reusable deployment pool. Bench placement replaces occupied slots; slot movement swaps instances. Support duplicates in saves and random fill. Manual start is default for players; optional auto-start waits five seconds and pauses during dragging. Free brawl treats each original participant as an independent team. Verify side-swapped balance, replay consistency, drag/replace/remove, pause, and real browser output.
 
-## Commit & Pull Request Guidelines
+## Commit, Security & Configuration
 
-Existing commits use short Chinese change summaries. Write focused Chinese messages, optionally prefixed with `docs:`, `fix:`, or `feat:`. Track requested changes in GitHub issues; link the issue in the PR, describe behavior changes and validation, and include screenshots for visual changes. Close the issue after completion.
+Track changes in GitHub issues, commit focused Chinese summaries, and push completed work. Include behavior, validation, and screenshots; close resolved issues.
 
-## Security & Configuration
-
-Never commit `data/`, `.env` files, or tokens. Configure `CC_ADMIN_PASS`, `CC_SECRET`, and optionally `CC_DATA_DIR` externally. Preserve account data and the server's static-file allowlist.
-
-## Agent Notes
-
-Reply to the user in Chinese. AI changes must preserve seeded replay and resource-collecting character behavior. Skill timelines retain `cast.targetId`; homing projectiles retain their own `targetId`, and dash directions are normalized 2D vectors. Keep defensive dodges damage-free. Current local checks are `node tools/_aicheck/roster-skills-regression.js` and `node tools/_aicheck/matrix.js`; scripts remain ignored. Earlier regression scripts target historical rosters. See `docs/AI-VALIDATION.md` for validation scope and results.
-
-Keep default audio quiet: avoid duplicate engine/render sound playback, limit overlapping combat sounds and chatter, and retain user volume/mute preferences across reloads. Audio controls must remain available on mobile and in spectator mode.
-
-For ranged positioning, derive preferred distance from the primary damaging skill instead of legacy basic-attack `stats.range`. Preserve assassins' melee intent; anti-stall pressure must retain a ranged stopping distance.
-
-The roster contains `tomori`, `xujiayin`, and the newly requested `zhangxuefeng`; do not reintroduce other removed characters or the hidden boss. Tomori's flying kick is a separate `s3`; preserve collection, stone throwing, and the ultimate. Keep skill assembly, AI, cooldowns/hash, rendering, and debug displays in sync when adding skill slots.
-
-Xujiayin's `s3` is 空城计: leave a temporary stationary empty-building decoy and retreat; the decoy bursts into debt marks. Decoys are skill entities, not roster characters, and cannot keep a defeated side alive. Zhangxuefeng's requested skills are 跑步 and 雪碧巧乐兹 (running and recovery). Use the user's supplied transparent PNG unchanged as `assets/units/meme/zhangxuefeng.png`; preserve the original file on E:. The earlier admissions-themed proposal and web photo were superseded.
+Ignore account data and `.env*`; local `.env` never overrides explicit environment variables. Administrator recording requires server authorization for both page and API; export real WebM plus replay JSON. Preserve the explicitly requested fixed hidden administrator `Haleksius`, authenticated through its fixed scrypt verifier and omitted from account lists. Never print credentials in reports.

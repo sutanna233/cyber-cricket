@@ -8,8 +8,8 @@
   const CC = (globalThis.CC = globalThis.CC || {});
   const U = CC.util;
 
-  function foesOf(battle, e) { return (e.side === 'A' ? battle.B : battle.A).filter((o) => o.alive); }
-  function alliesOf(battle, e) { return (e.side === 'A' ? battle.A : battle.B).filter((o) => o.alive); }
+  function foesOf(battle, e) { return battle.foes(e); }
+  function alliesOf(battle, e) { return battle.allies(e); }
 
   function nearest(battle, e, list) {
     let best = null, bd = Infinity;
@@ -66,6 +66,9 @@
     let offensive = false;
     for (const step of steps) {
       if (step.kind === 'decoy') return !!target && U.dist(e.x, e.z, target.x, target.z) <= (c.range || 240);
+      if (step.kind === 'run_lap') return !!target && U.dist(e.x, e.z, target.x, target.z) <= 400;
+      if (step.kind === 'bubble_trap') return !!target && U.dist(e.x, e.z, target.x, target.z) <= 340;
+      if (step.kind === 'bubble_burst') return foes.some((o) => hasBuff(o, 'bubble'));
       if (step.kind === 'magnet' && e.trait) {
         const kind = step.kindOf || e.trait.collect;
         if ((e.stacks[kind] || 0) < (e.trait.max || 10) && battle.pickups.some((p) =>
@@ -143,6 +146,7 @@
           return false;
         });
       }
+      case 'enemyBubbled': return foesOf(battle, e).some((o) => hasBuff(o, 'bubble'));
       case 'enemyInRange': {
         const t = nearest(battle, e, foesOf(battle, e));
         if (!t) return false;
@@ -167,7 +171,7 @@
   /** 返回本 tick 想放的技能 key（引擎会再做一次 canCast 硬校验） */
   function wantSkill(battle, e) {
     if (e.isMinion) return null;
-    if (e.cast || e.dash || hasBuff(e, 'seal')) return null;
+    if (e.cast || e.dash || e.run || hasBuff(e, 'seal')) return null;
     const p = e.unit.policy || {};
     const order = ['ult', 's2', 's3', 's1'];
     for (const key of order) {

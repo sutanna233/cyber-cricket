@@ -22,10 +22,12 @@
     defaultSize: 6,
   };
 
-  const TIPS = '左 / 右任一侧都能摆阵（拖放或点击放置，可拖回单位池） · 人数可用 ± 调整 · 空格 或 按钮 暂停/继续 · 重新开始 · 停手 5 秒自动开打';
+  const TIPS = '左 / 右任一侧都能摆阵（同一角色可反复放置，可拖回单位池） · 人数可用 ± 调整 · 空格 或 按钮 暂停/继续 · 布阵完成后点「开始对战」';
 
   const state = {
     booted: false,
+    gameMode: 'team',
+    autoStart: false,
     phase: 'placing',      // placing | fighting | report
     paused: false,
     running: false,
@@ -143,7 +145,7 @@
 
   function validateSave(d) {
     if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
-    const out = { round: 0, level: 1, sizes: { A: CONFIG.defaultSize, B: CONFIG.defaultSize }, lineup: { A: [], B: [] } };
+    const out = { mode: d.mode === 'brawl' ? 'brawl' : 'team', round: 0, level: 1, sizes: { A: CONFIG.defaultSize, B: CONFIG.defaultSize }, lineup: { A: [], B: [] } };
     let corrupt = false;
     if (d.round !== undefined && d.round !== null) {
       if (typeof d.round !== 'number' || !isFinite(d.round)) return null;   // 结构损坏
@@ -200,6 +202,7 @@
     const B = board();
     const data = {
       version: SAVE_VERSION,
+      mode: state.gameMode,
       round: state.round,
       size: (B && B.sizes) ? B.sizes() : { A: CONFIG.defaultSize, B: CONFIG.defaultSize },
       lineup: (B && B.rawSlots) ? B.rawSlots() : { A: [], B: [] },
@@ -297,7 +300,8 @@
   // ---------- 阶段流转 ----------
   function phaseText() {
     const base = state.phase === 'fighting' ? '对战' : state.phase === 'report' ? '战报' : '摆阵';
-    return state.paused ? (base + ' · 暂停') : base;
+    const label = state.gameMode === 'brawl' ? '乱斗 · ' + base : base;
+    return state.paused ? (label + ' · 暂停') : label;
   }
 
   function countAlive(list) {
@@ -361,7 +365,7 @@
     const bench = B.benchIds(side).length;
     const pool = B.poolIds().length;
     const sz = B.sizes();
-    const sig = [state.phase, state.paused ? 1 : 0, state.round, state.level, side, sz.A, sz.B,
+    const sig = [state.autoStart, state.phase, state.paused ? 1 : 0, state.round, state.level, side, sz.A, sz.B,
       countdown.toFixed(1), bench, pool, alive.a, alive.b, time, state.shot, hint].join('|');
     if (sig === state.hudSig) return;
     state.hudSig = sig;
@@ -374,6 +378,10 @@
       });
       ui().setPhase(phaseText());
       ui().setSide(side);
+      const startButton = byId('btn-start');
+      if (startButton) startButton.disabled = state.phase !== 'placing';
+      const countdownWrap = byId('autostart-wrap');
+      if (countdownWrap && !state.autoStart && !(CC.access && !CC.access.caps.place)) countdownWrap.classList.add('hidden');
     } catch (e) { fail(e, 'updateHud'); }
   }
 
@@ -467,12 +475,13 @@
     let m = null;
     const BT = CC.battle;
     if (BT && typeof BT.createMatch === 'function') {
-      try { m = BT.createMatch({ seed: seed, lineup: { A: lu.A, B: lu.B } }); } catch (e) { fail(e, 'battle.createMatch'); m = null; }
+      try { m = BT.createMatch({ seed: seed, mode: state.gameMode === 'brawl' ? 'brawl' : undefined, lineup: { A: lu.A, B: lu.B } }); } catch (e) { fail(e, 'battle.createMatch'); m = null; }
     }
     if (!m) m = fallbackMatch(seed, lu.A, lu.B);
 
     state.match = m;
     state.seed = seed;
+    const exportSeed = byId('export-seed'); if (exportSeed) exportSeed.value = String(seed);
     state.phase = 'fighting';
     state.battleClock = 0;
     state.report = null;
@@ -553,7 +562,8 @@
     state.report = null;
     state.winner = null;
     state.match = null;
-    startFight();
+    if (!state.autoStart && (!CC.access || CC.access.caps.place)) toPlacing();
+    else startFight();
   }
 
   // ---------- 帧推进 ----------
@@ -561,6 +571,8 @@
     if (state.phase === 'placing') {
       const B = board();
       if (!B) return;
+      if (!state.autoStart && !(CC.access && !CC.access.caps.place)) return;
+      if (CC.input && CC.input.state.dragging) return;
       B.tick(dt);
       if (B.shouldStart()) startFight();
       return;
@@ -656,14 +668,55 @@
     if (state.phase !== 'placing') return false;
     const B = board();
     if (!B) return false;
+    const previous = B.allSlots().find((slot) => slot.index === slotIndex);
+    const replacing = !!(previous && previous.unitId && previous.unitId !== unitId);
     const ok = safe(() => B.place(unitId, slotIndex), 'place');
     if (ok) {
       safe(() => ui().renderBench(B.benchIds(B.activeSide())), 'renderBench');
       saveNow();
       state.hudSig = '';
       updateHud();
+      const name = CC.fighters.get(unitId).name;
+      safe(() => ui().notice((slotIndex < 6 ? '左方' : '右方') + ' ' + (slotIndex % 6 + 1) + '号位：' + (replacing ? '已替换为' : '已部署') + name), 'notice');
+      render();
     }
     return !!ok;
+  }
+
+  function handleMove(from, to) {
+    if (state.phase !== 'placing' || (CC.access && !CC.access.caps.place)) return false;
+    const B = board();
+    if (!B || !B.move(from, to)) return false;
+    saveNow(); state.hudSig = ''; updateHud(); render();
+    return true;
+  }
+
+  function handleStart() {
+    if (state.phase !== 'placing' || (CC.access && !CC.access.caps.place)) return false;
+    setPaused(false); startFight(); render(); return true;
+  }
+
+  function handleExport() {
+    if (globalThis.__CC_ROLE__ !== 'admin') return false;
+    const input = byId('export-seed');
+    const seed = Number(input && input.value);
+    if (!Number.isInteger(seed) || seed < 0 || seed > 4294967295) {
+      safe(() => ui().notice('种子请输入0～4294967295之间的整数'), 'notice'); return false;
+    }
+    const params = new URLSearchParams({ seed: String(seed), battle: state.gameMode,
+      lineup: JSON.stringify(board().lineup()), size: JSON.stringify(board().sizes()), auto: '1' });
+    window.open('replay-export.html?' + params.toString(), '_blank', 'noopener');
+    return true;
+  }
+
+  function handleMode(mode) {
+    if (CC.access && !CC.access.caps.place) return false;
+    state.gameMode = mode === 'brawl' ? 'brawl' : 'team';
+    restart();
+    const button = byId('btn-mode');
+    if (button) button.textContent = state.gameMode === 'brawl' ? '模式：自由乱斗' : '模式：阵营对战';
+    safe(() => ui().notice(state.gameMode === 'brawl' ? '自由乱斗：每人各自为战，最后存活者获胜；左右仅区分布阵位置。' : '阵营对战：同侧角色互为队友。'), 'notice');
+    return true;
   }
 
   function handleRemove(slotIndex) {
@@ -676,6 +729,7 @@
       saveNow();
       state.hudSig = '';
       updateHud();
+      render();
     }
     return !!id;
   }
@@ -751,7 +805,6 @@
     const s = list.filter((x) => x.index === i)[0];
     if (!s) return false;                                   // 该槽未启用
     if (s.unitId === unitId) return true;
-    if (s.unitId) return false;
     return B.benchIds(sd).indexOf(unitId) >= 0;
   }
 
@@ -990,6 +1043,11 @@
 
     safe(() => ui().init({
       onPlace: handlePlace,
+      onMove: handleMove,
+      onStart: handleStart,
+      onExport: handleExport,
+      onAutoStart: function (enabled) { state.autoStart = !!enabled; board().setAutoStart(CONFIG.countdownSeconds); state.hudSig = ''; updateHud(); },
+      onMode: function () { handleMode(state.gameMode === 'brawl' ? 'team' : 'brawl'); },
       onRemove: handleRemove,
       onPause: togglePause,
       onRestart: restart,
@@ -1002,6 +1060,7 @@
     const save = loadSave();
     state.saveCorrupted = !!save.corrupted;
     if (save.data) {
+      state.gameMode = save.data.mode;
       state.round = save.data.round || 0;
       const W0 = waves();
       state.level = (W0 && typeof W0.nextDifficulty === 'function') ? W0.nextDifficulty(state.round) : 1;
@@ -1017,6 +1076,9 @@
       state.level = (W0 && typeof W0.nextDifficulty === 'function') ? W0.nextDifficulty(0) : 1;
     }
 
+    if (state.query.battle === 'brawl') state.gameMode = 'brawl';
+    const modeButton = byId('btn-mode');
+    if (modeButton) modeButton.textContent = state.gameMode === 'brawl' ? '模式：自由乱斗' : '模式：阵营对战';
     const B1 = board();
     safe(() => ui().renderBench(B1 ? B1.benchIds(B1.activeSide()) : [], true), 'renderBench');
 
@@ -1081,7 +1143,7 @@
     startLoop, stopLoop,
     setPaused, togglePause, restart,
     startFight, toPlacing, enterReport, advanceFromReport, fillEmptySides,
-    handlePlace, handleRemove, handleSide, handleSize,
+    handlePlace, handleMove, handleStart, handleExport, handleMode, handleRemove, handleSide, handleSize,
     canPlace, saveNow, loadSave, save: () => saveNow(),
     applyShot, defineDebug, fail,
     state,

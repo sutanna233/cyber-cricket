@@ -43,8 +43,8 @@
         },
         {
           key: 's2', name: '丢石头', desc: '把石头一块一块砸过去：攒得越多，落石越密', cd: 8, cost: 0,
-          steps: [{ kind: 'stone_rain', minCount: 2, maxDrops: 10, interval: 0.13, spread: 190,
-            dropRadius: 58, dmg: 0.14, knock: 80, warn: 0.22, t: 0.45 }],
+          steps: [{ kind: 'stone_rain', minCount: 2, maxDrops: 10, interval: 0.13, spread: 160,
+            dropRadius: 58, dmg: 0.17, knock: 80, warn: 0.22, t: 0.45 }],
           line: '（一块、一块、全砸下去）',
         },
         {
@@ -59,7 +59,7 @@
         cd: 0, cost: 100,
         steps: [{ kind: 'magnet', range: 430, t: 0.15 },
           { kind: 'stone_rain', minCount: 6, maxDrops: 14, interval: 0.1, spread: 340,
-            dropRadius: 72, dmg: 0.26, knock: 150, warn: 0.3,
+            dropRadius: 72, dmg: 0.3, knock: 150, warn: 0.3,
             effects: [{ kind: 'speedDown', dur: 4, mag: 0.3 }], t: 0.7 }],
         line: '（天上开始掉石头）',
       },
@@ -88,7 +88,7 @@
         {
           key: 's3', name: '空城计', desc: '留下空楼诱饵并后撤；诱饵被击破或到时爆开，给附近敌人挂债务',
           cd: 14, cost: 20, cast: 0.55,
-          steps: [{ kind: 'decoy', life: 3, hpRatio: 0.25, radius: 155, dmg: 0.35,
+          steps: [{ kind: 'decoy', life: 3, hpRatio: 0.25, radius: 130, dmg: 0.3,
             effects: [{ kind: 'marked', dur: 6, mag: 0.3 }] },
           dash({ dist: 180, dur: 0.28, dmg: 0, away: true, t: 0.05 })],
           line: '城里没人，账倒不少。',
@@ -97,7 +97,7 @@
       ult: {
         key: 'ult', name: '两万亿', desc: '必杀：先把所有人拽过来，再连本带利结算', cd: 0, cost: 100,
         steps: [ { kind: 'pull', radius: 320, dist: 150, at: 'target', t: 0.25 },
-          { kind: 'aoe', radius: 220, dmg: 1.6, warn: 0.7, at: 'target', sprite: 'boom', knock: 200,
+          { kind: 'aoe', radius: 175, dmg: 1.4, warn: 0.7, at: 'target', sprite: 'boom', knock: 200,
             effects: [{ kind: 'stun', dur: 1.0, mag: 1 }] },
           { kind: 'detonate', radius: 320, perMark: 0.8, t: 0.9 } ],
         line: '两万亿，连本带利。',
@@ -111,25 +111,47 @@
     {
       id: 'zhangxuefeng', name: '张雪峰', title: '跑步 · 雪碧巧乐兹',
       role: 'bruiser', pos: 'front', palette: ['#75e6a2', '#132d28'],
-      stats: { hp: 1280, atk: 100, def: 52, spd: 235, crit: 0.1, critDmg: 1.7,
+      stats: { hp: 1200, atk: 80, def: 52, spd: 235, crit: 0.1, critDmg: 1.7,
         weight: 1.0, range: 86, atkInterval: 0.6 },
       skills: [
-        { key: 's1', name: '跑步', desc: '加速冲向目标，沿途撞击并短暂提高移动速度', cd: 6, cost: 0, cast: 0.35,
-          steps: [buff({ effects: [{ kind: 'speedUp', dur: 3, mag: 0.25 }] }),
-            dash({ dist: 300, dur: 0.42, dmg: 0.65, radius: 56, knock: 160, hitstun: 0.25, stopAtTarget: true, t: 0.05 })],
-          line: '跑起来！' },
+        { key: 's1', name: '跑步·十公里结算', desc: '绕场跑圈留下持续15秒的减速跑道，积累五层配速，最后冲线重击', cd: 10, cost: 0, cast: 0.3,
+          steps: [{ kind: 'run_lap', dur: 2.4, radius: 105, speed: 510, dmg: 0.7, perPace: 0.09,
+            trailDmg: 0.07, trailLife: 15, finishDist: 520, knock: 210 }],
+          line: '十公里，跑完结算！' },
         { key: 's2', name: '雪碧巧乐兹', desc: '喝雪碧、吃巧乐兹，恢复生命并获得短暂护盾与续航', cd: 12, cost: 20, cast: 0.65,
           steps: [heal({ amount: 0.1 }), buff({ effects: [{ kind: 'shield', dur: 4, mag: 0.1 },
-            { kind: 'regen', dur: 4, mag: 0.012 }] })], line: '来口雪碧，再来根巧乐兹。' },
+            { kind: 'regen', dur: 4, mag: 0.012 }] }), { kind: 'pace_boost', stacks: 2 }], line: '来口雪碧，再来根巧乐兹。' },
       ],
-      ult: { key: 'ult', name: '全力跑步', desc: '全力冲刺撞开对手，获得短暂霸体', cost: 100, cd: 0, cast: 0.85,
-        steps: [buff({ effects: [{ kind: 'superArmor', dur: 1.5, mag: 1 }] }),
-          dash({ dist: 420, dur: 0.45, dmg: 1.35, radius: 56, knock: 270, hitstun: 0.5, stopAtTarget: true, t: 0.05 })],
+      ult: { key: 'ult', name: '全力跑步·最后一圈', desc: '以持续15秒的大跑道全力跑圈，冲线结算强化重击', cost: 100, cd: 0, cast: 0.65,
+        steps: [buff({ effects: [{ kind: 'superArmor', dur: 1.3, mag: 1 }] }),
+          { kind: 'run_lap', dur: 2.7, radius: 125, speed: 580, dmg: 1.2, perPace: 0.12,
+            trailDmg: 0.1, trailLife: 15, finishDist: 580, knock: 280, t: 0.05 }],
         line: '最后一圈，全力跑！' },
       policy: { s1: { when: 'enemyInRange', range: 300 }, s2: { when: 'selfHpBelow', v: 0.65 },
         ult: { when: 'energyFull' } },
       lines: ['跑步。', '雪碧巧乐兹。'], barks: { hit: '走！', taken: '呼', cast: '跑起来！' },
       texture: { key: 'zhangxuefeng', scale: 1.0 },
+    },
+    {
+      id: 'tiansuluo', name: '天素罗', title: '泡泡陷阱 · 连锁爆破', role: 'ranged', pos: 'back',
+      palette: ['#91e6ff', '#263756'],
+      stats: { hp: 1250, atk: 91, def: 56, spd: 190, crit: 0.08, critDmg: 1.6,
+        weight: 0.9, range: 300, atkInterval: 0.75 },
+      skills: [
+        { key: 's1', name: '泡泡快递', desc: '发射追踪泡泡，命中减速并叠一层泡泡印记，最多三层', cd: 5, cost: 0, cast: 0.4,
+          steps: [proj({ dmg: 0.48, speed: 410, radius: 30, bubble: true,
+            effects: [{ kind: 'bubble', dur: 8, mag: 1 }, { kind: 'speedDown', dur: 1.4, mag: 0.18 }] })],
+          line: '泡泡签收！' },
+        { key: 's2', name: '泡泡陷阱', desc: '目标附近布置延时陷阱，踩中后困住敌人并叠加两层泡泡', cd: 11, cost: 20, cast: 0.65,
+          steps: [{ kind: 'bubble_trap', radius: 95, arm: 0.4, life: 4, dmg: 0.3 }],
+          line: '踩进泡泡里吧。' },
+      ],
+      ult: { key: 'ult', name: '连锁啵啵', desc: '引爆带泡泡的敌人，每层泡泡增加爆炸伤害，并波及附近目标', cost: 100, cd: 0, cast: 1.0,
+        steps: [{ kind: 'bubble_burst', radius: 145, dmg: 0.7, perBubble: 0.35 }], line: '三个，两个，一个——啵！' },
+      policy: { s1: { when: 'enemyInRange', range: 420 }, s2: { when: 'enemyInRange', range: 320 },
+        ult: { when: 'enemyBubbled' } },
+      lines: ['啵。', '泡泡来了。'], barks: { hit: '啵', taken: '唔', cast: '泡泡！' },
+      texture: { key: 'tiansuluo', scale: 1.0 },
     },
   ];
 
@@ -137,8 +159,16 @@
   // 依据 tools/_simcheck/balance.js 的实测对位胜率调整（目标：每人 45%~55%）
   // 规律：胜率 ≈ 输出能力，坦克血多但打不动 → 补攻；高速输出手太强 → 削血削攻
   const BALANCE = {
-    tomori: { hp: 1700, atk: 124, def: 88 },
-    xujiayin: { hp: 1160, atk: 110, def: 44 },
+    tomori: { hp: 1800, atk: 138, def: 88 },
+    xujiayin: { hp: 1250, atk: 110, def: 44 },
+  };
+
+  // 单挑与团战分开校准，避免范围技在多人局的收益挤压单挑表现。
+  const MODE_BALANCE = {
+    tomori: { solo: { hp: 1.02, atk: 1.0 }, team: { hp: 1.13, atk: 1.08 } },
+    xujiayin: { solo: { hp: 1.1, atk: 1.07 }, team: { hp: 1.0, atk: 0.94 } },
+    zhangxuefeng: { solo: { hp: 1.02, atk: 1.02 }, team: { hp: 1.06, atk: 0.98 }, brawl: { hp: 1.3, atk: 1.08 } },
+    tiansuluo: { solo: { hp: 0.96, atk: 0.92 }, team: { hp: 1.04, atk: 0.99 } },
   };
 
   // ---------- 手感调参表 ----------
@@ -176,6 +206,7 @@
       id: r.id, name: r.name, title: r.title, role: r.role, pos: r.pos,
       palette: r.palette, hidden: !!r.hidden,
       trait: r.trait || null,                    // 收集型单位的拾取特性（例如凑企鹅捡石头）
+      modeBalance: MODE_BALANCE[r.id] || {},
       stats: Object.assign({
         hp: 1000, atk: 90, def: 40, spd: 200, crit: 0.1, critDmg: 1.7,
         weight: 1, range: 80, atkInterval: 0.6,

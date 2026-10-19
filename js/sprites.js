@@ -188,8 +188,8 @@
     p.sqx *= 1 - 0.018 * br;
     p.sqy *= 1 + 0.028 * br;
 
-    if (st === 'walk') {
-      const w = Math.sin(t * 7.4 + phase);
+    if (st === 'walk' || st === 'run') {
+      const w = Math.sin(t * (st === 'run' ? 15 : 7.4) + phase);
       p.bobY = -Math.abs(w) * 3.4;
       p.rot = w * 0.055;
       p.sqx *= 1 + 0.02 * w;
@@ -398,7 +398,7 @@
       ctx.font = 'bold 11px "PingFang SC","Microsoft YaHei",sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
-      const nm = (u.name || ent.unitId || '?');
+      const nm = (u.name || ent.unitId || '?') + (ent.brawl ? ' #' + ent.id : '');
       ctx.fillStyle = 'rgba(0,0,0,0.65)';
       ctx.fillText(nm, p.sx + 1, y + BAR.nameGap + 1);
       ctx.fillStyle = ent.side === 'B' ? '#ffd0d8' : '#d8f4ff';
@@ -575,7 +575,7 @@
     const minionN = o.minionCount || 0;
     if ((!st || !Object.keys(st).length) && !minionN) return;
     const keys = [];
-    if (st) for (const k in st) { if ((st[k] | 0) > 0) keys.push(k); }
+    if (st) for (const k in st) { if (k !== 'pace' && k !== 'paceBoost' && (st[k] | 0) > 0) keys.push(k); }
     if (!keys.length && !minionN) return;              // 0 个：什么都不画
     if (ent.alive === false) return;
     const s = spriteSize(ent, { scale: o.scale });
@@ -862,6 +862,28 @@
     drawMarked(ctx, ent, o);
     drawStacks(ctx, ent, o);
     drawBuffs(ctx, ent, o);
+    const ground = project(ent.x, ent.z, ent.h || 0);
+    if (ent.run || (ent.dash && ent.dash.step.finish) || (ent.stacks && ent.stacks.paceBoost)) {
+      const pace = (ent.stacks && ent.stacks.pace) || 0;
+      const label = ent.run ? '跑圈 ' + Math.round(ent.run.t / ent.run.step.dur * 100) + '% · 配速 ' + pace + '/5'
+        : ent.dash && ent.dash.step.finish ? '终点冲刺 · 配速 ' + pace + '/5' : '补给就绪 · 配速 +2';
+      ctx.save(); ctx.fillStyle = 'rgba(6,36,24,0.95)'; rr(ctx, ground.sx - 89, ground.sy - s.h - 48, 178, 24, 6); ctx.fill();
+      ctx.fillStyle = '#8dffb9'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(label, ground.sx, ground.sy - s.h - 32); ctx.restore();
+    }
+    const bubble = (ent.buffs || []).find((b) => b.kind === 'bubble' && b.t < b.dur);
+    if (bubble || ent.bubbleCageT > 0) {
+      ctx.save(); ctx.strokeStyle = '#b3edff'; ctx.lineWidth = 2;
+      if (ent.bubbleCageT > 0) {
+        ctx.fillStyle = 'rgba(115,210,255,0.2)';
+        ellipsePath(ctx, ground.sx, ground.sy - s.h * 0.45, s.w * 0.72 + 10, s.h * 0.7); ctx.fill(); ctx.stroke();
+      }
+      for (let i = 0; i < (bubble ? bubble.mag : 0); i++) {
+        const x = ground.sx + (i - 1) * 16;
+        ctx.fillStyle = 'rgba(110,210,255,0.4)'; ellipsePath(ctx, x, ground.sy - s.h - 17, 7, 7); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
 
   // 单个单位的整体屏幕信息（UI/命中数字用）

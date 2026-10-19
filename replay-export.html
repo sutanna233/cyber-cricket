@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>管理员 · 对战录像导出</title>
+  <style>
+    body{margin:20px;background:#080e1d;color:#e7f4ff;font:15px system-ui,sans-serif}main{max-width:980px;margin:auto}
+    canvas,video{display:block;width:100%;max-width:960px;background:#020611;border:1px solid #33516d;border-radius:12px;margin:16px 0}
+    button,input,a{font:inherit}button,a{padding:8px 14px;margin:4px;border-radius:6px}button{cursor:pointer}input{width:150px;padding:8px}
+    a{color:#8fe8ff}#status{min-height:24px;color:#acebc2}#error{color:#ffa6a6}.hidden{display:none}
+  </style>
+</head>
+<body><main>
+  <h1>对战录像导出</h1>
+  <p>管理员专用 · 当前阵容与模式 · 960×600 / 30fps / 无声 WebM。保持页面打开，按对局时长生成。</p>
+  <form id="export-form"><label>种子 <input id="seed" type="number" min="0" max="4294967295" step="1" required></label>
+    <button id="record" type="submit">生成并下载录像</button><button id="cancel" type="button" disabled>取消导出</button>
+  </form>
+  <p id="lineup"></p><p id="status" role="status">准备就绪</p><p id="error" role="alert"></p>
+  <canvas id="recording" width="960" height="600" aria-label="录像画面"></canvas>
+  <div id="downloads" class="hidden"><a id="video-download" download>下载 WebM 录像</a><a id="replay-download" download>下载种子与阵容 JSON</a></div>
+  <video id="preview" controls class="hidden"></video>
+</main>
+<script src="js/util.js"></script><script src="js/fighters.js?v=13"></script><script src="js/waves.js?v=13"></script>
+<script src="js/assets.js?v=13"></script><script src="js/sprites.js?v=13"></script><script src="js/engine.js?v=13"></script>
+<script src="js/ai.js?v=13"></script><script src="js/battle.js?v=13"></script><script src="js/render.js?v=13"></script>
+<script src="js/webm.js?v=13"></script><script src="js/recorder.js?v=13"></script>
+</body></html>

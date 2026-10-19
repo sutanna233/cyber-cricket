@@ -11,6 +11,7 @@
   const canvas = $('game');
 
   const S = {
+    mode: 'team',
     seed: 20261019,
     speed: 1,
     playing: true,
@@ -30,7 +31,7 @@
     CC.fighters.units.forEach((u) => {
       const d = document.createElement('div');
       d.className = 'u';
-      d.title = u.name + ' · ' + u.title + '（' + u.role + '）';
+      d.title = u.name + ' · 左键添加一个，右键移除一个（最多6个）';
       const img = document.createElement('img');
       const p = 'assets/units/meme/' + u.id + '.png';
       img.src = p;
@@ -39,13 +40,19 @@
       const t = document.createElement('div');
       t.textContent = u.name;
       d.appendChild(t);
-      d.onclick = () => {
-        const i = sel.indexOf(u.id);
-        if (i >= 0) sel.splice(i, 1);
-        else if (sel.length < 6) sel.push(u.id);
-        d.classList.toggle('sel', sel.indexOf(u.id) >= 0);
+      const refresh = () => {
+        const count = sel.filter((id) => id === u.id).length;
+        d.classList.toggle('sel', count > 0);
+        t.textContent = u.name + (count ? ' ×' + count : '');
         counter.textContent = sel.length;
       };
+      d.onclick = () => { if (sel.length < 6) sel.push(u.id); refresh(); };
+      d.oncontextmenu = (ev) => {
+        ev.preventDefault();
+        const index = sel.lastIndexOf(u.id); if (index >= 0) sel.splice(index, 1);
+        refresh();
+      };
+      refresh();
       host.appendChild(d);
     });
   }
@@ -69,7 +76,7 @@
     S.seed = seed == null ? nextSeed() : seed;
     const A = makeLineup(S.selA);
     const B = makeLineup(S.selB);
-    S.match = CC.battle.createMatch({ seed: S.seed, lineup: { A, B } });
+    S.match = CC.battle.createMatch({ seed: S.seed, mode: S.mode === 'brawl' ? 'brawl' : undefined, lineup: { A, B } });
     S.matchState = { board: [], phase: 'fighting', paused: false, bench: [], streak: 0, difficulty: 1, seed: S.seed };
     $('log').innerHTML = '';
     logLine('新对局 seed=' + S.seed + '  A=[' + A.map((x) => x.id).join(',') + ']  B=[' + B.map((x) => x.id).join(',') + ']', 'k');
@@ -177,7 +184,7 @@
     }
     $('units-hp').innerHTML = rows.join('<br>');
     $('phase-readout').textContent = 'seed=' + S.seed + '  t=' + b.time.toFixed(1) + 's  tick=' + b.tick
-      + '  hash=' + b.hash() + '  ' + (b.over ? ('结束: ' + b.result + ' (' + b.endReason + ')') : '进行中');
+      + '  hash=' + b.hash() + '  ' + (b.over ? ('结束: ' + (b.mode === 'brawl' ? (S.match.report().champion || '平局') : b.result) + ' (' + b.endReason + ')') : '进行中');
     let totalA = 0, totalB = 0;
     b.A.forEach((e) => { if (e.alive) totalA += e.hp; });
     b.B.forEach((e) => { if (e.alive) totalB += e.hp; });
@@ -284,6 +291,7 @@
   }
 
   // ---------- 绑定 ----------
+  $('battle-mode').onchange = () => { S.mode = $('battle-mode').value; startMatch(S.seed); };
   $('btn-play').onclick = () => {
     S.playing = !S.playing;
     $('btn-play').textContent = S.playing ? '暂停' : '继续';
@@ -327,7 +335,16 @@
     if (CC.render && typeof CC.render.init === 'function') {
       try { CC.render.init(canvas); } catch (e) { logLine('render.init 异常: ' + e.message, 'r'); }
     }
+    S.mode = q.get('battle') === 'brawl' ? 'brawl' : 'team';
+    $('battle-mode').value = S.mode;
     if (q.get('seed')) { S.seed = parseInt(q.get('seed'), 10) || S.seed; }
+    for (const [key, selected, host, counter] of [['a', S.selA, 'units-a', 'cnt-a'], ['b', S.selB, 'units-b', 'cnt-b']]) {
+      if (!q.has(key)) continue;
+      const ids = q.get(key).split(',').filter((id) => !!CC.fighters.get(id)).slice(0, 6);
+      selected.splice(0, selected.length, ...ids);
+      buildUnitPicker($(host), selected, $(counter));
+      $(counter).textContent = selected.length;
+    }
     startMatch(S.seed);
     $('seed').value = S.seed;
     logLine('提示：左侧实时战斗，右侧事件流；「批量测试」会逐场滚动打印结果。', 'd');

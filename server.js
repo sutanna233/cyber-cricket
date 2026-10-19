@@ -35,6 +35,18 @@ const crypto = require('crypto');
 
 const root = __dirname;
 
+// 本地账号配置不进入版本控制；显式环境变量优先。
+const envFile = path.join(root, '.env');
+if (fs.existsSync(envFile)) {
+  for (const line of fs.readFileSync(envFile, 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/);
+    if (!match || process.env[match[1]] !== undefined) continue;
+    let value = match[2].trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
+    process.env[match[1]] = value;
+  }
+}
+
 function arg(name, def) {
   const i = process.argv.indexOf('--' + name);
   return i >= 0 && process.argv[i + 1] && !process.argv[i + 1].startsWith('--') ? process.argv[i + 1] : def;
@@ -177,7 +189,7 @@ function roundInfo() {
 if (roundState.enabled) { startRound(1); setInterval(() => { if (Date.now() >= roundState.nextAt) startRound(roundState.round + 1); }, 500); }
 
 // ---------------- 静态文件 ----------------
-const PUBLIC_ROOT_FILES = new Set(['index.html', 'admin.html', 'account.html', 'sim-watch.html', 'styles.css', 'favicon.ico']);
+const PUBLIC_ROOT_FILES = new Set(['index.html', 'admin.html', 'account.html', 'sim-watch.html', 'replay-export.html', 'styles.css', 'favicon.ico']);
 const PUBLIC_DIRS = ['js/', 'assets/'];
 
 function isPublic(rel) {
@@ -237,12 +249,22 @@ async function handleApi(req, res, pathname) {
   const ip = clientIp(req);
   const role = roleOf(req);
 
+  if (pathname === '/api/admin/replay' && req.method === 'POST') {
+    if (role !== 'admin') return sendJson(res, 403, { ok: false, error: '仅管理员可以导出录像' });
+    try {
+      if (!simhost) throw new Error('模拟模块不可用');
+      const input = JSON.parse(await readBody(req, 16384));
+      const config = require('./lib/replay').makeConfig(input, simhost);
+      return sendJson(res, 200, Object.assign({ ok: true }, config));
+    } catch (error) { return sendJson(res, 400, { ok: false, error: error.message }); }
+  }
+
   if (pathname === '/api/session' && req.method === 'GET') {
     return sendJson(res, 200, {
       role: role === 'admin' ? 'admin' : role === 'user' ? 'user' : 'guest',
       mode: role === 'view' ? PUBLIC_MODE : 'play',
       user: userOf(req),
-      loginEnabled: users.count() > 0 || !!ADMIN_PASS,
+      loginEnabled: users.hasBuiltinAdmin || users.count() > 0 || !!ADMIN_PASS,
       registerEnabled: ALLOW_REGISTER,
       syncEnabled: roundState.enabled,
       userCount: users.count(),
@@ -346,6 +368,9 @@ function handle(req, res) {
   if (!file) {
     res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
     return res.end('404 ' + p);
+  }
+  if (file === path.join(root, 'replay-export.html') && role !== 'admin') {
+    return sendJson(res, 403, { ok: false, error: '仅管理员可以导出录像' });
   }
   if (!QUIET) console.log(new Date().toISOString() + ' ' + (req.method || 'GET') + ' ' + p + ' [' + role + ']');
   serveFile(req, res, file, path.extname(file).slice(1).toLowerCase(), role);

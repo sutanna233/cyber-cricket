@@ -42,11 +42,12 @@
       return;
     }
     if (kind === 'regen' || kind === 'shield' || kind === 'lifesteal') mag *= SUSTAIN_SCALE;
-      if (kind === 'shield') e.shield = Math.max(e.shield || 0, Math.round(e.maxHp * mag));
+    if (kind === 'shield') e.shield = Math.max(e.shield || 0, Math.round(e.maxHp * mag));
     // 同类叠加取更强的一条，避免无限堆叠
     for (let i = 0; i < e.buffs.length; i++) {
       const b = e.buffs[i];
       if (b.kind === kind && b.t < b.dur) {
+        if (kind === 'bubble') { b.mag = Math.min(3, b.mag + mag); b.t = 0; b.dur = dur; return; }
         if (mag >= b.mag) { b.mag = mag; b.dur = Math.max(b.dur, dur); b.t = 0; }
         else b.dur = Math.max(b.dur, dur);
         return;
@@ -68,13 +69,13 @@
     const teamA = opts.teamA || [];
     const teamB = opts.teamB || [];
     const mode = opts.mode || ((teamA.length > 1 || teamB.length > 1) ? 'team' : 'solo');
-    const hpScale = mode === 'team' ? CC.fighters.consts.TEAM_HP_SCALE : 1;
+    const hpScale = mode === 'team' || mode === 'brawl' ? CC.fighters.consts.TEAM_HP_SCALE : 1;
 
     const battle = {
       mode, seed: opts.seed == null ? 1 : opts.seed,
       rng: U.RNG(opts.seed == null ? 1 : opts.seed),
       time: 0, tick: 0, over: false, result: null, endReason: null,
-      A: [], B: [], projectiles: [], zones: [], pickups: [], rains: [],
+      A: [], B: [], projectiles: [], zones: [], pickups: [], rains: [], tracks: [], bubbleTraps: [],
       events: [], fxSeq: 0,
       stats: { dmgByUnit: {}, dmgBySideUnit: {}, killsByUnit: {}, killsBySideUnit: {}, maxCombo: 0, casts: [], duration: 0, picked: {} },
       _eid: 1, _pickupT: 0,
@@ -83,14 +84,15 @@
     function spawn(side, spec, idx) {
       const unit = CC.fighters.get(spec.id);
       if (!unit) return null;
+      const modeScale = (unit.modeBalance && (unit.modeBalance[mode] || (mode === 'brawl' && unit.modeBalance.team))) || {};
       const lane = spec.lane == null ? (unit.pos === 'back' ? 1 : 0) : spec.lane;
       // 默认站位与 board.js 的 LAYOUT 对齐（前排距中线 400 / 后排 480），保证开局有距离
       const defX = side === 'A' ? (lane === 0 ? 200 : 120) : (lane === 0 ? 1000 : 1080);
       const defZ = 200 + (idx % 3) * 150;
       const pos = spec.pos || [defX, defZ];
-      const hp = Math.max(1, Math.round(unit.stats.hp * hpScale * (spec.hpMul || 1)));
+      const hp = Math.max(1, Math.round(unit.stats.hp * hpScale * (spec.hpMul || 1) * (modeScale.hp || 1)));
       const e = {
-        id: battle._eid++, side, unitId: unit.id, unit, slot: spec.slot == null ? idx : spec.slot, lane,
+        id: battle._eid++, side, team: spec.team || side, unitId: unit.id, unit, slot: spec.slot == null ? idx : spec.slot, lane,
         x: pos[0], z: pos[1], h: 0, vx: 0, vz: 0, vh: 0,
         facing: side === 'A' ? 1 : -1, alive: true,
         hp, maxHp: hp, shield: 0, energy: spec.energy || 0,
@@ -98,7 +100,7 @@
         buffs: [], targetId: 0, combo: 0, comboT: 0,
         cast: null, hitstun: 0, deciding: 0, plan: null, dodgeCd: 0, stuck: 0, lastX: pos[0], lastZ: pos[1],
         isMinion: !!spec.isMinion, ownerId: spec.ownerId || 0, life: spec.life || 0,
-        atkMul: spec.atkMul || 1,
+        atkMul: (spec.atkMul || 1) * (modeScale.atk || 1),
         stacks: {},                 // 可拾取资源计数（例如 stone）
         trait: unit.trait || null,
         deadT: 0,
@@ -109,6 +111,16 @@
 
     teamA.forEach((s, i) => spawn('A', s, i));
     teamB.forEach((s, i) => spawn('B', s, i));
+    battle.participants = battle.A.concat(battle.B).slice();
+    if (mode === 'brawl') {
+      const rotation = battle.rng.next() * Math.PI * 2;
+      battle.participants.forEach((e, i, list) => {
+        e.team = 'fighter-' + e.id; e.brawl = true;
+        const angle = rotation + i * Math.PI * 2 / list.length;
+        e.x = 600 + Math.cos(angle) * 340; e.z = 350 + Math.sin(angle) * 230;
+        e.lastX = e.x; e.lastZ = e.z; e.facing = e.x < 600 ? 1 : -1;
+      });
+    }
     battle.ramp = 1;
     battle.dbg = { kite: 0, retreat: 0, approach: 0, attack: 0, idle: 0, early: {} };
     function dbg(k) { battle.dbg.early[k] = (battle.dbg.early[k] || 0) + 1; }
@@ -116,8 +128,13 @@
     spawnPickup('stone', 8);
 
     const all = () => battle.A.concat(battle.B);
-    const foes = (e) => (e.side === 'A' ? battle.B : battle.A).filter((o) => o.alive);
-    const allies = (e) => (e.side === 'A' ? battle.A : battle.B).filter((o) => o.alive);
+    const foes = (e) => all().filter((o) => o.alive && o.team !== e.team);
+    const allies = (e) => all().filter((o) => o.alive && o.team === e.team);
+    const friendlyEffect = (effect, e) => {
+      const owner = all().find((o) => o.id === effect.ownerId);
+      return owner ? owner.team === e.team : mode !== 'brawl' && effect.side === e.side;
+    };
+    battle.foes = foes; battle.allies = allies;
 
     function push(ev) {
       ev.seq = ++battle.fxSeq;
@@ -129,7 +146,7 @@
     // ---------- 伤害 ----------
     function applyDamage(src, dst, coef, opt) {
       opt = opt || {};
-      if (!dst || !dst.alive || !src) return 0;
+      if (!dst || !dst.alive || !src || src.team === dst.team) return 0;
       if (hasBuff(dst, 'invuln')) {
         push({ type: 'miss', unitId: src.id, targetId: dst.id, reason: 'invuln', x: dst.x, z: dst.z, h: dst.h });
         return 0;
@@ -237,6 +254,7 @@
       e.stateT = 0;
       if (e.dash && e.dash.step.jumpHeight) { e.h = 0; e.vh = 0; }
       e.dash = null;
+      e.run = null;
       e.cast = null;
       e.buffs = [];
       if (e.isDecoy) {
@@ -351,11 +369,54 @@
             x: src.x + dx * 20, z: src.z + dz * 20, h: src.h + 34,
             vx: dx * sp, vz: dz * sp, speed: sp, vh: 0, homing: !!t,
             targetId: t ? t.id : 0,
+            bubble: !!step.bubble,
             dmg: step.dmg, life: step.life || 2, radius: step.radius || 24,
             sprite: step.sprite || 'spark', scale: step.scale || 0.9,
             pierce: !!step.pierce, bounces: step.bounces || 0, effects: step.effects || [], hits: 0, arcH: step.arcH || 60,
           });
           push({ type: 'cast_fx', unitId: src.id, at: 'proj', x: src.x, z: src.z, h: src.h + 34 });
+          break;
+        }
+        case 'bubble_trap': {
+          const target = castTarget(src);
+          if (!target) break;
+          battle.bubbleTraps.push({ id: battle._eid++, ownerId: src.id, side: src.side,
+            x: target.x, z: target.z, radius: step.radius, arm: step.arm, life: step.life, t: 0, dmg: step.dmg });
+          push({ type: 'bubble_trap', unitId: src.id, x: target.x, z: target.z });
+          break;
+        }
+        case 'bubble_burst': {
+          const targets = foes(src).filter((o) => buffMag(o, 'bubble') > 0);
+          const hitCounts = {};
+          for (const target of targets) {
+            const stacks = buffMag(target, 'bubble');
+            target.buffs = target.buffs.filter((b) => b.kind !== 'bubble');
+            push({ type: 'bubble_burst', unitId: src.id, x: target.x, z: target.z, stacks });
+            for (const o of foes(src)) {
+              if (U.dist(o.x, o.z, target.x, target.z) > step.radius || (hitCounts[o.id] || 0) >= 2) continue;
+              hitCounts[o.id] = (hitCounts[o.id] || 0) + 1;
+              applyDamage(src, o, step.dmg + stacks * step.perBubble, { skill: opt.skillKey });
+              if (o.alive) { knockback(target, o, 100); o.hitstun = Math.max(o.hitstun, 0.25); }
+            }
+          }
+          break;
+        }
+        case 'pace_boost': {
+          src.stacks.paceBoost = Math.min(2, step.stacks || 2);
+          push({ type: 'pace_boost', unitId: src.id, x: src.x, z: src.z, stacks: src.stacks.paceBoost });
+          break;
+        }
+        case 'run_lap': {
+          const target = castTarget(src);
+          if (!target) break;
+          const cx = U.clamp(target.x, 170, W - 170), cz = U.clamp(target.z, 175, D - 175);
+          const bonus = src.stacks.paceBoost || 0;
+          src.stacks.paceBoost = 0; src.stacks.pace = bonus;
+          src.run = { t: 0, step, cx, cz, angle: Math.atan2(src.z - cz, src.x - cx),
+            direction: src.id % 2 ? 1 : -1, targetId: target.id, distance: 0, bonus, pace: bonus,
+            lastX: src.x, lastZ: src.z, marked: {}, skill: opt.skillKey };
+          src.state = 'run'; src.stateT = 0;
+          push({ type: 'run_start', unitId: src.id, x: src.x, z: src.z, cx, cz, radius: step.radius, ult: opt.skillKey === 'ult' });
           break;
         }
         case 'dash': {
@@ -409,7 +470,7 @@
         }
         case 'decoy': {
           const e = spawn(src.side, { id: src.unitId, pos: [src.x, src.z], lane: src.lane,
-            isMinion: true, ownerId: src.id, life: step.life || 3, hpMul: step.hpRatio || 0.25 }, 0);
+            team: src.team, isMinion: true, ownerId: src.id, life: step.life || 3, hpMul: step.hpRatio || 0.25 }, 0);
           if (!e) break;
           e.isDecoy = true; e.decoyStep = step; e.unitId = 'decoy_' + src.unitId;
           e.unit = Object.assign({}, src.unit, { id: e.unitId, name: '空楼', radius: 30, height: 70,
@@ -422,7 +483,7 @@
           const count = step.count || 1;
           for (let i = 0; i < count; i++) {
             const m = {
-              id: battle._eid++, side: src.side, unitId: 'minion_' + src.unitId, unit: minionUnit(src, step),
+              id: battle._eid++, side: src.side, team: src.team, unitId: 'minion_' + src.unitId, unit: minionUnit(src, step),
               slot: -1, lane: src.lane,
               x: U.clamp(src.x + (i - (count - 1) / 2) * 60, 40, W - 40), z: src.z, h: 0,
               vx: 0, vz: 0, vh: 0, facing: src.facing, alive: true,
@@ -591,13 +652,13 @@
         if (travel < distance * 0.5) continue;
         let score = (ux * dx + uz * dz) * 35 + travel * 0.1;
         for (const zone of battle.zones) {
-          if (zone.side === e.side || zone.done) continue;
+          if (friendlyEffect(zone, e) || zone.done) continue;
           const margin = U.dist(x, z, zone.x, zone.z) - zone.radius - e.unit.radius * 0.5;
           score += Math.min(0, margin) * 5;
         }
         // 同时比较两侧，别从一个弹道闪进另一个弹道。
         for (const p of battle.projectiles) {
-          if (p.side === e.side || p.lob) continue;
+          if (friendlyEffect(p, e) || p.lob) continue;
           const gap = U.dist(x, z, p.x + p.vx * duration, p.z + p.vz * duration);
           score -= Math.max(0, (p.radius || 24) + e.unit.radius - gap) * 3;
         }
@@ -678,12 +739,96 @@
       e.atkCd = e.unit.stats.atkInterval;
     }
 
+    function finishRun(e) {
+      const r = e.run;
+      e.run = null;
+      const target = all().find((o) => o.id === r.targetId && o.alive) || castTarget(e);
+      if (!target) { e.stacks.pace = 0; e.state = 'idle'; return; }
+      const dx = target.x - e.x, dz = target.z - e.z, len = Math.hypot(dx, dz) || 1;
+      const dist = Math.min(r.step.finishDist || 520, len + 45);
+      e.state = 'dash'; e.stateT = 0; e.facing = dx >= 0 ? 1 : -1;
+      e.dash = { dir: dx / len, dirZ: dz / len, t: 0, dur: 0.38, skill: r.skill,
+        step: { dist, dmg: r.step.dmg + r.pace * r.step.perPace, radius: 78,
+          knock: r.step.knock, hitstun: 0.4, finish: true, pace: r.pace, marked: r.marked } };
+      battle.tracks.push({ id: battle._eid++, ownerId: e.id, side: e.side, finish: true,
+        x1: target.x - dz / len * 85, z1: target.z + dx / len * 85,
+        x2: target.x + dz / len * 85, z2: target.z - dx / len * 85, t: 0, life: 1.5 });
+      push({ type: 'run_finish', unitId: e.id, x: e.x, z: e.z, pace: r.pace, distance: r.distance });
+    }
+
+    function updateRun(e, dt) {
+      const r = e.run, step = r.step;
+      r.t += dt;
+      if (e.hitstun <= 0) {
+        const angle = r.angle + r.direction * Math.PI * 2 * Math.min(1, r.t / step.dur);
+        const tx = r.cx + Math.cos(angle) * step.radius, tz = r.cz + Math.sin(angle) * step.radius;
+        const dx = tx - e.x, dz = tz - e.z, len = Math.hypot(dx, dz) || 1;
+        const travel = Math.min(len, (step.speed || 510) * dt);
+        e.x = U.clamp(e.x + dx / len * travel, 55, W - 55);
+        e.z = U.clamp(e.z + dz / len * travel, 65, D - 65);
+        r.distance += travel; e.facing = dx >= 0 ? 1 : -1; e.state = 'run';
+        const pace = Math.min(5, r.bonus + Math.floor(r.distance / 135));
+        if (pace > r.pace) {
+          r.pace = pace; e.stacks.pace = pace;
+          push({ type: 'run_pace', unitId: e.id, x: e.x, z: e.z, pace });
+        }
+        if (battle.tick % 6 === 0 && U.dist(r.lastX, r.lastZ, e.x, e.z) > 2) {
+          battle.tracks.push({ id: battle._eid++, ownerId: e.id, side: e.side,
+            x1: r.lastX, z1: r.lastZ, x2: e.x, z2: e.z, t: 0, life: step.trailLife,
+            dmg: step.trailDmg, skill: r.skill, marked: r.marked });
+          r.lastX = e.x; r.lastZ = e.z;
+        }
+      } else e.state = 'hurt';
+      if (r.t >= step.dur) finishRun(e);
+    }
+
+    function updateTracks(dt) {
+      for (let i = battle.tracks.length - 1; i >= 0; i--) {
+        const track = battle.tracks[i]; track.t += dt;
+        const owner = all().find((o) => o.id === track.ownerId && o.alive);
+        if (!owner || track.t >= track.life) { battle.tracks.splice(i, 1); continue; }
+        if (track.finish) continue;
+        const dx = track.x2 - track.x1, dz = track.z2 - track.z1;
+        const len2 = dx * dx + dz * dz || 1;
+        for (const o of foes(owner)) {
+          const t = U.clamp(((o.x - track.x1) * dx + (o.z - track.z1) * dz) / len2, 0, 1);
+          if (U.dist(o.x, o.z, track.x1 + dx * t, track.z1 + dz * t) > 30 + o.unit.radius * 0.5) continue;
+          o.trackCd = o.trackCd || {};
+          if ((o.trackCd[owner.id] || 0) > battle.tick) continue;
+          o.trackCd[owner.id] = battle.tick + 24;
+          track.marked[o.id] = true;
+          applyDamage(owner, o, track.dmg, { skill: track.skill });
+          if (o.alive) addBuff(o, 'speedDown', 0.7, 0.22);
+        }
+      }
+    }
+
+    function updateBubbleTraps(dt) {
+      for (let i = battle.bubbleTraps.length - 1; i >= 0; i--) {
+        const trap = battle.bubbleTraps[i]; trap.t += dt;
+        const owner = all().find((o) => o.id === trap.ownerId && o.alive);
+        if (!owner || trap.t >= trap.life) { battle.bubbleTraps.splice(i, 1); continue; }
+        if (trap.t < trap.arm) continue;
+        const targets = foes(owner).filter((o) => U.dist(o.x, o.z, trap.x, trap.z) < trap.radius);
+        if (!targets.length) continue;
+        for (const o of targets.slice(0, 2)) {
+          applyDamage(owner, o, trap.dmg, { skill: 's2' });
+          if (!o.alive) continue;
+          addBuff(o, 'bubble', 8, 2);
+          o.hitstun = Math.max(o.hitstun, 0.8); o.state = 'stun'; o.bubbleCageT = 0.8;
+          push({ type: 'bubble_cage', unitId: o.id, x: o.x, z: o.z });
+        }
+        battle.bubbleTraps.splice(i, 1);
+      }
+    }
+
     // ---------- 实体更新 ----------
     function updateEntity(e, dt) {
       if (!e.alive) return;
 
       // 计时器
       e.stateT += dt;
+      e.bubbleCageT = Math.max(0, (e.bubbleCageT || 0) - dt);
       e.atkCd = Math.max(0, e.atkCd - dt);
       e.deciding = Math.max(0, e.deciding - dt);
       e.dodgeCd = Math.max(0, e.dodgeCd - dt);
@@ -718,6 +863,8 @@
       }
       if (e.isDecoy) return;
 
+      if (e.run) { updateRun(e, dt); return; }
+
       // 冲刺
       if (e.dash && e.state !== 'dash') {
         // 受击中止突进时清理状态，避免残留 dash 永久阻止后续施法。
@@ -740,7 +887,8 @@
           if (U.dist(e.x, e.z, o.x, o.z) < (d.step.radius || 46) + o.unit.radius * 0.5) {
             if (!(o._dashHit && o._dashHit === d)) {
               o._dashHit = d;
-              applyDamage(e, o, d.step.dmg, { skill: e.cast ? e.cast.key : 's1', melee: true,
+              const coef = d.step.dmg + (d.step.finish && d.step.marked[o.id] ? 0.3 : 0);
+              applyDamage(e, o, coef, { skill: d.skill || (e.cast ? e.cast.key : 's1'), melee: true,
                 armorPierce: d.step.pierceArmor ? 0.4 : (d.step.armorPierce || 0),
                 lowHpBonus: d.step.lowHpBonus });
               if (d.step.knock && o.alive) knockback(e, o, d.step.knock, d.step.up);
@@ -754,6 +902,7 @@
             e.h = 0; e.vh = 0;
             push({ type: 'kick_land', unitId: e.id, x: e.x, z: e.z, h: 0 });
           }
+          if (d.step.finish) e.stacks.pace = 0;
           e.dash = null; e.state = 'idle';
         }
         return;
@@ -781,7 +930,7 @@
         }
         if (c.idx >= c.steps.length) {
           const dur = c.skill && c.key !== 'basic' ? 0.55 : 0.25;
-          if (c.t >= dur) { e.cast = null; e.state = 'idle'; }
+          if (c.t >= dur && !e.run && !e.dash) { e.cast = null; e.state = 'idle'; }
         }
         return;
       }
@@ -822,7 +971,7 @@
       // 躲避：先躲 AOE 预警圈，再预判侧闪飞行道具（捡石头途中同样会闪）
       if (e.dodgeCd <= 0 && !hasBuff(e, 'invuln')) {
         for (const z of battle.zones) {
-          if (z.side === e.side || z.done) continue;
+          if (friendlyEffect(z, e) || z.done) continue;
           if (U.dist(e.x, e.z, z.x, z.z) < z.radius + e.unit.radius * 0.5) {
             dbg('dodge');
             const dx = e.x - z.x, dz = e.z - z.z;
@@ -830,7 +979,7 @@
           }
         }
         for (const p of battle.projectiles) {
-          if (p.side === e.side || p.lob) continue;
+          if (friendlyEffect(p, e) || p.lob) continue;
           const d = U.dist(p.x, p.z, e.x, e.z);
           if (d > 230) continue;
           const dx = e.x - p.x, dz = e.z - p.z;
@@ -1022,7 +1171,7 @@
         p.life -= dt;
         const owner = all().find((o) => o.id === p.ownerId);
         if (!owner) { battle.projectiles.splice(i, 1); continue; }
-        const enemySide = p.side === 'A' ? battle.B : battle.A;
+        const enemySide = foes(owner);
         // 抛物线落石：不参与普通碰撞，落地即范围结算
         if (p.lob) {
           p.t += dt;
@@ -1121,8 +1270,7 @@
 
     function landStone(p) {
       const owner = all().find((o) => o.id === p.ownerId);
-      const side = p.side;
-      const enemySide = side === 'A' ? battle.B : battle.A;
+      const enemySide = owner ? foes(owner) : [];
       for (const o of enemySide) {
         if (!o.alive) continue;
         if (U.dist(o.x, o.z, p.tx, p.tz) > p.radius + o.unit.radius * 0.5) continue;
@@ -1158,7 +1306,7 @@
             z.fired++;
             z.nextFire += (z.repeatGap || 0.4);
             if (owner) {
-              for (const o of (z.side === 'A' ? battle.B : battle.A)) {
+              for (const o of foes(owner)) {
                 if (!o.alive) continue;
                 if (U.dist(o.x, o.z, z.x, z.z) < z.radius + o.unit.radius * 0.5) {
                   applyDamage(owner, o, z.dmg, { skill: z.skill, armorPierce: z.armorPierce });
@@ -1177,6 +1325,15 @@
     }
 
     function checkEnd() {
+      if (mode === 'brawl') {
+        const survivors = battle.participants.filter((e) => e.alive);
+        if (survivors.length <= 1) {
+          battle.over = true; battle.winnerId = survivors.length ? survivors[0].id : null;
+          battle.result = survivors.length ? 'brawl' : 'draw';
+          battle.endReason = survivors.length ? 'last-standing' : 'double-ko';
+        }
+        return;
+      }
       const aAlive = battle.A.filter((e) => e.alive && !e.isDecoy).length;
       const bAlive = battle.B.filter((e) => e.alive && !e.isDecoy).length;
       if (aAlive === 0 && bAlive === 0) { battle.over = true; battle.result = 'draw'; battle.endReason = 'double-ko'; return; }
@@ -1189,8 +1346,8 @@
       if (battle.over) return;
       battle.events.length = 0;
       const dt = TICK;
-      battle.time = U.round2(battle.time + dt);
       battle.tick++;
+      battle.time = U.round2(battle.tick * TICK);
       const list = all();
       for (const e of list) updateEntity(e, dt);
       // 单位互斥：不让两个单位叠在一起（简单的两两分离松弛）
@@ -1228,6 +1385,8 @@
       updateZones(dt);
       updateRains(dt);
       updatePickups(dt);
+      updateTracks(dt);
+      updateBubbleTraps(dt);
       // 尸体淡出后移出战场（之前尸体会永远留在场上）
       for (const side of ['A', 'B']) {
         for (let i = battle[side].length - 1; i >= 0; i--) {
@@ -1243,15 +1402,17 @@
     };
 
     battle.hash = function () {
-      const parts = [battle.tick, battle.time, battle.over ? battle.result || '-' : '-', battle.rng.snapshot()];
+      const parts = [battle.mode, battle.winnerId || 0, battle.tick, battle.time, battle.over ? battle.result || '-' : '-', battle.rng.snapshot()];
       for (const e of all()) {
         parts.push(e.id, Math.round(e.x * 50), Math.round(e.z * 50), Math.round(e.h * 50),
           e.alive ? Math.round(e.hp) : -1, Math.round(e.energy), e.state,
           Math.round(e.cds.s1 * 50), Math.round(e.cds.s2 * 50), e.buffs.length);
         if (e.unit.s3) parts.push('s3', Math.round(e.cds.s3 * 50));
         if (e.isDecoy) parts.push('decoy', e.ownerId, Math.round(e.life * 60));
+        if (e.run) parts.push('run', Math.round(e.run.t * 60), Math.round(e.run.distance), e.run.pace);
+        if (e.unitId === 'zhangxuefeng') parts.push(e.stacks.pace || 0, e.stacks.paceBoost || 0);
       }
-      parts.push(battle.projectiles.length, battle.zones.length);
+      parts.push(battle.projectiles.length, battle.zones.length, battle.tracks.length, battle.bubbleTraps.length);
       return U.hex8(U.hashParts(parts));
     };
 
@@ -1260,6 +1421,7 @@
 
     // 契约要求的 state 视图（getter 零拷贝，渲染层按 st.A / st.B / st.time 读取）
     battle.state = {
+      get mode() { return battle.mode; },
       get time() { return battle.time; },
       get tick() { return battle.tick; },
       get over() { return battle.over; },
@@ -1271,6 +1433,8 @@
       get projectiles() { return battle.projectiles; },
       get zones() { return battle.zones; },
       get rains() { return battle.rains; },
+      get tracks() { return battle.tracks; },
+      get bubbleTraps() { return battle.bubbleTraps; },
       get pickups() { return battle.pickups; },
       get minions() { return battle.minions; },
       get stats() { return battle.stats; },

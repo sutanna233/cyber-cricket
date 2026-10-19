@@ -53,6 +53,7 @@
   <div id="right">
     <div class="panel">
       <h3>阵容与种子</h3>
+      <label>模式 <select id="battle-mode"><option value="team">阵营对战</option><option value="brawl">自由乱斗 · 最后存活者</option></select></label>
       <div class="row">
         <span>seed</span><input type="number" id="seed" value="20261019">
         <span>左方(玩家)已选 <b id="cnt-a">0</b></span>
@@ -61,7 +62,7 @@
       </div>
       <div class="row"><span style="width:52px">左方</span><div class="units" id="units-a"></div></div>
       <div class="row"><span style="width:52px">右方</span><div class="units" id="units-b"></div></div>
-      <div class="row"><span class="d">点角色卡切换上场；留空则自动从池中随机满编</span></div>
+      <div class="row"><span class="d">点卡片添加一只，右键移除一只；可重复选择，每侧最多6只；留空随机满编</span></div>
     </div>
 
     <div class="panel">
@@ -90,17 +91,17 @@
 </div>
 
 <script src="js/util.js"></script>
-<script src="js/fighters.js?v=5"></script>
-<script src="js/waves.js?v=5"></script>
-<script src="js/assets.js?v=5"></script>
+<script src="js/fighters.js?v=13"></script>
+<script src="js/waves.js?v=13"></script>
+<script src="js/assets.js?v=13"></script>
 <script src="js/audio-controls.js?v=1"></script>
-<script src="js/sprites.js?v=5"></script>
-<script src="js/engine.js?v=5"></script>
-<script src="js/ai.js?v=5"></script>
-<script src="js/battle.js?v=5"></script>
-<script src="js/board.js"></script>
-<script src="js/render.js?v=5"></script>
-<script src="js/simwatch.js?v=5"></script>
+<script src="js/sprites.js?v=13"></script>
+<script src="js/engine.js?v=13"></script>
+<script src="js/ai.js?v=13"></script>
+<script src="js/battle.js?v=13"></script>
+<script src="js/board.js?v=13"></script>
+<script src="js/render.js?v=13"></script>
+<script src="js/simwatch.js?v=13"></script>
 <script src="js/mobile.js"></script>
 </body>
 </html>

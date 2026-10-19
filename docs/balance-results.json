@@ -1,0 +1,125 @@
+{
+  "label": "release",
+  "seeds": 60,
+  "seedBase": 32000,
+  "summaries": [
+    {
+      "size": 1,
+      "count": 720,
+      "unfinished": 0,
+      "fighters": [
+        {
+          "id": "tomori",
+          "games": 360,
+          "winRate": 53.1
+        },
+        {
+          "id": "xujiayin",
+          "games": 360,
+          "winRate": 48.6
+        },
+        {
+          "id": "zhangxuefeng",
+          "games": 360,
+          "winRate": 46.1
+        },
+        {
+          "id": "tiansuluo",
+          "games": 360,
+          "winRate": 51.9
+        }
+      ],
+      "pairs": [
+        {
+          "a": "tomori",
+          "b": "xujiayin",
+          "aWinRate": 26.7
+        },
+        {
+          "a": "tomori",
+          "b": "zhangxuefeng",
+          "aWinRate": 45.8
+        },
+        {
+          "a": "tomori",
+          "b": "tiansuluo",
+          "aWinRate": 86.7
+        },
+        {
+          "a": "xujiayin",
+          "b": "zhangxuefeng",
+          "aWinRate": 45.8
+        },
+        {
+          "a": "xujiayin",
+          "b": "tiansuluo",
+          "aWinRate": 27.5
+        },
+        {
+          "a": "zhangxuefeng",
+          "b": "tiansuluo",
+          "aWinRate": 30
+        }
+      ]
+    },
+    {
+      "size": 3,
+      "count": 720,
+      "unfinished": 0,
+      "fighters": [
+        {
+          "id": "tomori",
+          "games": 360,
+          "winRate": 49.2
+        },
+        {
+          "id": "xujiayin",
+          "games": 360,
+          "winRate": 52.8
+        },
+        {
+          "id": "zhangxuefeng",
+          "games": 360,
+          "winRate": 56.4
+        },
+        {
+          "id": "tiansuluo",
+          "games": 360,
+          "winRate": 41.7
+        }
+      ],
+      "pairs": [
+        {
+          "a": "tomori",
+          "b": "xujiayin",
+          "aWinRate": 45
+        },
+        {
+          "a": "tomori",
+          "b": "zhangxuefeng",
+          "aWinRate": 25.8
+        },
+        {
+          "a": "tomori",
+          "b": "tiansuluo",
+          "aWinRate": 76.7
+        },
+        {
+          "a": "xujiayin",
+          "b": "zhangxuefeng",
+          "aWinRate": 53.3
+        },
+        {
+          "a": "xujiayin",
+          "b": "tiansuluo",
+          "aWinRate": 50
+        },
+        {
+          "a": "zhangxuefeng",
+          "b": "tiansuluo",
+          "aWinRate": 48.3
+        }
+      ]
+    }
+  ]
+}

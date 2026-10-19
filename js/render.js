@@ -575,6 +575,25 @@
           spawn('ring', p.x, p.z, 6, { size: 48, life: 0.25, grow: 1.2, alpha: 0.6, layer: 'ground' });
         }
         if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.5 });
+      } else if (type === 'run_start') {
+        announce(ev.ult ? '最后一圈 · 全速开跑！' : '十公里结算 · 开跑！', '#75ffae');
+        floatText(p.x, p.z, 85, '跑圈蓄速', { color: '#75ffae', life: 0.9, size: 20 });
+      } else if (type === 'run_pace') {
+        floatText(p.x, p.z, 100, '配速 ' + ev.pace + '/5', { color: '#75ffae', life: 0.65, size: 17 });
+      } else if (type === 'run_finish') {
+        announce('冲线！配速 ' + ev.pace + '/5', '#e9ff8c');
+        floatText(p.x, p.z, 105, '终点重击！', { color: '#e9ff8c', life: 0.9, size: 24 });
+        if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.35 });
+      } else if (type === 'pace_boost') {
+        floatText(p.x, p.z, 95, '补给：下次配速 +2', { color: '#75ffae', life: 1.1, size: 16 });
+      } else if (type === 'bubble_trap') {
+        floatText(p.x, p.z, 20, '泡泡陷阱', { color: '#a3edff', life: 0.8, size: 16 });
+      } else if (type === 'bubble_cage') {
+        floatText(p.x, p.z, 100, '被泡泡包住了！', { color: '#a3edff', life: 0.8, size: 16 });
+      } else if (type === 'bubble_burst') {
+        spawn('ring', p.x, p.z, 40, { size: 130, life: 0.55, grow: 1.8, color: '#a3edff', alpha: 0.85 });
+        floatText(p.x, p.z, 90, '啵！×' + ev.stacks, { color: '#c8f5ff', life: 0.9, size: 23 });
+        if (CC.assets && CC.assets.play) CC.assets.play('buff', { vol: 0.3, rate: 1.5 });
       } else if (type === 'kick_land') {
         spawn('ring', p.x, p.z, 3, { size: 55, life: 0.3, grow: 1.5, alpha: 0.5, layer: 'ground' });
         if (CC.assets && CC.assets.play) CC.assets.play('land', { vol: 0.3 });
@@ -986,6 +1005,12 @@
     const Sp = CC.sprites, A = CC.assets;
     const size = (p.scale || 1) * 48;
     const pt = Sp.project(p.x, p.z, (p.h || 0));
+    if (p.bubble) {
+      ctx.save(); ctx.fillStyle = 'rgba(110,210,255,0.3)'; ctx.strokeStyle = '#c0f5ff'; ctx.lineWidth = 2.5;
+      Sp.ellipsePath(ctx, pt.sx, pt.sy, 18, 18); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#fff'; Sp.ellipsePath(ctx, pt.sx - 6, pt.sy - 6, 4, 3); ctx.fill();
+      ctx.restore(); return;
+    }
     const ang = Math.atan2(((p.vz || 0)) * Sp.VIEW.ZS, ((p.vx || 0)) * Sp.VIEW.SCALE) || 0;
     const key = p.sprite || 'spark';
     // 拖尾
@@ -1109,6 +1134,36 @@
         ctx.fill();
       }
       ctx.restore();
+    }
+  }
+
+  function drawRunningTracks(ctx, st) {
+    const Sp = CC.sprites;
+    for (const track of (st && st.tracks) || []) {
+      const a = Sp.project(track.x1, track.z1, 0), b = Sp.project(track.x2, track.z2, 0);
+      ctx.save(); ctx.globalAlpha = Math.min(0.85, (track.life - track.t) * 0.8);
+      ctx.lineCap = 'round';
+      if (track.finish) {
+        const dx = b.sx - a.sx, dy = b.sy - a.sy, length = Math.hypot(dx, dy);
+        ctx.translate(a.sx, a.sy); ctx.rotate(Math.atan2(dy, dx));
+        for (let i = 0; i < 16; i++) {
+          ctx.fillStyle = i % 2 ? '#151c22' : '#f2fff4'; ctx.fillRect(i * length / 16, -5, length / 16 + 1, 10);
+        }
+      } else {
+        ctx.strokeStyle = '#0c7c4a'; ctx.lineWidth = 22;
+        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+        ctx.strokeStyle = '#75ffae'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    for (const trap of (st && st.bubbleTraps) || []) {
+      const p = Sp.project(trap.x, trap.z, 0);
+      ctx.save(); ctx.fillStyle = 'rgba(105,205,255,0.16)'; ctx.strokeStyle = '#9ae6ff'; ctx.lineWidth = 2.5;
+      if (ctx.setLineDash && trap.t < trap.arm) ctx.setLineDash([5, 5]);
+      Sp.ellipsePath(ctx, p.sx, p.sy, Sp.scaleX(trap.radius), Sp.scaleZ(trap.radius)); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#c4f2ff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('泡泡陷阱', p.sx, p.sy + 4); ctx.restore();
     }
   }
 
@@ -1324,7 +1379,7 @@
   // ---------------------------------------------------------------- HUD
   function teamStats(st, side) {
     const arr = st && (side === 'B' ? st.B : st.A);
-    const list = Array.isArray(arr) ? arr : [];
+    const list = Array.isArray(arr) ? arr.filter((e) => !e.isDecoy) : [];
     let hp = 0, max = 0, alive = 0;
     for (let i = 0; i < list.length; i++) {
       const e = list[i];
@@ -1433,7 +1488,13 @@
       }
       ctx.restore();
     };
-    if (hasTeams(st)) {
+    if (st && st.mode === 'brawl') {
+      const alive = (st.A || []).concat(st.B || []).filter((e) => e.alive && !e.isMinion).length;
+      ctx.save(); ctx.font = 'bold 16px ' + FONT; ctx.fillStyle = '#ffe294';
+      ctx.fillText('自由乱斗 · 剩余 ' + alive + ' 人', 24, 35);
+      ctx.font = '12px ' + FONT; ctx.fillStyle = C.dim;
+      ctx.fillText('每人各自为战 · 最后存活者获胜', 24, 56); ctx.restore();
+    } else if (hasTeams(st)) {
       drawTeam('A', A, 12, false);
       drawTeam('B', B, W - 12 - 264, true);
     }
@@ -1727,6 +1788,7 @@
     ctx.textBaseline = 'alphabetic';
     drawBackground(ctx, phase);
     drawZones(ctx, st);
+    drawRunningTracks(ctx, st);
     drawChargeWarns(ctx, st);
     drawRains(ctx, st);
     drawPickups(ctx, st);

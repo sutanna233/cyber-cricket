@@ -175,8 +175,7 @@
     return arr(s).map((x) => x.unitId).filter((x) => !!x);
   }
   function benchIds(s) {
-    const used = sidePlacedIds(normSide(s));
-    return poolIds.filter((id) => used.indexOf(id) < 0);
+    return poolIds.slice();
   }
 
   // ---------- 每侧上场人数 ----------
@@ -210,9 +209,6 @@
     if (!target) return false;
     if (target.slot >= sizes[sd]) return false;                  // 该槽未启用
     if (target.unitId === unitId) return true;                   // 幂等
-    if (target.unitId !== null) return false;                    // 该槽已被占
-    const cur = slotOf(unitId, sd);
-    if (cur >= 0 && cur !== i) arr(sd)[toLocal(cur)].unitId = null;   // 同侧移动
     target.unitId = unitId;
     noteActivity();
     return true;
@@ -231,6 +227,16 @@
   }
 
   // 无参 = 两侧清空（人数保持）；带 side = 只清一侧
+  function move(from, to) {
+    const source = allSlots().find((x) => x.index === from);
+    const target = allSlots().find((x) => x.index === to);
+    if (!source || !target || !source.unitId) return false;
+    const a = arr(source.side)[source.slot], b = arr(target.side)[target.slot];
+    const id = a.unitId; a.unitId = b.unitId; b.unitId = id;
+    noteActivity();
+    return true;
+  }
+
   function clear(s) {
     const list = (s === undefined || s === null) ? SIDES.slice() : [normSide(s)];
     list.forEach((sd) => arr(sd).forEach((x) => { x.unitId = null; }));
@@ -264,8 +270,8 @@
       const t = avail[i]; avail[i] = avail[j]; avail[j] = t;
     }
     let n = 0;
-    for (let k = 0; k < free.length && k < avail.length; k++) {
-      arr(sd)[toLocal(free[k])].unitId = avail[k];
+    for (let k = 0; k < free.length; k++) {
+      arr(sd)[toLocal(free[k])].unitId = avail[k % avail.length];
       n++;
     }
     fillCount++;
@@ -292,7 +298,6 @@
       if (!e || !e.id) return;
       if (n >= sizes[sd]) return;
       if (poolIds.indexOf(e.id) < 0) return;
-      if (slotOf(e.id, sd) >= 0) return;
       const local = clamp(number(e.slot, 0), 0, sizes[sd] - 1);
       let target = arr(sd)[local];
       if (!target || target.slot >= sizes[sd] || target.unitId) {
@@ -315,7 +320,7 @@
   function noteActivity() {
     autoStart = AUTO_START_SECONDS;
     armed = true;
-    fullArmed = true;
+    fullArmed = false;   // 替换满编阵容后也保留5秒调整时间
     return autoStart;
   }
 
@@ -392,7 +397,6 @@
     for (let i = 0; i < sizes[sd]; i++) {
       const id = list[i];
       if (!id || poolIds.indexOf(id) < 0) continue;
-      if (slotOf(id, sd) >= 0) continue;
       arr(sd)[i].unitId = id;
       n++;
     }
@@ -421,7 +425,7 @@
     slots: slotsView, allSlots, slotsRaw: (s) => arr(s),
     slotPos, mirror, slotOf, sideOfIndex, toGlobal, toLocal,
     setSize, size, sizes: sizes_, lastSizeChange,
-    place, remove, clear, autoFill, autoFillEmpty, applySquad,
+    place, remove, move, clear, autoFill, autoFillEmpty, applySquad,
     isFull, isFullAll, filledCount, countAll, isFullArmed: () => fullArmed,
     activeSide, setActiveSide,
     noteActivity, tick, autoStartIn, shouldStart, setAutoStart, disarm,

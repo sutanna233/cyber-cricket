@@ -177,6 +177,7 @@
         };
         wrap('place', caps.place);
         wrap('remove', caps.place);
+        wrap('move', caps.place);
         wrap('clear', caps.place);
         wrap('setSize', caps.size);
         wrap('noteActivity', caps.place);
@@ -194,6 +195,9 @@
           };
         };
         wrapM('restart', caps.restart);
+        wrapM('handleMode', caps.place);
+        wrapM('handleMove', caps.place);
+        wrapM('handleStart', caps.place);
         wrapM('setPaused', caps.pause);
         wrapM('togglePause', caps.pause);
         M.__ccGuarded = true;
@@ -214,7 +218,7 @@
         document.querySelectorAll('#bench,.cc-bench,#bench-panel,.unit-pool,.bench-panel').forEach((el) => { el.style.display = 'none'; });
       }
       if (!caps.restart) {
-        document.querySelectorAll('#btn-restart,#restart-btn,.restart-btn,#btnRestart').forEach((el) => { el.style.display = 'none'; });
+        document.querySelectorAll('#btn-restart,#restart-btn,.restart-btn,#btnRestart,#btn-mode,#btn-start').forEach((el) => { el.style.display = 'none'; });
       }
       if (!caps.pause) {
         document.querySelectorAll('#btn-pause,#pause-btn,.pause-btn,#btnPause').forEach((el) => { el.style.display = 'none'; });
