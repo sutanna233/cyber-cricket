@@ -14,7 +14,7 @@
   const SKILL_DMG_SCALE = 5.3;      // 技能伤害补偿（没有平A，单次技能必须够痛）
   const CORPSE_FADE = 1.4;          // 尸体淡出时长（秒），之后从战场移除
   // 蓄力（前摇）默认时长：蓄力中可被打断
-  const CHARGE = { s1: 0.5, s2: 0.8, ult: 1.4 };
+  const CHARGE = { s1: 0.5, s2: 0.8, s3: 0.4, ult: 1.4 };
   const INTERRUPT_CD = 0.4;         // 被打断后进入的短冷却比例
   const INTERRUPT_MIN_RATIO = 0.015; // 只有"有效伤害"（≥1.5% 最大生命）才能打断，避免被蹭一下就断
   const SUSTAIN_SCALE = 0.72;        // 全局续航系数（回血/护盾/吸血统一压一档，防止打不死的僵局）
@@ -42,6 +42,7 @@
       return;
     }
     if (kind === 'regen' || kind === 'shield' || kind === 'lifesteal') mag *= SUSTAIN_SCALE;
+      if (kind === 'shield') e.shield = Math.max(e.shield || 0, Math.round(e.maxHp * mag));
     // 同类叠加取更强的一条，避免无限堆叠
     for (let i = 0; i < e.buffs.length; i++) {
       const b = e.buffs[i];
@@ -93,7 +94,7 @@
         x: pos[0], z: pos[1], h: 0, vx: 0, vz: 0, vh: 0,
         facing: side === 'A' ? 1 : -1, alive: true,
         hp, maxHp: hp, shield: 0, energy: spec.energy || 0,
-        state: 'idle', stateT: 0, atkCd: 0, cds: { s1: 0, s2: 0, ult: 0 },
+        state: 'idle', stateT: 0, atkCd: 0, cds: { s1: 0, s2: 0, s3: 0, ult: 0 },
         buffs: [], targetId: 0, combo: 0, comboT: 0,
         cast: null, hitstun: 0, deciding: 0, plan: null, dodgeCd: 0, stuck: 0, lastX: pos[0], lastZ: pos[1],
         isMinion: !!spec.isMinion, ownerId: spec.ownerId || 0, life: spec.life || 0,
@@ -234,8 +235,22 @@
       e.alive = false;
       e.state = 'ko';
       e.stateT = 0;
+      if (e.dash && e.dash.step.jumpHeight) { e.h = 0; e.vh = 0; }
+      e.dash = null;
       e.cast = null;
       e.buffs = [];
+      if (e.isDecoy) {
+        push({ type: 'decoy_break', unitId: e.id, x: e.x, z: e.z, h: 0, radius: e.decoyStep.radius });
+        const owner = all().find((o) => o.id === e.ownerId && o.alive);
+        if (owner) {
+          for (const o of foes(e)) {
+            if (!owner.alive || U.dist(e.x, e.z, o.x, o.z) > e.decoyStep.radius + o.unit.radius * 0.5) continue;
+            applyDamage(owner, o, e.decoyStep.dmg, { skill: 's3' });
+            if (o.alive) applyEffects(owner, o, e.decoyStep.effects, e.decoyStep);
+          }
+        }
+        return;
+      }
       battle.stats.killsByUnit[killer ? killer.unitId : 'none'] =
         (battle.stats.killsByUnit[killer ? killer.unitId : 'none'] || 0) + 1;
       if (killer) {
@@ -350,8 +365,12 @@
           const len = Math.hypot(dx, dz) || 1;
           src.state = 'dash';
           src.stateT = 0;
-          src.dash = { dir: dx / len, dirZ: dz / len, dur: step.dur || 0.3, t: 0, step };
-          push({ type: 'dash', unitId: src.id, x: src.x, z: src.z, h: src.h });
+          const direction = step.away ? -1 : 1;
+          src.dash = { dir: dx / len * direction, dirZ: dz / len * direction, dur: step.dur || 0.3, t: 0, step };
+          if (step.stopAtTarget && target) {
+            src.dash.dist = Math.min(step.dist, Math.max(0, len - (src.unit.radius + target.unit.radius) * 0.8));
+          }
+          push({ type: 'dash', unitId: src.id, x: src.x, z: src.z, h: src.h, flyingKick: !!step.jumpHeight });
           break;
         }
         case 'aoe': {
@@ -386,6 +405,17 @@
             tgt.hp = U.clamp(tgt.hp + v, 0, tgt.maxHp);
             push({ type: 'heal', unitId: tgt.id, amount: v, x: tgt.x, z: tgt.z, h: tgt.h + 40 });
           }
+          break;
+        }
+        case 'decoy': {
+          const e = spawn(src.side, { id: src.unitId, pos: [src.x, src.z], lane: src.lane,
+            isMinion: true, ownerId: src.id, life: step.life || 3, hpMul: step.hpRatio || 0.25 }, 0);
+          if (!e) break;
+          e.isDecoy = true; e.decoyStep = step; e.unitId = 'decoy_' + src.unitId;
+          e.unit = Object.assign({}, src.unit, { id: e.unitId, name: '空楼', radius: 30, height: 70,
+            stats: Object.assign({}, src.unit.stats, { spd: 0, weight: 4 }),
+            s1: null, s2: null, s3: null, ult: null, policy: {} });
+          push({ type: 'decoy_spawn', unitId: e.id, x: e.x, z: e.z, h: 0 });
           break;
         }
         case 'summon': {
@@ -598,8 +628,7 @@
       if (!e.unit[key] || hasBuff(e, 'seal')) return false;
       const sk = e.unit[key];
       if (key === 'ult') return e.energy >= (sk.cost || 100);
-      if (key === 's2') return e.cds.s2 <= 0 && e.energy >= (sk.cost || 0);
-      return e.cds.s1 <= 0;
+      return (e.cds[key] || 0) <= 0 && e.energy >= (sk.cost || 0);
     }
 
     function startCast(e, key) {
@@ -607,8 +636,10 @@
       if (!sk) return false;
       if (!canCast(e, key)) return false;
       if (key === 'ult') e.energy = U.clamp(e.energy - (sk.cost || 100), 0, 100);
-      else if (key === 's2') { e.energy = U.clamp(e.energy - (sk.cost || 0), 0, 100); e.cds.s2 = (sk.cd || 8) * CD_SCALE; }
-      else e.cds.s1 = (sk.cd || 6) * CD_SCALE;
+      else {
+        e.energy = U.clamp(e.energy - (sk.cost || 0), 0, 100);
+        e.cds[key] = (sk.cd || (key === 's1' ? 6 : 8)) * CD_SCALE;
+      }
       // 蓄力前摇：蓄力期间站桩可被打断（霸体 / uninterruptible 除外）
       const charge = sk.cast != null ? sk.cast : (CHARGE[key] || 0.6);
       // 代价型技能：施放时先付出自身血量（王境泽「真香」：先嘴硬，再真香）
@@ -673,21 +704,32 @@
         } else if (b.kind === 'regen') {
           e.hp = U.clamp(e.hp + e.maxHp * b.mag * dt, 0, e.maxHp);
         }
-        if (b.t >= b.dur) e.buffs.splice(i, 1);
+        if (b.t >= b.dur) {
+          if (b.kind === 'shield') e.shield = 0;
+          e.buffs.splice(i, 1);
+        }
       }
 
       // 召唤物寿命
       if (e.isMinion) {
         e.life -= dt;
-        if (e.life <= 0) { kill(e, null); return; }
+        const ownerGone = e.isDecoy && !all().some((o) => o.id === e.ownerId && o.alive);
+        if (e.life <= 0 || ownerGone) { kill(e, null); return; }
       }
+      if (e.isDecoy) return;
 
       // 冲刺
+      if (e.dash && e.state !== 'dash') {
+        // 受击中止突进时清理状态，避免残留 dash 永久阻止后续施法。
+        if (e.dash.step.jumpHeight) { e.h = 0; e.vh = 0; }
+        e.dash = null;
+      }
       if (e.state === 'dash' && e.dash) {
         dbg('dash');
         const d = e.dash;
         d.t += dt;
-        const sp = (d.step.dist / Math.max(0.05, d.dur));
+        const sp = ((d.dist == null ? d.step.dist : d.dist) / Math.max(0.05, d.dur));
+        if (d.step.jumpHeight) e.h = Math.sin(Math.PI * Math.min(1, d.t / d.dur)) * d.step.jumpHeight;
         e.x += d.dir * sp * dt;
         e.z += (d.dirZ || 0) * sp * dt;
         e.x = U.clamp(e.x, 60, W - 60);
@@ -707,7 +749,13 @@
             }
           }
         }
-        if (d.t >= d.dur) { e.dash = null; e.state = 'idle'; }
+        if (d.t >= d.dur) {
+          if (d.step.jumpHeight) {
+            e.h = 0; e.vh = 0;
+            push({ type: 'kick_land', unitId: e.id, x: e.x, z: e.z, h: 0 });
+          }
+          e.dash = null; e.state = 'idle';
+        }
         return;
       }
 
@@ -1129,8 +1177,8 @@
     }
 
     function checkEnd() {
-      const aAlive = battle.A.filter((e) => e.alive).length;
-      const bAlive = battle.B.filter((e) => e.alive).length;
+      const aAlive = battle.A.filter((e) => e.alive && !e.isDecoy).length;
+      const bAlive = battle.B.filter((e) => e.alive && !e.isDecoy).length;
       if (aAlive === 0 && bAlive === 0) { battle.over = true; battle.result = 'draw'; battle.endReason = 'double-ko'; return; }
       if (aAlive === 0) { battle.over = true; battle.result = 'B'; battle.endReason = 'wipe'; return; }
       if (bAlive === 0) { battle.over = true; battle.result = 'A'; battle.endReason = 'wipe'; return; }
@@ -1200,12 +1248,14 @@
         parts.push(e.id, Math.round(e.x * 50), Math.round(e.z * 50), Math.round(e.h * 50),
           e.alive ? Math.round(e.hp) : -1, Math.round(e.energy), e.state,
           Math.round(e.cds.s1 * 50), Math.round(e.cds.s2 * 50), e.buffs.length);
+        if (e.unit.s3) parts.push('s3', Math.round(e.cds.s3 * 50));
+        if (e.isDecoy) parts.push('decoy', e.ownerId, Math.round(e.life * 60));
       }
       parts.push(battle.projectiles.length, battle.zones.length);
       return U.hex8(U.hashParts(parts));
     };
 
-    battle.aliveCount = (side) => battle[side].filter((e) => e.alive).length;
+    battle.aliveCount = (side) => battle[side].filter((e) => e.alive && !e.isDecoy).length;
     battle.entities = all;
 
     // 契约要求的 state 视图（getter 零拷贝，渲染层按 st.A / st.B / st.time 读取）

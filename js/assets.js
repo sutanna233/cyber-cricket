@@ -19,48 +19,20 @@
   let BASE = 'assets/';
 
   // ---------------------------------------------------------------- 清单
-  const UNIT_IDS = [
-    'tomori', 'xujiayin', 'kun', 'dingzhen', 'bao', 'sunge', 'bili', 'yingma',
-    'oligei', 'fawang', 'liulaoshi', 'daxiang', 'xiongmao', 'zhenxiang', 'chongwang',
-  ];
+  const UNIT_IDS = ['tomori', 'xujiayin', 'zhangxuefeng'];
 
   // 512×512 抠图里"真正有像素"的内容框（实测，tools/_rendercheck/measure*.ps1）
-  // 渲染层按这些框裁切绘制，保证 15 只单位视觉体量一致。
+  // 渲染层按这些框裁切绘制，保证两位角色视觉体量一致。
   // <<<TEX_META_BEGIN>>> 由 tools/_rendercheck/gen_tex_meta.js 生成，勿手改
   // 口径：box = alpha>64 的内容包围盒；ratio = alpha>16 的非透明占比（与 tests/_loader 一致）
   // 重算：node tools/_rendercheck/gen_tex_meta.js    校验：--check
   const TEX_META_STAMP = "2026-10-18T18:20:22.611Z";
   const MEME_TEX = {
-    bao: { box: [93, 41, 493, 505], ratio: 0.4528, w: 512, h: 512, size: 259027, mtime: 1792343280141, sha: "250d92056f80" },
-    bili: { box: [57, 67, 495, 511], ratio: 0.5257, w: 512, h: 512, size: 283543, mtime: 1792343285005, sha: "aa47321e15af" },
-    chongwang: { box: [24, 64, 491, 449], ratio: 0.4462, w: 512, h: 512, size: 224402, mtime: 1792343304543, sha: "f7c63a3fea41" },
-    daxiang: { box: [61, 98, 511, 475], ratio: 0.4425, w: 512, h: 512, size: 220773, mtime: 1792343297189, sha: "f1ad798672d5" },
-    dingzhen: { box: [61, 71, 511, 511], ratio: 0.4964, w: 512, h: 512, size: 253610, mtime: 1792343277737, sha: "a2cf47f45974" },
-    fawang: { box: [23, 151, 488, 458], ratio: 0.3424, w: 512, h: 512, size: 147560, mtime: 1792343292238, sha: "2f32d9584a20" },
-    kun: { box: [71, 35, 455, 499], ratio: 0.5435, w: 512, h: 512, size: 222153, mtime: 1792343275316, sha: "9b13924a0685" },
-    liulaoshi: { box: [136, 54, 467, 511], ratio: 0.4159, w: 512, h: 512, size: 198972, mtime: 1792343294677, sha: "128e85bda40d" },
-    oligei: { box: [91, 146, 480, 511], ratio: 0.3921, w: 512, h: 512, size: 141050, mtime: 1792343289841, sha: "232c515d2028" },
-    sunge: { box: [59, 75, 511, 511], ratio: 0.4771, w: 512, h: 512, size: 168327, mtime: 1792343282553, sha: "60bafb502a11" },
+    zhangxuefeng: { box: [89, 5, 531, 396], ratio: 0.4153, w: 629, h: 397 },
     tomori: { box: [148, 31, 364, 497], ratio: 0.3043, w: 512, h: 512, size: 132749, mtime: 1792343268136, sha: "77ece0404248" },
-    xiongmao: { box: [48, 25, 463, 492], ratio: 0.6173, w: 512, h: 512, size: 248310, mtime: 1792344947238, sha: "66dcfd3ba14f" },
     xujiayin: { box: [51, 23, 460, 487], ratio: 0.3863, w: 512, h: 512, size: 193429, mtime: 1792343272958, sha: "d14dd4a7a7e3" },
-    yingma: { box: [37, 45, 501, 480], ratio: 0.7349, w: 512, h: 512, size: 233365, mtime: 1792343658649, sha: "7ffaf274ea94" },
-    zhenxiang: { box: [74, 27, 438, 491], ratio: 0.3917, w: 512, h: 512, size: 151508, mtime: 1792343302120, sha: "694caecb0013" },
   };
   const ROOT_TEX = {
-    bao: { box: [32, 54, 479, 493], ratio: 0.4786, w: 512, h: 512, size: 97557, mtime: 1792339942333, sha: "e2342c1bfaa9" },
-    bili: { box: [32, 50, 479, 493], ratio: 0.4846, w: 512, h: 512, size: 75349, mtime: 1792339943086, sha: "9b3a60131469" },
-    chongwang: { box: [32, 54, 479, 493], ratio: 0.5146, w: 512, h: 512, size: 106162, mtime: 1792339946318, sha: "83c215887d49" },
-    daxiang: { box: [32, 54, 479, 493], ratio: 0.4994, w: 512, h: 512, size: 85837, mtime: 1792339945027, sha: "9017e846b6c6" },
-    dingzhen: { box: [32, 54, 479, 493], ratio: 0.4851, w: 512, h: 512, size: 111301, mtime: 1792339941959, sha: "0cc6b02712da" },
-    fawang: { box: [32, 51, 479, 493], ratio: 0.5205, w: 512, h: 512, size: 93370, mtime: 1792339944175, sha: "7081fa895e3e" },
-    ge: { box: [32, 54, 479, 493], ratio: 0.4924, w: 512, h: 512, size: 97181, mtime: 1792339945464, sha: "05a561c3c821" },
-    kun: { box: [32, 48, 479, 493], ratio: 0.4929, w: 512, h: 512, size: 98027, mtime: 1792339941617, sha: "8533cd3940dd" },
-    liulaoshi: { box: [32, 54, 479, 493], ratio: 0.5165, w: 512, h: 512, size: 114543, mtime: 1792339944596, sha: "9a6222d4ad11" },
-    oligei: { box: [32, 54, 479, 493], ratio: 0.4826, w: 512, h: 512, size: 94877, mtime: 1792339943806, sha: "2f96b327e29b" },
-    sunge: { box: [32, 54, 479, 493], ratio: 0.4931, w: 512, h: 512, size: 86984, mtime: 1792339942741, sha: "7e3d0936eef6" },
-    yingma: { box: [32, 54, 479, 493], ratio: 0.4856, w: 512, h: 512, size: 78476, mtime: 1792339943436, sha: "1e27541479b9" },
-    zhenxiang: { box: [32, 54, 479, 493], ratio: 0.4828, w: 512, h: 512, size: 104085, mtime: 1792339945885, sha: "89f72fc61cfd" },
   };
   const ROOT_BOX_FALLBACK = [31, 53, 480, 493];   // 未列入 ROOT_TEX 的兜底贴图
   const FX_META = {"aoe_warn":[512,512],"boom":[256,256],"crit":[256,256],"glitch":[256,256],"impact":[256,192],"ring":[256,256],"shadow":[256,128],"slash":[256,128],"slash_arc":[256,256],"spark":[128,128],"star":[128,128]};
@@ -811,7 +783,7 @@
     try {
       if (AUD.paused) return null;
       const s = String(slot === undefined || slot === null ? '1' : slot);
-      const norm = (s === 's1' ? '1' : s === 's2' ? '2' : s === 'ult' ? 'ult' : s);
+      const norm = (s === 's1' ? '1' : s === 's2' ? '2' : s === 's3' ? '3' : s === 'ult' ? 'ult' : s);
       const key = 'skill_' + unitId + '_' + norm;
       if (AUD.samples[key]) {
         if (!admitSound(key, AUD.samples[key], opts)) return null;

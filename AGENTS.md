@@ -42,8 +42,12 @@ Never commit `data/`, `.env` files, or tokens. Configure `CC_ADMIN_PASS`, `CC_SE
 
 ## Agent Notes
 
-Reply to the user in Chinese. AI changes must preserve seeded replay and resource-collecting character behavior. Skill timelines retain `cast.targetId`; homing projectiles retain their own `targetId`, and dash directions are normalized 2D vectors. Keep defensive dodges damage-free. Local regression commands are `node tools/_aicheck/regression.js` and `node tools/_aicheck/matrix.js`; these development scripts remain ignored. See `docs/AI-VALIDATION.md` for validation scope and results.
+Reply to the user in Chinese. AI changes must preserve seeded replay and resource-collecting character behavior. Skill timelines retain `cast.targetId`; homing projectiles retain their own `targetId`, and dash directions are normalized 2D vectors. Keep defensive dodges damage-free. Current local checks are `node tools/_aicheck/roster-skills-regression.js` and `node tools/_aicheck/matrix.js`; scripts remain ignored. Earlier regression scripts target historical rosters. See `docs/AI-VALIDATION.md` for validation scope and results.
 
 Keep default audio quiet: avoid duplicate engine/render sound playback, limit overlapping combat sounds and chatter, and retain user volume/mute preferences across reloads. Audio controls must remain available on mobile and in spectator mode.
 
 For ranged positioning, derive preferred distance from the primary damaging skill instead of legacy basic-attack `stats.range`. Preserve assassins' melee intent; anti-stall pressure must retain a ranged stopping distance.
+
+The roster contains `tomori`, `xujiayin`, and the newly requested `zhangxuefeng`; do not reintroduce other removed characters or the hidden boss. Tomori's flying kick is a separate `s3`; preserve collection, stone throwing, and the ultimate. Keep skill assembly, AI, cooldowns/hash, rendering, and debug displays in sync when adding skill slots.
+
+Xujiayin's `s3` is 空城计: leave a temporary stationary empty-building decoy and retreat; the decoy bursts into debt marks. Decoys are skill entities, not roster characters, and cannot keep a defeated side alive. Zhangxuefeng's requested skills are 跑步 and 雪碧巧乐兹 (running and recovery). Use the user's supplied transparent PNG unchanged as `assets/units/meme/zhangxuefeng.png`; preserve the original file on E:. The earlier admissions-themed proposal and web photo were superseded.

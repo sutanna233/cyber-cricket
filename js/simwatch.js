@@ -171,7 +171,8 @@
           + e.unit.name.padEnd(6, '　') + ' ' + bar + ' ' + Math.round(e.hp) + '/' + e.maxHp
           + (e.alive ? '' : ' <span class="r">KO</span>')
           + ' 怒气' + Math.round(e.energy)
-          + ' 技1:' + e.cds.s1.toFixed(1) + 's 技2:' + e.cds.s2.toFixed(1) + 's');
+          + ' 技1:' + e.cds.s1.toFixed(1) + 's 技2:' + e.cds.s2.toFixed(1) + 's'
+          + (e.unit.s3 ? ' ' + e.unit.s3.name + ':' + e.cds.s3.toFixed(1) + 's' : ''));
       }
     }
     $('units-hp').innerHTML = rows.join('<br>');
@@ -180,8 +181,8 @@
     let totalA = 0, totalB = 0;
     b.A.forEach((e) => { if (e.alive) totalA += e.hp; });
     b.B.forEach((e) => { if (e.alive) totalB += e.hp; });
-    $('stats').innerHTML = '存活 <span class="k">左 ' + b.A.filter((e) => e.alive).length + '</span> : '
-      + '<span class="r">右 ' + b.B.filter((e) => e.alive).length + '</span>'
+    $('stats').innerHTML = '存活 <span class="k">左 ' + b.aliveCount('A') + '</span> : '
+      + '<span class="r">右 ' + b.aliveCount('B') + '</span>'
       + '　总血量 左 ' + Math.round(totalA) + ' / 右 ' + Math.round(totalB)
       + '<br>投射物 ' + b.projectiles.length + '　区域 ' + b.zones.length
       + '　连击峰值 ' + b.stats.maxCombo + '　关键施法 ' + b.stats.casts.length;

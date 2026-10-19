@@ -12,7 +12,6 @@
   const CC = (globalThis.CC = globalThis.CC || {});
 
   const MAX_SLOTS = 6;
-  const BOSS_ID = 'chongwang';
 
   // ---------- 本地小工具（util 未就绪时兜底，不抛错） ----------
   function number(v, d) {
@@ -148,16 +147,6 @@
     const bag = shuffleInPlace(windowUnits.slice(), rng);
     const picks = bag.slice(0, Math.min(count, bag.length)).map((u) => u.id);
 
-    // 高难度小概率出现隐藏 Boss（替换掉最弱的一个）
-    const bossUnit = getUnit(BOSS_ID);
-    const bossAllowed = !!bossUnit && exclude.indexOf(BOSS_ID) < 0;
-    const bossChance = clamp(0.12 + 0.06 * (difficulty - 3), 0, 0.45);
-    if (bossAllowed && difficulty >= 3 && picks.length && rng.chance(bossChance)) {
-      let weakestIdx = 0;
-      picks.forEach((id, i) => { if (power(getUnit(id)) < power(getUnit(picks[weakestIdx]))) weakestIdx = i; });
-      picks[weakestIdx] = BOSS_ID;
-    }
-
     return assignSlots(picks, rng);
   }
 
@@ -174,7 +163,6 @@
     nextDifficulty,
     levelFor: nextDifficulty,   // 中立别名：第 n 场的对局等级
     power,
-    BOSS_ID,
     MAX_SLOTS,
     rngFrom,
   };

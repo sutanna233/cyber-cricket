@@ -48,6 +48,7 @@
       if (o.id === e.targetId) score -= 45;
       if (hasBuff(o, 'invuln')) score += 280;
       if (o.isMinion) score += 65;
+      if (o.isDecoy && d < 320) score -= 190;
       // 就近协同收割，不为集火横穿整个场地。
       if (d < targetRange(e) + 120) {
         score -= Math.min(2, allies.filter((a) => a !== e && a.targetId === o.id).length) * 18;
@@ -64,6 +65,7 @@
     const steps = sk.steps || [];
     let offensive = false;
     for (const step of steps) {
+      if (step.kind === 'decoy') return !!target && U.dist(e.x, e.z, target.x, target.z) <= (c.range || 240);
       if (step.kind === 'magnet' && e.trait) {
         const kind = step.kindOf || e.trait.collect;
         if ((e.stacks[kind] || 0) < (e.trait.max || 10) && battle.pickups.some((p) =>
@@ -167,14 +169,12 @@
     if (e.isMinion) return null;
     if (e.cast || e.dash || hasBuff(e, 'seal')) return null;
     const p = e.unit.policy || {};
-    const order = ['ult', 's2', 's1'];
+    const order = ['ult', 's2', 's3', 's1'];
     for (const key of order) {
       const sk = e.unit[key];
       if (!sk) continue;
       if (key === 'ult' && e.energy < 100) continue;
-      if (key === 's2' && e.cds.s2 > 0) continue;
-      if (key === 's2' && e.energy < (sk.cost || 0)) continue;
-      if (key === 's1' && e.cds.s1 > 0) continue;
+      if (key !== 'ult' && ((e.cds[key] || 0) > 0 || e.energy < (sk.cost || 0))) continue;
       const c = p[key];
       if (!c) continue;
       if (cond(battle, e, c) && usefulSkill(battle, e, sk, c)) return key;

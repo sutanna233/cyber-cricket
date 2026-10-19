@@ -123,7 +123,7 @@
       const duration = b.stats.duration || b.time;
       // 上帝视角：只有"哪一方赢了"，没有玩家的输赢
       const winner = b.result === 'draw' ? null : b.result;      // 'A' | 'B' | null
-      const survivors = winner ? b[winner].filter((e) => e.alive).length : 0;
+      const survivors = winner ? b[winner].filter((e) => e.alive && !e.isDecoy).length : 0;
       const loser = winner === 'A' ? 'B' : winner === 'B' ? 'A' : null;
       const loserTotal = loser ? Math.max(1, b[loser].length) : 1;
       // 战况评分：赢得越干净越高

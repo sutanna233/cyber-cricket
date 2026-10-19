@@ -342,6 +342,7 @@
     if (!u) return key || '技能';
     if (key === 's1' && u.s1) return u.s1.name;
     if (key === 's2' && u.s2) return u.s2.name;
+    if (key === 's3' && u.s3) return u.s3.name;
     if (key === 'ult' && u.ult) return u.ult.name;
     return key || '技能';
   }
@@ -569,7 +570,21 @@
           });
         }
         if (type === 'dodge') floatText(p.x, p.z, 42, '闪避', { color: '#9ff2ff', life: 0.55, size: 12 });
+        if (ev.flyingKick) {
+          floatText(p.x, p.z, 72, '企鹅飞踢！', { color: '#a6f3ce', life: 0.65, size: 18 });
+          spawn('ring', p.x, p.z, 6, { size: 48, life: 0.25, grow: 1.2, alpha: 0.6, layer: 'ground' });
+        }
         if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.5 });
+      } else if (type === 'kick_land') {
+        spawn('ring', p.x, p.z, 3, { size: 55, life: 0.3, grow: 1.5, alpha: 0.5, layer: 'ground' });
+        if (CC.assets && CC.assets.play) CC.assets.play('land', { vol: 0.3 });
+      } else if (type === 'decoy_spawn') {
+        floatText(p.x, p.z, 90, '空城计', { color: '#ffd166', life: 0.8, size: 18 });
+        spawn('ring', p.x, p.z, 3, { size: 70, life: 0.4, grow: 1.2, alpha: 0.6, layer: 'ground' });
+      } else if (type === 'decoy_break') {
+        spawn('boom', p.x, p.z, 24, { size: 110, life: 0.4, grow: 0.8, sprite: 'boom' });
+        floatText(p.x, p.z, 65, '空楼爆债', { color: '#ffd166', life: 0.7, size: 16 });
+        if (CC.assets && CC.assets.play) CC.assets.play('explode', { vol: 0.35 });
       } else if (type === 'reflect') {
         spawn('ring', p.x, p.z, (ev.h || 20), { size: 40, life: 0.28, grow: 0.8, alpha: 0.75, color: '#ffe066' });
         floatText(p.x, p.z, (ev.h || 30) + 30, '反弹', { color: '#ffe066', life: 0.6, size: 12 });
@@ -892,7 +907,7 @@
       if (!Array.isArray(arr)) continue;
       for (let i = 0; i < arr.length; i++) {
         const e = arr[i];
-        if (!e || !e.isMinion || e.alive === false) continue;
+        if (!e || !e.isMinion || e.isDecoy || e.alive === false) continue;
         const own = e.ownerId;
         if (own === undefined || own === null) continue;
         map[own] = (map[own] || 0) + 1;

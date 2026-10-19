@@ -216,6 +216,10 @@
       p.fwd = 12;
       p.rot = 0.12;
       p.lean = 1;
+      if (ent.dash && ent.dash.step.jumpHeight) {
+        p.rot = 0.85 * (ent.facing === -1 ? -1 : 1);
+        p.sqx *= 1.08; p.sqy *= 0.9;
+      }
     } else if (st === 'hurt') {
       const j = Math.sin(t * 78 + phase);
       p.rot = j * 0.07;
@@ -297,7 +301,7 @@
     ctx.restore();
   }
 
-  // 按内容框裁切绘制（保持 15 只单位体量一致）
+  // 按内容框裁切绘制，保持角色体量一致。
   function drawTrimmed(ctx, img, key, dx, dy, dw, dh) {
     const A = CC.assets;
     let box = null;
@@ -619,6 +623,7 @@
   const CHARGE_COLORS = {
     s1: ['#8ff0ff', '#1c5c72'],
     s2: ['#ffd166', '#7a4d08'],
+    s3: ['#a6f3ce', '#276245'],
     ult: ['#ff8ad8', '#7a1050'],
   };
   function drawCharge(ctx, ent, opt) {
@@ -664,7 +669,7 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = key === 'ult' ? '#ffd0ee' : '#dff2ff';
-      const label = key === 'ult' ? '必杀蓄力' : (key === 's2' ? '技2' : '技1');
+      const label = key === 'ult' ? '必杀蓄力' : (key === 's3' ? (cast.skill.name || '技3') : key === 's2' ? '技2' : '技1');
       ctx.fillText(label + ' ' + Math.max(0, dur - (cast.chargeT || 0)).toFixed(1) + 's', p.sx, y - 3);
     }
     ctx.restore();
@@ -764,6 +769,20 @@
   // ---------------------------------------------------------------- 单位
   function drawUnit(ctx, ent, opt) {
     if (!ent) return;
+    if (ent.isDecoy) {
+      if (!ent.alive) return;
+      const p = project(ent.x, ent.z, 0);
+      ctx.save(); ctx.translate(p.sx, p.sy);
+      ctx.fillStyle = '#27334b'; ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 2;
+      ctx.fillRect(-24, -74, 48, 74); ctx.strokeRect(-24, -74, 48, 74);
+      ctx.fillStyle = '#0c1423';
+      for (let row = 0; row < 3; row++) for (let col = 0; col < 3; col++) ctx.fillRect(-17 + col * 13, -64 + row * 17, 8, 10);
+      ctx.fillStyle = '#ffd166'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('空楼', 0, -84);
+      ctx.fillStyle = '#161b27'; ctx.fillRect(-24, 6, 48, 4);
+      ctx.fillStyle = '#ffd166'; ctx.fillRect(-24, 6, 48 * Math.max(0, ent.hp / ent.maxHp), 4);
+      ctx.restore(); return;
+    }
     const o = opt || {};
     const t = (o.t === undefined ? 0 : o.t);
     const key = spriteKey(ent);
