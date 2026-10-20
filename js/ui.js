@@ -207,13 +207,14 @@
     if (rep.mode === 'brawl') rows.push(['乱斗结果', rep.champion || '同归于尽']);
     else rows.push(['存活', '左 ' + leftAlive + ' / ' + sideTotal('A') + '　右 ' + rightAlive + ' / ' + sideTotal('B')]);
 
-    const dmg = rep.dmgByUnit || {};
+    const hasInstances = Array.isArray(rep.entities) && rep.entities.length > 0;
+    const dmg = hasInstances ? {} : rep.dmgByUnit || {};
     const ids = Object.keys(dmg).sort((a, b) => (Number(dmg[b]) || 0) - (Number(dmg[a]) || 0));
     const top = ids.slice(0, 4);
     if (top.length) {
       rows.push(['伤害分布', top.map((id) => sideOf(id) + unitName(id) + ' ' + Math.round(Number(dmg[id]) || 0)).join(' / ')]);
     }
-    const kills = rep.killsByUnit || {};
+    const kills = hasInstances ? {} : rep.killsByUnit || {};
     const known = (id) => {
       const F = CC.fighters;
       return !!(F && typeof F.get === 'function' && F.get(id));
@@ -224,7 +225,10 @@
     if (kIds.length) {
       rows.push(['击杀', kIds.map((id) => sideOf(id) + unitName(id) + '×' + (Number(kills[id]) || 0)).join(' / ')]);
     }
-    if (rep.mvp) {
+    if (rep.mvpEntityLabel) {
+      const entity = (rep.entities || []).find((entry) => entry.id === rep.mvpEntityId);
+      rows.push(['最高伤害', rep.mvpEntityLabel + (entity ? '（' + Math.round(entity.damage) + '）' : '')]);
+    } else if (rep.mvp) {
       rows.push(['最高伤害', sideOf(rep.mvp) + unitName(rep.mvp) +
         (Number(rep.mvpDmg) > 0 ? '（' + Math.round(Number(rep.mvpDmg)) + '）' : '')]);
     }
@@ -238,6 +242,51 @@
     }
     if (rep.grade) rows.push(['战况评分', String(rep.grade)]);
     return rows;
+  }
+
+  function amount(value) {
+    return Math.round(Math.max(0, Number(value) || 0)).toLocaleString('zh-CN');
+  }
+
+  function skillContributions(entity) {
+    const fighter = CC.fighters && CC.fighters.get && CC.fighters.get(entity.unitId);
+    const damage = entity.skillDamage || {};
+    const pieces = ['s1', 's2', 's3', 'ult'].filter((key) => Number(damage[key]) > 0).map((key) =>
+      (fighter && fighter[key] && fighter[key].name || key) + ' ' + amount(damage[key]));
+    const details = [['track', '跑道'], ['trap', '泡泡陷阱'], ['run_finish', '冲线']]
+      .filter((pair) => Number(damage[pair[0]]) > 0).map((pair) => pair[1] + ' ' + amount(damage[pair[0]]));
+    if (details.length) pieces.push('其中：' + details.join(' / '));
+    return pieces.join('；') || '本局暂无技能伤害';
+  }
+
+  function renderInstances(report) {
+    const host = els.repInstances;
+    if (!host) return;
+    clear(host);
+    const entries = report && Array.isArray(report.entities) ? report.entities : [];
+    show(host, entries.length > 0);
+    if (!entries.length) return;
+    append(host, el('h3', 'cc-instance-heading', '参战实例 · 按伤害排序'));
+    append(host, el('p', 'cc-instance-note', '编号对应本局原始参赛者；点开角色查看技能贡献。伤害、治疗只统计实际生效值，护盾统计实际吸收，控制为实际硬控时间。'));
+    const grid = el('div', 'cc-instance-grid');
+    entries.forEach((entry) => {
+      const card = el('details', 'cc-instance-card' + (entry.side === 'B' ? ' side-b' : ' side-a'));
+      const summary = el('summary', 'cc-instance-summary');
+      append(summary, el('span', 'cc-instance-name', entry.label || unitName(entry.unitId) + ' ' + entry.id + '号'));
+      append(summary, el('span', 'cc-instance-result', amount(entry.damage) + ' 伤害 · ' + amount(entry.kills) + ' 击杀'));
+      append(card, summary);
+      const stats = el('dl', 'cc-instance-stats');
+      [['承受伤害', amount(entry.damageTaken)], ['有效治疗', amount(entry.healing)],
+        ['护盾吸收', amount(entry.shielding)], ['硬控时间', (Number(entry.controlSeconds) || 0).toFixed(1) + '秒'],
+        ['打断施法', amount(entry.interrupts) + '次'], ['存活时间', (Number(entry.aliveSeconds) || 0).toFixed(1) + '秒'],
+        ['施法 / 命中', amount(entry.casts) + ' / ' + amount(entry.hits)], ['结局', entry.alive ? '存活' : '淘汰']]
+        .forEach((pair) => { append(stats, el('dt', '', pair[0])); append(stats, el('dd', '', pair[1])); });
+      append(card, stats);
+      append(card, el('p', 'cc-instance-skills', skillContributions(entry)));
+      on(card, 'toggle', () => { if (card.open && handlers.onReportHold) handlers.onReportHold(true); });
+      append(grid, card);
+    });
+    append(host, grid);
   }
 
   function winnerLabelOf(rep) {
@@ -262,10 +311,12 @@
     }
     const used = rep.seconds || mmss(Number(rep.duration) || 0);
     const reason = reasonText(rep.reason);
-    setText(els.repSub, (state.stats.round ? ('第 ' + state.stats.round + ' 场 · ') : '') +
-      '对局等级 ' + (Number(state.stats.level) || 1).toFixed(1) +
+    const reportRound = Number(rep.round) || state.stats.round;
+    setText(els.repSub, (reportRound ? ('第 ' + reportRound + ' 场 · ') : '') +
+      '对局等级 ' + (Number(rep.level) || Number(state.stats.level) || 1).toFixed(1) +
       ' · 用时 ' + used + (reason ? ' · ' + reason : ''));
     const lines = els.repLines;
+    if (els.reportContent) els.reportContent.scrollTop = 0;
     if (lines) {
       clear(lines);
       reportRows(rep).forEach((pair) => {
@@ -276,6 +327,7 @@
         append(lines, row);
       });
     }
+    renderInstances(rep);
     syncReportActions();
     show(panel, true);
     scrollReportHeading();
@@ -284,12 +336,24 @@
 
   function syncReportActions() {
     const M = CC.main;
+    const current = M && M.state || {};
     const canControl = !CC.access || !!(CC.access.caps && CC.access.caps.place);
     const automatic = M && typeof M.reportAutoAdvances === 'function' ? M.reportAutoAdvances()
-      : !!(M && M.state && M.state.autoStart) || !canControl;
-    setText(els.repFoot, automatic ? '3 秒后自动重开一场（沿用当前布阵）'
-      : '战报会保留，查看完可返回布阵或再来一局。');
+      : current.continuousPlay !== false || !canControl;
+    const held = !!current.reportHeld;
+    const remaining = Math.max(0, Math.ceil(Number(current.reportTimer) || 0));
+    setText(els.reportNext, !automatic ? '连续对战已关闭，战报将保留。'
+      : held ? '已留在战报 · 连战倒计时暂停'
+        : current.paused ? '已暂停 · 连战倒计时暂停'
+          : remaining + ' 秒后自动下一局（沿用当前布阵）');
+    setText(els.repFoot, automatic && !held
+      ? canControl ? '点“留在战报”、展开角色或滚动查看时可暂停连战。' : '自动观看模式将继续下一场。'
+      : '可继续连战，或返回布阵调整阵容。');
     show(els.reportActions, canControl && !!state.report);
+    show(els.reportHold, canControl && automatic && !!state.report);
+    setText(els.reportHold, held ? '继续连战' : '留在战报');
+    if (els.reportHold && typeof els.reportHold.setAttribute === 'function') els.reportHold.setAttribute('aria-pressed', String(held));
+    if (els.continuousPlay) els.continuousPlay.checked = current.continuousPlay !== false;
     if (els.reportBack) els.reportBack.disabled = !canControl || !state.report;
     if (els.reportRematch) els.reportRematch.disabled = !canControl || !state.report;
     return { automatic, canControl };
@@ -445,6 +509,8 @@
     on(byId('btn-start'), 'click', () => { if (handlers.onStart) handlers.onStart(); });
     on(byId('btn-export'), 'click', () => { if (handlers.onExport) handlers.onExport(); });
     on(byId('auto-start'), 'change', (ev) => { if (handlers.onAutoStart) handlers.onAutoStart(ev.target.checked); });
+    els.continuousPlay = byId('continuous-play');
+    on(els.continuousPlay, 'change', (ev) => { if (handlers.onContinuousPlay) handlers.onContinuousPlay(ev.target.checked); });
     const exportPanel = byId('export-controls');
     if (exportPanel && globalThis.__CC_ROLE__ === 'admin') exportPanel.classList.remove('hidden');
     els.bench = byId('bench');
@@ -459,10 +525,14 @@
     els.repTitle = byId('rep-title');
     els.repSub = byId('rep-sub');
     els.repLines = byId('rep-lines');
+    els.reportContent = byId('report-content');
+    els.reportNext = byId('report-next');
+    els.repInstances = byId('rep-instances');
     els.repFoot = byId('rep-foot');
     els.reportActions = byId('report-actions');
     els.reportBack = byId('btn-report-back');
     els.reportRematch = byId('btn-report-rematch');
+    els.reportHold = byId('btn-report-hold');
     els.errorPanel = byId('errorPanel');
     els.errMsg = byId('err-msg');
     els.errStack = byId('err-stack');
@@ -485,6 +555,12 @@
       if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
       if (typeof handlers.onReportRematch === 'function') handlers.onReportRematch();
     });
+    on(els.reportHold, 'click', () => { if (handlers.onReportHold) handlers.onReportHold(); });
+    const holdWhileReading = () => { if (state.report && handlers.onReportHold) handlers.onReportHold(true); };
+    on(els.reportContent, 'wheel', holdWhileReading);
+    on(els.reportContent, 'pointerdown', holdWhileReading);
+    on(els.reportContent, 'touchstart', holdWhileReading);
+    on(els.reportContent, 'keydown', holdWhileReading);
     on(els.btnMode, 'click', () => {
       if (typeof handlers.onMode === 'function') handlers.onMode();
     });
@@ -541,7 +617,7 @@
     init, renderBench, showReport, hideReport, syncReportActions,
     setPhase, setStatus, setPaused, setStats, setSide, setSideSize, notice,
     showError, hideError,
-    els, state, cardIdFromEvent, SIDE_LABEL,
+    els, state, cardIdFromEvent, SIDE_LABEL, reportRows, skillContributions,
     isMounted: () => mounted,
     handlers: () => handlers,
   };

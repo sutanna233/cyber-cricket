@@ -588,12 +588,12 @@
         if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.5 });
       } else if (type === 'run_start') {
         announce(ev.ult ? '最后一圈 · 全速开跑！' : '十公里结算 · 开跑！', '#75ffae');
-        floatText(p.x, p.z, 85, '跑圈蓄速', { color: '#75ffae', life: 0.9, size: 20 });
+        floatText(p.x, p.z, 85, '封路跑道 · ' + (ev.trailLife || 15) + '秒', { color: '#75ffae', life: 0.9, size: 20 });
       } else if (type === 'run_pace') {
         floatText(p.x, p.z, 100, '配速 ' + ev.pace + '/5', { color: '#75ffae', life: 0.65, size: 17 });
       } else if (type === 'run_finish') {
         announce('冲线！配速 ' + ev.pace + '/5', '#e9ff8c');
-        floatText(p.x, p.z, 105, '终点重击！', { color: '#e9ff8c', life: 0.9, size: 24 });
+        floatText(p.x, p.z, 105, '冲线！跑道已命中 ' + (ev.trackHits || 0) + ' 人', { color: '#e9ff8c', life: 0.9, size: 20 });
         if (CC.assets && CC.assets.play) CC.assets.play('whoosh', { vol: 0.35 });
       } else if (type === 'pace_boost') {
         floatText(p.x, p.z, 95, '补给：下次配速 +2', { color: '#75ffae', life: 1.1, size: 16 });
@@ -1220,6 +1220,18 @@
 
   function drawRunningTracks(ctx, st) {
     const Sp = CC.sprites;
+    for (const e of (st ? (st.A || []).concat(st.B || []) : [])) {
+      const run = e.alive && e.run;
+      if (!run) continue;
+      const center = Sp.project(run.cx, run.cz, 0);
+      ctx.save(); ctx.strokeStyle = 'rgba(117,255,174,0.4)'; ctx.lineWidth = 1.5;
+      if (ctx.setLineDash) ctx.setLineDash([5, 8]);
+      Sp.ellipsePath(ctx, center.sx, center.sy, Sp.scaleX(run.step.radius), Sp.scaleZ(run.step.radius));
+      ctx.stroke();
+      ctx.fillStyle = '#a1ffd0'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('配速 ' + run.pace + '/5', center.sx, center.sy + 4);
+      ctx.restore();
+    }
     for (const track of (st && st.tracks) || []) {
       const a = Sp.project(track.x1, track.z1, 0), b = Sp.project(track.x2, track.z2, 0);
       ctx.save(); ctx.globalAlpha = Math.min(0.85, (track.life - track.t) * 0.8);

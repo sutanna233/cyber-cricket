@@ -1,0 +1,6937 @@
+{
+  "date": "2026-10-20",
+  "baselineRevision": "67e46f109c447063911e3c55b58efc595e1c767a",
+  "baselineCoreHash": "279afef1e1c33dceea66025fbc39cc318463b7bd8bf29c240047aef799f333ae",
+  "currentCoreHash": "a3bca330266bdbf70645a169077ea3680278822451349b0408e6804db75ad13a",
+  "matchesPerVersion": 135,
+  "naturalFinishes": 135,
+  "longestSeconds": 75.17,
+  "limitations": [
+    "Small paired regression sample, not a definitive balance estimate.",
+    "All modes retain the same stats and skill parameters.",
+    "Control time excludes stationary decoys; damage/healing are effective HP amounts.",
+    "No paid commentary or new full audio/video export in this validation."
+  ],
+  "checks": {
+    "tactics": 20,
+    "engine": 14,
+    "continuousPlay": 11,
+    "instanceReport": 5
+  },
+  "groups": {
+    "solo": {
+      "matches": 40,
+      "beforeMeanSeconds": 40.64,
+      "afterMeanSeconds": 42.72,
+      "currentEntries": {
+        "tomori": {
+          "entries": 16,
+          "wins": 11,
+          "survived": 11,
+          "winPerEntry": 68.8
+        },
+        "xujiayin": {
+          "entries": 16,
+          "wins": 7,
+          "survived": 7,
+          "winPerEntry": 43.8
+        },
+        "zhangxuefeng": {
+          "entries": 16,
+          "wins": 11,
+          "survived": 11,
+          "winPerEntry": 68.8
+        },
+        "tiansuluo": {
+          "entries": 16,
+          "wins": 6,
+          "survived": 6,
+          "winPerEntry": 37.5
+        },
+        "leijun": {
+          "entries": 16,
+          "wins": 5,
+          "survived": 5,
+          "winPerEntry": 31.3
+        }
+      }
+    },
+    "mirror-3v3": {
+      "matches": 40,
+      "beforeMeanSeconds": 31.44,
+      "afterMeanSeconds": 31.89,
+      "currentEntries": {
+        "tomori": {
+          "entries": 48,
+          "wins": 30,
+          "survived": 23,
+          "winPerEntry": 62.5
+        },
+        "xujiayin": {
+          "entries": 48,
+          "wins": 18,
+          "survived": 13,
+          "winPerEntry": 37.5
+        },
+        "zhangxuefeng": {
+          "entries": 48,
+          "wins": 24,
+          "survived": 18,
+          "winPerEntry": 50
+        },
+        "tiansuluo": {
+          "entries": 48,
+          "wins": 21,
+          "survived": 15,
+          "winPerEntry": 43.8
+        },
+        "leijun": {
+          "entries": 48,
+          "wins": 27,
+          "survived": 22,
+          "winPerEntry": 56.3
+        }
+      }
+    },
+    "mixed-3v3": {
+      "matches": 20,
+      "beforeMeanSeconds": 37.33,
+      "afterMeanSeconds": 38.39,
+      "currentEntries": {
+        "tomori": {
+          "entries": 24,
+          "wins": 14,
+          "survived": 14,
+          "winPerEntry": 58.3
+        },
+        "xujiayin": {
+          "entries": 24,
+          "wins": 9,
+          "survived": 8,
+          "winPerEntry": 37.5
+        },
+        "zhangxuefeng": {
+          "entries": 24,
+          "wins": 13,
+          "survived": 4,
+          "winPerEntry": 54.2
+        },
+        "tiansuluo": {
+          "entries": 24,
+          "wins": 10,
+          "survived": 7,
+          "winPerEntry": 41.7
+        },
+        "leijun": {
+          "entries": 24,
+          "wins": 14,
+          "survived": 12,
+          "winPerEntry": 58.3
+        }
+      }
+    },
+    "mixed-6v6": {
+      "matches": 20,
+      "beforeMeanSeconds": 32.86,
+      "afterMeanSeconds": 32.89,
+      "currentEntries": {
+        "tomori": {
+          "entries": 48,
+          "wins": 26,
+          "survived": 24,
+          "winPerEntry": 54.2
+        },
+        "xujiayin": {
+          "entries": 48,
+          "wins": 22,
+          "survived": 17,
+          "winPerEntry": 45.8
+        },
+        "zhangxuefeng": {
+          "entries": 48,
+          "wins": 24,
+          "survived": 5,
+          "winPerEntry": 50
+        },
+        "tiansuluo": {
+          "entries": 48,
+          "wins": 23,
+          "survived": 19,
+          "winPerEntry": 47.9
+        },
+        "leijun": {
+          "entries": 48,
+          "wins": 25,
+          "survived": 11,
+          "winPerEntry": 52.1
+        }
+      }
+    },
+    "brawl-5": {
+      "matches": 5,
+      "beforeMeanSeconds": 51.62,
+      "afterMeanSeconds": 47.57,
+      "currentEntries": {
+        "tomori": {
+          "entries": 5,
+          "wins": 3,
+          "survived": 3,
+          "winPerEntry": 60
+        },
+        "xujiayin": {
+          "entries": 5,
+          "wins": 0,
+          "survived": 0,
+          "winPerEntry": 0
+        },
+        "zhangxuefeng": {
+          "entries": 5,
+          "wins": 0,
+          "survived": 0,
+          "winPerEntry": 0
+        },
+        "tiansuluo": {
+          "entries": 5,
+          "wins": 2,
+          "survived": 2,
+          "winPerEntry": 40
+        },
+        "leijun": {
+          "entries": 5,
+          "wins": 0,
+          "survived": 0,
+          "winPerEntry": 0
+        }
+      }
+    },
+    "brawl-10": {
+      "matches": 5,
+      "beforeMeanSeconds": 46.45,
+      "afterMeanSeconds": 46.55,
+      "currentEntries": {
+        "tomori": {
+          "entries": 10,
+          "wins": 2,
+          "survived": 2,
+          "winPerEntry": 20
+        },
+        "xujiayin": {
+          "entries": 10,
+          "wins": 0,
+          "survived": 0,
+          "winPerEntry": 0
+        },
+        "zhangxuefeng": {
+          "entries": 10,
+          "wins": 0,
+          "survived": 0,
+          "winPerEntry": 0
+        },
+        "tiansuluo": {
+          "entries": 10,
+          "wins": 2,
+          "survived": 2,
+          "winPerEntry": 20
+        },
+        "leijun": {
+          "entries": 10,
+          "wins": 1,
+          "survived": 1,
+          "winPerEntry": 10
+        }
+      }
+    },
+    "brawl-12": {
+      "matches": 5,
+      "beforeMeanSeconds": 44.3,
+      "afterMeanSeconds": 50.37,
+      "currentEntries": {
+        "tomori": {
+          "entries": 12,
+          "wins": 2,
+          "survived": 2,
+          "winPerEntry": 16.7
+        },
+        "xujiayin": {
+          "entries": 12,
+          "wins": 1,
+          "survived": 1,
+          "winPerEntry": 8.3
+        },
+        "zhangxuefeng": {
+          "entries": 12,
+          "wins": 0,
+          "survived": 0,
+          "winPerEntry": 0
+        },
+        "tiansuluo": {
+          "entries": 12,
+          "wins": 1,
+          "survived": 1,
+          "winPerEntry": 8.3
+        },
+        "leijun": {
+          "entries": 12,
+          "wins": 1,
+          "survived": 1,
+          "winPerEntry": 8.3
+        }
+      }
+    }
+  },
+  "matches": [
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2969,
+      "seconds": 49.483333333333334,
+      "result": "A",
+      "winnerId": null,
+      "hash": "976adc41",
+      "beforeTicks": 2969,
+      "beforeResult": "A",
+      "beforeHash": "6f44918d"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1943,
+      "seconds": 32.38333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "9f28f857",
+      "beforeTicks": 2401,
+      "beforeResult": "A",
+      "beforeHash": "888bd1f3"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3271,
+      "seconds": 54.516666666666666,
+      "result": "A",
+      "winnerId": null,
+      "hash": "da92287c",
+      "beforeTicks": 3271,
+      "beforeResult": "A",
+      "beforeHash": "a263f191"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2450,
+      "seconds": 40.833333333333336,
+      "result": "B",
+      "winnerId": null,
+      "hash": "9fcaee65",
+      "beforeTicks": 2857,
+      "beforeResult": "B",
+      "beforeHash": "baffc9c2"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3558,
+      "seconds": 59.3,
+      "result": "B",
+      "winnerId": null,
+      "hash": "feb238f7",
+      "beforeTicks": 2482,
+      "beforeResult": "A",
+      "beforeHash": "0d485144"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3567,
+      "seconds": 59.45,
+      "result": "B",
+      "winnerId": null,
+      "hash": "0986764d",
+      "beforeTicks": 3147,
+      "beforeResult": "A",
+      "beforeHash": "6e61a30c"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3774,
+      "seconds": 62.9,
+      "result": "B",
+      "winnerId": null,
+      "hash": "eb493f62",
+      "beforeTicks": 3629,
+      "beforeResult": "B",
+      "beforeHash": "240d154f"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 4510,
+      "seconds": 75.16666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "010658a6",
+      "beforeTicks": 2902,
+      "beforeResult": "B",
+      "beforeHash": "477d89a8"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89501,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2100,
+      "seconds": 35,
+      "result": "A",
+      "winnerId": null,
+      "hash": "fb8f750d",
+      "beforeTicks": 3548,
+      "beforeResult": "A",
+      "beforeHash": "c376f8da"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89501,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2079,
+      "seconds": 34.65,
+      "result": "B",
+      "winnerId": null,
+      "hash": "68329eb2",
+      "beforeTicks": 2343,
+      "beforeResult": "A",
+      "beforeHash": "1cba9e1e"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89501,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1961,
+      "seconds": 32.68333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "f0b2b3cc",
+      "beforeTicks": 1972,
+      "beforeResult": "B",
+      "beforeHash": "3960895f"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89501,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1699,
+      "seconds": 28.316666666666666,
+      "result": "B",
+      "winnerId": null,
+      "hash": "27466d76",
+      "beforeTicks": 2273,
+      "beforeResult": "A",
+      "beforeHash": "5ee577ab"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1961,
+      "seconds": 32.68333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "54df920b",
+      "beforeTicks": 2607,
+      "beforeResult": "B",
+      "beforeHash": "5056228a"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1499,
+      "seconds": 24.983333333333334,
+      "result": "A",
+      "winnerId": null,
+      "hash": "9889d389",
+      "beforeTicks": 1476,
+      "beforeResult": "A",
+      "beforeHash": "17114c74"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1952,
+      "seconds": 32.53333333333333,
+      "result": "B",
+      "winnerId": null,
+      "hash": "ffa0cc99",
+      "beforeTicks": 2564,
+      "beforeResult": "A",
+      "beforeHash": "3e2148aa"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1684,
+      "seconds": 28.066666666666666,
+      "result": "B",
+      "winnerId": null,
+      "hash": "fb2c89d0",
+      "beforeTicks": 1723,
+      "beforeResult": "A",
+      "beforeHash": "c2605bfb"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1618,
+      "seconds": 26.966666666666665,
+      "result": "B",
+      "winnerId": null,
+      "hash": "7253f681",
+      "beforeTicks": 1509,
+      "beforeResult": "A",
+      "beforeHash": "9dd7b9d4"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1469,
+      "seconds": 24.483333333333334,
+      "result": "A",
+      "winnerId": null,
+      "hash": "9509f1f9",
+      "beforeTicks": 1967,
+      "beforeResult": "B",
+      "beforeHash": "692bea77"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2567,
+      "seconds": 42.78333333333333,
+      "result": "B",
+      "winnerId": null,
+      "hash": "a3dcb01e",
+      "beforeTicks": 2217,
+      "beforeResult": "B",
+      "beforeHash": "3383ef75"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1838,
+      "seconds": 30.633333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "7f6abc56",
+      "beforeTicks": 1120,
+      "beforeResult": "B",
+      "beforeHash": "95dc3c41"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89502,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2325,
+      "seconds": 38.75,
+      "result": "B",
+      "winnerId": null,
+      "hash": "18ac10ae",
+      "beforeTicks": 1966,
+      "beforeResult": "B",
+      "beforeHash": "7977eaa2"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89502,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2140,
+      "seconds": 35.666666666666664,
+      "result": "B",
+      "winnerId": null,
+      "hash": "b5cac5ed",
+      "beforeTicks": 1389,
+      "beforeResult": "B",
+      "beforeHash": "9ae5fb08"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89502,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1346,
+      "seconds": 22.433333333333334,
+      "result": "B",
+      "winnerId": null,
+      "hash": "989d46ae",
+      "beforeTicks": 1381,
+      "beforeResult": "B",
+      "beforeHash": "c1c7d15b"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89502,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1941,
+      "seconds": 32.35,
+      "result": "B",
+      "winnerId": null,
+      "hash": "fc9f713b",
+      "beforeTicks": 2178,
+      "beforeResult": "B",
+      "beforeHash": "852b19a0"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 4376,
+      "seconds": 72.93333333333334,
+      "result": "B",
+      "winnerId": null,
+      "hash": "1f107590",
+      "beforeTicks": 4438,
+      "beforeResult": "A",
+      "beforeHash": "7fbe49c5"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2323,
+      "seconds": 38.71666666666667,
+      "result": "A",
+      "winnerId": null,
+      "hash": "b2be8c65",
+      "beforeTicks": 4513,
+      "beforeResult": "B",
+      "beforeHash": "c77b98c3"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1767,
+      "seconds": 29.45,
+      "result": "B",
+      "winnerId": null,
+      "hash": "871854a4",
+      "beforeTicks": 1767,
+      "beforeResult": "B",
+      "beforeHash": "0c360211"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3023,
+      "seconds": 50.38333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "ba4b0fb9",
+      "beforeTicks": 2435,
+      "beforeResult": "B",
+      "beforeHash": "16f9ecf3"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3396,
+      "seconds": 56.6,
+      "result": "A",
+      "winnerId": null,
+      "hash": "51e8b22f",
+      "beforeTicks": 3651,
+      "beforeResult": "A",
+      "beforeHash": "d8bb7312"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2977,
+      "seconds": 49.61666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "839239e8",
+      "beforeTicks": 2620,
+      "beforeResult": "A",
+      "beforeHash": "28b8e10d"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3899,
+      "seconds": 64.98333333333333,
+      "result": "B",
+      "winnerId": null,
+      "hash": "1c306e71",
+      "beforeTicks": 3870,
+      "beforeResult": "B",
+      "beforeHash": "ef1f2763"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2389,
+      "seconds": 39.81666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "7e052d62",
+      "beforeTicks": 3889,
+      "beforeResult": "B",
+      "beforeHash": "54639cba"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89503,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3015,
+      "seconds": 50.25,
+      "result": "B",
+      "winnerId": null,
+      "hash": "b796dfa7",
+      "beforeTicks": 2296,
+      "beforeResult": "A",
+      "beforeHash": "1a9f8a9d"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89503,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2204,
+      "seconds": 36.733333333333334,
+      "result": "B",
+      "winnerId": null,
+      "hash": "a5f27424",
+      "beforeTicks": 2099,
+      "beforeResult": "B",
+      "beforeHash": "85ba5f3f"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89503,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1538,
+      "seconds": 25.633333333333333,
+      "result": "B",
+      "winnerId": null,
+      "hash": "0956cbc6",
+      "beforeTicks": 1831,
+      "beforeResult": "A",
+      "beforeHash": "e31cab98"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89503,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2120,
+      "seconds": 35.333333333333336,
+      "result": "B",
+      "winnerId": null,
+      "hash": "1adbb3f5",
+      "beforeTicks": 2010,
+      "beforeResult": "A",
+      "beforeHash": "db295306"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3974,
+      "seconds": 66.23333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "983e0aa7",
+      "beforeTicks": 2684,
+      "beforeResult": "A",
+      "beforeHash": "2688cc8d"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2079,
+      "seconds": 34.65,
+      "result": "B",
+      "winnerId": null,
+      "hash": "aceabaef",
+      "beforeTicks": 2214,
+      "beforeResult": "B",
+      "beforeHash": "a8f76c88"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3073,
+      "seconds": 51.21666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "9208d703",
+      "beforeTicks": 3395,
+      "beforeResult": "A",
+      "beforeHash": "b427677f"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2195,
+      "seconds": 36.583333333333336,
+      "result": "A",
+      "winnerId": null,
+      "hash": "f4ebf5ba",
+      "beforeTicks": 2019,
+      "beforeResult": "B",
+      "beforeHash": "db0455b0"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3027,
+      "seconds": 50.45,
+      "result": "A",
+      "winnerId": null,
+      "hash": "83b69de0",
+      "beforeTicks": 3658,
+      "beforeResult": "A",
+      "beforeHash": "4b76226a"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2196,
+      "seconds": 36.6,
+      "result": "A",
+      "winnerId": null,
+      "hash": "26b3e56c",
+      "beforeTicks": 3247,
+      "beforeResult": "B",
+      "beforeHash": "b7bb5ec2"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3625,
+      "seconds": 60.416666666666664,
+      "result": "A",
+      "winnerId": null,
+      "hash": "3d054246",
+      "beforeTicks": 3625,
+      "beforeResult": "A",
+      "beforeHash": "f79ee1c5"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3238,
+      "seconds": 53.96666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "bd34df73",
+      "beforeTicks": 2567,
+      "beforeResult": "A",
+      "beforeHash": "2a6d40f2"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89504,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2647,
+      "seconds": 44.11666666666667,
+      "result": "A",
+      "winnerId": null,
+      "hash": "c268cba3",
+      "beforeTicks": 2634,
+      "beforeResult": "B",
+      "beforeHash": "d5a32ce3"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89504,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2165,
+      "seconds": 36.083333333333336,
+      "result": "B",
+      "winnerId": null,
+      "hash": "dad63f54",
+      "beforeTicks": 2574,
+      "beforeResult": "A",
+      "beforeHash": "71493546"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89504,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1932,
+      "seconds": 32.2,
+      "result": "A",
+      "winnerId": null,
+      "hash": "ac279591",
+      "beforeTicks": 2634,
+      "beforeResult": "A",
+      "beforeHash": "705b33d7"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89504,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1977,
+      "seconds": 32.95,
+      "result": "B",
+      "winnerId": null,
+      "hash": "ec9fdb3e",
+      "beforeTicks": 2157,
+      "beforeResult": "B",
+      "beforeHash": "8b9d91af"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2084,
+      "seconds": 34.733333333333334,
+      "result": "A",
+      "winnerId": null,
+      "hash": "d40306be",
+      "beforeTicks": 2076,
+      "beforeResult": "B",
+      "beforeHash": "d081d568"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 925,
+      "seconds": 15.416666666666666,
+      "result": "A",
+      "winnerId": null,
+      "hash": "a6b34bc9",
+      "beforeTicks": 1541,
+      "beforeResult": "A",
+      "beforeHash": "121bfc3a"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2004,
+      "seconds": 33.4,
+      "result": "B",
+      "winnerId": null,
+      "hash": "61ca62ba",
+      "beforeTicks": 1536,
+      "beforeResult": "B",
+      "beforeHash": "abbd6188"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 928,
+      "seconds": 15.466666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "0ea86c8c",
+      "beforeTicks": 898,
+      "beforeResult": "B",
+      "beforeHash": "961c2c4b"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2219,
+      "seconds": 36.983333333333334,
+      "result": "B",
+      "winnerId": null,
+      "hash": "25296b5b",
+      "beforeTicks": 2076,
+      "beforeResult": "B",
+      "beforeHash": "64950ab9"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1254,
+      "seconds": 20.9,
+      "result": "B",
+      "winnerId": null,
+      "hash": "6579c40d",
+      "beforeTicks": 937,
+      "beforeResult": "A",
+      "beforeHash": "43e58fe9"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2004,
+      "seconds": 33.4,
+      "result": "A",
+      "winnerId": null,
+      "hash": "a92af7db",
+      "beforeTicks": 1670,
+      "beforeResult": "A",
+      "beforeHash": "c7c9005f"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 913,
+      "seconds": 15.216666666666667,
+      "result": "A",
+      "winnerId": null,
+      "hash": "94e3cb53",
+      "beforeTicks": 924,
+      "beforeResult": "B",
+      "beforeHash": "9e78842b"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89512,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2401,
+      "seconds": 40.016666666666666,
+      "result": "B",
+      "winnerId": null,
+      "hash": "6611e754",
+      "beforeTicks": 2283,
+      "beforeResult": "B",
+      "beforeHash": "678d3fa4"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89512,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1634,
+      "seconds": 27.233333333333334,
+      "result": "A",
+      "winnerId": null,
+      "hash": "ea1b7d18",
+      "beforeTicks": 1947,
+      "beforeResult": "B",
+      "beforeHash": "34d39e2f"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89512,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1568,
+      "seconds": 26.133333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "3984437c",
+      "beforeTicks": 2008,
+      "beforeResult": "A",
+      "beforeHash": "2ca76249"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89512,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1843,
+      "seconds": 30.716666666666665,
+      "result": "A",
+      "winnerId": null,
+      "hash": "2e7d866d",
+      "beforeTicks": 2619,
+      "beforeResult": "B",
+      "beforeHash": "83b50398"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1917,
+      "seconds": 31.95,
+      "result": "A",
+      "winnerId": null,
+      "hash": "e96eff44",
+      "beforeTicks": 2243,
+      "beforeResult": "B",
+      "beforeHash": "d64a7791"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1734,
+      "seconds": 28.9,
+      "result": "A",
+      "winnerId": null,
+      "hash": "c508e0a8",
+      "beforeTicks": 2022,
+      "beforeResult": "A",
+      "beforeHash": "4bba76cb"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1974,
+      "seconds": 32.9,
+      "result": "A",
+      "winnerId": null,
+      "hash": "9ef1a8ab",
+      "beforeTicks": 2243,
+      "beforeResult": "A",
+      "beforeHash": "b480dc4e"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2901,
+      "seconds": 48.35,
+      "result": "B",
+      "winnerId": null,
+      "hash": "f524ab49",
+      "beforeTicks": 2186,
+      "beforeResult": "B",
+      "beforeHash": "4a0c0353"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1821,
+      "seconds": 30.35,
+      "result": "B",
+      "winnerId": null,
+      "hash": "9f17e7c1",
+      "beforeTicks": 1901,
+      "beforeResult": "B",
+      "beforeHash": "9de2dafa"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2369,
+      "seconds": 39.483333333333334,
+      "result": "A",
+      "winnerId": null,
+      "hash": "1e250f5e",
+      "beforeTicks": 2014,
+      "beforeResult": "A",
+      "beforeHash": "de47994b"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1974,
+      "seconds": 32.9,
+      "result": "A",
+      "winnerId": null,
+      "hash": "d4b55742",
+      "beforeTicks": 2026,
+      "beforeResult": "A",
+      "beforeHash": "6b7fe52d"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1954,
+      "seconds": 32.56666666666667,
+      "result": "A",
+      "winnerId": null,
+      "hash": "a76cfdaa",
+      "beforeTicks": 2036,
+      "beforeResult": "A",
+      "beforeHash": "474a436b"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89513,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2397,
+      "seconds": 39.95,
+      "result": "B",
+      "winnerId": null,
+      "hash": "79d75162",
+      "beforeTicks": 3382,
+      "beforeResult": "B",
+      "beforeHash": "9e3e5850"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89513,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2294,
+      "seconds": 38.233333333333334,
+      "result": "B",
+      "winnerId": null,
+      "hash": "72589b26",
+      "beforeTicks": 1910,
+      "beforeResult": "B",
+      "beforeHash": "80c8a64c"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89513,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2635,
+      "seconds": 43.916666666666664,
+      "result": "B",
+      "winnerId": null,
+      "hash": "8528a764",
+      "beforeTicks": 1889,
+      "beforeResult": "B",
+      "beforeHash": "9d01ea0f"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89513,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2847,
+      "seconds": 47.45,
+      "result": "B",
+      "winnerId": null,
+      "hash": "1219d3d0",
+      "beforeTicks": 1336,
+      "beforeResult": "A",
+      "beforeHash": "e27e400c"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1819,
+      "seconds": 30.316666666666666,
+      "result": "B",
+      "winnerId": null,
+      "hash": "f15e665c",
+      "beforeTicks": 1819,
+      "beforeResult": "B",
+      "beforeHash": "685296ef"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1782,
+      "seconds": 29.7,
+      "result": "B",
+      "winnerId": null,
+      "hash": "983187f8",
+      "beforeTicks": 1390,
+      "beforeResult": "B",
+      "beforeHash": "80c870c1"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1962,
+      "seconds": 32.7,
+      "result": "B",
+      "winnerId": null,
+      "hash": "ca8e235c",
+      "beforeTicks": 1962,
+      "beforeResult": "B",
+      "beforeHash": "5eb94463"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1867,
+      "seconds": 31.116666666666667,
+      "result": "A",
+      "winnerId": null,
+      "hash": "de4d9bbf",
+      "beforeTicks": 1472,
+      "beforeResult": "A",
+      "beforeHash": "9c10753c"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1820,
+      "seconds": 30.333333333333332,
+      "result": "B",
+      "winnerId": null,
+      "hash": "8a3f2231",
+      "beforeTicks": 1820,
+      "beforeResult": "B",
+      "beforeHash": "9fafe557"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2096,
+      "seconds": 34.93333333333333,
+      "result": "B",
+      "winnerId": null,
+      "hash": "b9ac04f0",
+      "beforeTicks": 1623,
+      "beforeResult": "B",
+      "beforeHash": "5522a665"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1581,
+      "seconds": 26.35,
+      "result": "B",
+      "winnerId": null,
+      "hash": "b0567fbb",
+      "beforeTicks": 1581,
+      "beforeResult": "B",
+      "beforeHash": "83371025"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1815,
+      "seconds": 30.25,
+      "result": "A",
+      "winnerId": null,
+      "hash": "d84413b2",
+      "beforeTicks": 1552,
+      "beforeResult": "A",
+      "beforeHash": "4d09a416"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89514,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3681,
+      "seconds": 61.35,
+      "result": "B",
+      "winnerId": null,
+      "hash": "12b7feb9",
+      "beforeTicks": 2736,
+      "beforeResult": "B",
+      "beforeHash": "1e519b11"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89514,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2566,
+      "seconds": 42.766666666666666,
+      "result": "A",
+      "winnerId": null,
+      "hash": "0e13f90c",
+      "beforeTicks": 3014,
+      "beforeResult": "A",
+      "beforeHash": "5bb1eee7"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89514,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2133,
+      "seconds": 35.55,
+      "result": "B",
+      "winnerId": null,
+      "hash": "de9f48e0",
+      "beforeTicks": 2501,
+      "beforeResult": "B",
+      "beforeHash": "b0e775a2"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89514,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1215,
+      "seconds": 20.25,
+      "result": "A",
+      "winnerId": null,
+      "hash": "74a645c0",
+      "beforeTicks": 1383,
+      "beforeResult": "B",
+      "beforeHash": "ac071097"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3363,
+      "seconds": 56.05,
+      "result": "A",
+      "winnerId": null,
+      "hash": "554b775e",
+      "beforeTicks": 2473,
+      "beforeResult": "B",
+      "beforeHash": "bf56dfe0"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2101,
+      "seconds": 35.016666666666666,
+      "result": "B",
+      "winnerId": null,
+      "hash": "35bf9a35",
+      "beforeTicks": 999,
+      "beforeResult": "B",
+      "beforeHash": "1bf6a5ed"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3373,
+      "seconds": 56.21666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "24933637",
+      "beforeTicks": 2462,
+      "beforeResult": "A",
+      "beforeHash": "6b59fff4"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1639,
+      "seconds": 27.316666666666666,
+      "result": "B",
+      "winnerId": null,
+      "hash": "8830e5f2",
+      "beforeTicks": 784,
+      "beforeResult": "A",
+      "beforeHash": "5a563c24"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3363,
+      "seconds": 56.05,
+      "result": "A",
+      "winnerId": null,
+      "hash": "1822b794",
+      "beforeTicks": 2368,
+      "beforeResult": "B",
+      "beforeHash": "45898b13"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1101,
+      "seconds": 18.35,
+      "result": "B",
+      "winnerId": null,
+      "hash": "4312c7f9",
+      "beforeTicks": 1460,
+      "beforeResult": "A",
+      "beforeHash": "b8b79151"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3373,
+      "seconds": 56.21666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "620bbef2",
+      "beforeTicks": 2369,
+      "beforeResult": "A",
+      "beforeHash": "a584c6c6"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1066,
+      "seconds": 17.766666666666666,
+      "result": "A",
+      "winnerId": null,
+      "hash": "9f9ce25c",
+      "beforeTicks": 784,
+      "beforeResult": "A",
+      "beforeHash": "711edd89"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89523,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2438,
+      "seconds": 40.63333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "bec42f9c",
+      "beforeTicks": 2665,
+      "beforeResult": "A",
+      "beforeHash": "d597f78a"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89523,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3139,
+      "seconds": 52.31666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "74e9d32a",
+      "beforeTicks": 2566,
+      "beforeResult": "A",
+      "beforeHash": "b3ed3d72"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89523,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2218,
+      "seconds": 36.96666666666667,
+      "result": "B",
+      "winnerId": null,
+      "hash": "06454b3f",
+      "beforeTicks": 2036,
+      "beforeResult": "A",
+      "beforeHash": "754d0aaa"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89523,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1450,
+      "seconds": 24.166666666666668,
+      "result": "B",
+      "winnerId": null,
+      "hash": "4bd79fa7",
+      "beforeTicks": 2368,
+      "beforeResult": "A",
+      "beforeHash": "2ebe4b37"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2481,
+      "seconds": 41.35,
+      "result": "A",
+      "winnerId": null,
+      "hash": "e170a063",
+      "beforeTicks": 1720,
+      "beforeResult": "A",
+      "beforeHash": "6681b5d6"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1116,
+      "seconds": 18.6,
+      "result": "A",
+      "winnerId": null,
+      "hash": "1bda866a",
+      "beforeTicks": 1261,
+      "beforeResult": "A",
+      "beforeHash": "be6a168b"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2007,
+      "seconds": 33.45,
+      "result": "B",
+      "winnerId": null,
+      "hash": "34fed41c",
+      "beforeTicks": 2065,
+      "beforeResult": "B",
+      "beforeHash": "ffd9b4eb"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1010,
+      "seconds": 16.833333333333332,
+      "result": "B",
+      "winnerId": null,
+      "hash": "9b1fb3e2",
+      "beforeTicks": 1513,
+      "beforeResult": "B",
+      "beforeHash": "379e3c04"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2505,
+      "seconds": 41.75,
+      "result": "A",
+      "winnerId": null,
+      "hash": "ddaff562",
+      "beforeTicks": 2345,
+      "beforeResult": "A",
+      "beforeHash": "daa9bafb"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 884,
+      "seconds": 14.733333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "949ffd5a",
+      "beforeTicks": 1116,
+      "beforeResult": "A",
+      "beforeHash": "e4619e86"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1664,
+      "seconds": 27.733333333333334,
+      "result": "B",
+      "winnerId": null,
+      "hash": "52ec3e31",
+      "beforeTicks": 2065,
+      "beforeResult": "B",
+      "beforeHash": "bbedf305"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1473,
+      "seconds": 24.55,
+      "result": "B",
+      "winnerId": null,
+      "hash": "7abb5dad",
+      "beforeTicks": 1138,
+      "beforeResult": "B",
+      "beforeHash": "d51f441f"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89524,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1860,
+      "seconds": 31,
+      "result": "B",
+      "winnerId": null,
+      "hash": "75d7416e",
+      "beforeTicks": 2005,
+      "beforeResult": "A",
+      "beforeHash": "7e973a1e"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89524,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1208,
+      "seconds": 20.133333333333333,
+      "result": "A",
+      "winnerId": null,
+      "hash": "a36c6f07",
+      "beforeTicks": 1264,
+      "beforeResult": "A",
+      "beforeHash": "000899ca"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89524,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1994,
+      "seconds": 33.233333333333334,
+      "result": "A",
+      "winnerId": null,
+      "hash": "3a74396c",
+      "beforeTicks": 1617,
+      "beforeResult": "A",
+      "beforeHash": "ec05033c"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89524,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 1802,
+      "seconds": 30.033333333333335,
+      "result": "A",
+      "winnerId": null,
+      "hash": "e4d370d2",
+      "beforeTicks": 1554,
+      "beforeResult": "B",
+      "beforeHash": "6b343b73"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2271,
+      "seconds": 37.85,
+      "result": "B",
+      "winnerId": null,
+      "hash": "c671e981",
+      "beforeTicks": 2270,
+      "beforeResult": "B",
+      "beforeHash": "615aa922"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1630,
+      "seconds": 27.166666666666668,
+      "result": "A",
+      "winnerId": null,
+      "hash": "0f9ffbd1",
+      "beforeTicks": 1881,
+      "beforeResult": "B",
+      "beforeHash": "eeb5625f"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1970,
+      "seconds": 32.833333333333336,
+      "result": "B",
+      "winnerId": null,
+      "hash": "f1ef4639",
+      "beforeTicks": 1970,
+      "beforeResult": "B",
+      "beforeHash": "08f1f66a"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89000,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1647,
+      "seconds": 27.45,
+      "result": "A",
+      "winnerId": null,
+      "hash": "a9b6a990",
+      "beforeTicks": 1489,
+      "beforeResult": "A",
+      "beforeHash": "44f63aee"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2192,
+      "seconds": 36.53333333333333,
+      "result": "B",
+      "winnerId": null,
+      "hash": "1503526e",
+      "beforeTicks": 2172,
+      "beforeResult": "B",
+      "beforeHash": "56cb3e3a"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1232,
+      "seconds": 20.533333333333335,
+      "result": "B",
+      "winnerId": null,
+      "hash": "08721679",
+      "beforeTicks": 1625,
+      "beforeResult": "B",
+      "beforeHash": "e6da2ea9"
+    },
+    {
+      "group": "solo",
+      "mode": "solo",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1970,
+      "seconds": 32.833333333333336,
+      "result": "B",
+      "winnerId": null,
+      "hash": "c13655df",
+      "beforeTicks": 1970,
+      "beforeResult": "B",
+      "beforeHash": "1fab06a8"
+    },
+    {
+      "group": "mirror-3v3",
+      "mode": "team",
+      "seed": 89001,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1708,
+      "seconds": 28.466666666666665,
+      "result": "A",
+      "winnerId": null,
+      "hash": "32af508c",
+      "beforeTicks": 1703,
+      "beforeResult": "B",
+      "beforeHash": "6f807bd1"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89534,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 1660,
+      "seconds": 27.666666666666668,
+      "result": "B",
+      "winnerId": null,
+      "hash": "25707a2b",
+      "beforeTicks": 1088,
+      "beforeResult": "B",
+      "beforeHash": "1a3d247b"
+    },
+    {
+      "group": "mixed-3v3",
+      "mode": "team",
+      "seed": 89534,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2110,
+      "seconds": 35.166666666666664,
+      "result": "A",
+      "winnerId": null,
+      "hash": "532129de",
+      "beforeTicks": 1090,
+      "beforeResult": "B",
+      "beforeHash": "5cabff19"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89534,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2271,
+      "seconds": 37.85,
+      "result": "B",
+      "winnerId": null,
+      "hash": "aaafe21c",
+      "beforeTicks": 1484,
+      "beforeResult": "B",
+      "beforeHash": "c6738b34"
+    },
+    {
+      "group": "mixed-6v6",
+      "mode": "team",
+      "seed": 89534,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2975,
+      "seconds": 49.583333333333336,
+      "result": "A",
+      "winnerId": null,
+      "hash": "9e449bd7",
+      "beforeTicks": 2203,
+      "beforeResult": "B",
+      "beforeHash": "0b812adc"
+    },
+    {
+      "group": "brawl-5",
+      "mode": "brawl",
+      "seed": 89900,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2444,
+      "seconds": 40.733333333333334,
+      "result": "brawl",
+      "winnerId": 4,
+      "hash": "f4fb9852",
+      "beforeTicks": 2821,
+      "beforeResult": "brawl",
+      "beforeHash": "4b0066c5"
+    },
+    {
+      "group": "brawl-5",
+      "mode": "brawl",
+      "seed": 89901,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2243,
+      "seconds": 37.38333333333333,
+      "result": "brawl",
+      "winnerId": 3,
+      "hash": "5a656b92",
+      "beforeTicks": 2986,
+      "beforeResult": "brawl",
+      "beforeHash": "f1f40c4d"
+    },
+    {
+      "group": "brawl-5",
+      "mode": "brawl",
+      "seed": 89902,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 3266,
+      "seconds": 54.43333333333333,
+      "result": "brawl",
+      "winnerId": 4,
+      "hash": "953445f5",
+      "beforeTicks": 3804,
+      "beforeResult": "brawl",
+      "beforeHash": "5937d5a8"
+    },
+    {
+      "group": "brawl-5",
+      "mode": "brawl",
+      "seed": 89903,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 3306,
+      "seconds": 55.1,
+      "result": "brawl",
+      "winnerId": 3,
+      "hash": "f1b391dd",
+      "beforeTicks": 2678,
+      "beforeResult": "brawl",
+      "beforeHash": "3868c700"
+    },
+    {
+      "group": "brawl-5",
+      "mode": "brawl",
+      "seed": 89904,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 3013,
+      "seconds": 50.21666666666667,
+      "result": "brawl",
+      "winnerId": 2,
+      "hash": "98a509f7",
+      "beforeTicks": 3198,
+      "beforeResult": "brawl",
+      "beforeHash": "49b15650"
+    },
+    {
+      "group": "brawl-10",
+      "mode": "brawl",
+      "seed": 89900,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2514,
+      "seconds": 41.9,
+      "result": "brawl",
+      "winnerId": 1,
+      "hash": "973442bc",
+      "beforeTicks": 2856,
+      "beforeResult": "brawl",
+      "beforeHash": "ce98a73a"
+    },
+    {
+      "group": "brawl-10",
+      "mode": "brawl",
+      "seed": 89901,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2303,
+      "seconds": 38.38333333333333,
+      "result": "brawl",
+      "winnerId": 3,
+      "hash": "a4ed15d0",
+      "beforeTicks": 2137,
+      "beforeResult": "brawl",
+      "beforeHash": "0e264833"
+    },
+    {
+      "group": "brawl-10",
+      "mode": "brawl",
+      "seed": 89902,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 3516,
+      "seconds": 58.6,
+      "result": "brawl",
+      "winnerId": 7,
+      "hash": "3b4e1539",
+      "beforeTicks": 3260,
+      "beforeResult": "brawl",
+      "beforeHash": "7ac68226"
+    },
+    {
+      "group": "brawl-10",
+      "mode": "brawl",
+      "seed": 89903,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2761,
+      "seconds": 46.016666666666666,
+      "result": "brawl",
+      "winnerId": 2,
+      "hash": "c9fa89bd",
+      "beforeTicks": 3041,
+      "beforeResult": "brawl",
+      "beforeHash": "8d6bb722"
+    },
+    {
+      "group": "brawl-10",
+      "mode": "brawl",
+      "seed": 89904,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          }
+        ]
+      },
+      "ticks": 2870,
+      "seconds": 47.833333333333336,
+      "result": "brawl",
+      "winnerId": 7,
+      "hash": "88174c57",
+      "beforeTicks": 2640,
+      "beforeResult": "brawl",
+      "beforeHash": "658f98f1"
+    },
+    {
+      "group": "brawl-12",
+      "mode": "brawl",
+      "seed": 89900,
+      "lineup": {
+        "A": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2850,
+      "seconds": 47.5,
+      "result": "brawl",
+      "winnerId": 1,
+      "hash": "6824c3a4",
+      "beforeTicks": 2592,
+      "beforeResult": "brawl",
+      "beforeHash": "83eda866"
+    },
+    {
+      "group": "brawl-12",
+      "mode": "brawl",
+      "seed": 89901,
+      "lineup": {
+        "A": [
+          {
+            "id": "xujiayin",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2994,
+      "seconds": 49.9,
+      "result": "brawl",
+      "winnerId": 11,
+      "hash": "1d9946c9",
+      "beforeTicks": 3081,
+      "beforeResult": "brawl",
+      "beforeHash": "288c629d"
+    },
+    {
+      "group": "brawl-12",
+      "mode": "brawl",
+      "seed": 89902,
+      "lineup": {
+        "A": [
+          {
+            "id": "zhangxuefeng",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 3716,
+      "seconds": 61.93333333333333,
+      "result": "brawl",
+      "winnerId": 9,
+      "hash": "50d85dfb",
+      "beforeTicks": 3557,
+      "beforeResult": "brawl",
+      "beforeHash": "880cb295"
+    },
+    {
+      "group": "brawl-12",
+      "mode": "brawl",
+      "seed": 89903,
+      "lineup": {
+        "A": [
+          {
+            "id": "tiansuluo",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "tomori",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2635,
+      "seconds": 43.916666666666664,
+      "result": "brawl",
+      "winnerId": 12,
+      "hash": "f49c0a68",
+      "beforeTicks": 1928,
+      "beforeResult": "brawl",
+      "beforeHash": "47231fef"
+    },
+    {
+      "group": "brawl-12",
+      "mode": "brawl",
+      "seed": 89904,
+      "lineup": {
+        "A": [
+          {
+            "id": "leijun",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "xujiayin",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "leijun",
+            "slot": 5,
+            "lane": 1
+          }
+        ],
+        "B": [
+          {
+            "id": "tomori",
+            "slot": 0,
+            "lane": 0
+          },
+          {
+            "id": "xujiayin",
+            "slot": 1,
+            "lane": 1
+          },
+          {
+            "id": "zhangxuefeng",
+            "slot": 2,
+            "lane": 0
+          },
+          {
+            "id": "tiansuluo",
+            "slot": 3,
+            "lane": 1
+          },
+          {
+            "id": "leijun",
+            "slot": 4,
+            "lane": 0
+          },
+          {
+            "id": "tomori",
+            "slot": 5,
+            "lane": 1
+          }
+        ]
+      },
+      "ticks": 2916,
+      "seconds": 48.6,
+      "result": "brawl",
+      "winnerId": 10,
+      "hash": "cef38104",
+      "beforeTicks": 2133,
+      "beforeResult": "brawl",
+      "beforeHash": "9b096650"
+    }
+  ],
+  "sourceFiles": {
+    "js/ai.js": "9018229d77eb5c04d954f9d9b65d02a54a4a05e6171f13bbacb18412dcc76605",
+    "js/engine.js": "6069e01b644639ca22e39ee90812a748550ddaa8f31f2320a865c814498c5b35",
+    "js/battle.js": "86c32a3c0ff83031f107e9124fca95237652b3248ab7f3715c0566e61de9868b",
+    "js/sprites.js": "bd57fdc82d69c1b8570867002b901443bc1330b5d3b4d3f8f206e012350aacf7",
+    "js/render.js": "3c249f91c8ce89001cea9565403201e17ae5bfbcd4cd0521b8bda8fcf64bc152",
+    "js/main.js": "6ae6b874e720dc958ad75ae2c4ee7bd8e155c96413b70ce50ac1c5aeeb4bbabe",
+    "js/ui.js": "03001f523009a9efc3f6bbefefa842ea137d12fe77a85454bf79b1da804024a7",
+    "js/recording-report.js": "956a49bd0657418ed46c8f70edc846865049e4d87e0f1111f8c4cc8d6a0f9784",
+    "index.html": "5ad9811a48d62af0e81de7d991952619b72336f3d3f83997cc7933f3c4398da0",
+    "styles.css": "eccc932f638f3fa4a2382629a62a8cbd04634fb53b7ac8235338c36e79931a6b",
+    "mobile.css": "6b577f4db80933b3cd85d961f6a332d1946c8e2cf492858a6e548c39bb02b476"
+  }
+}

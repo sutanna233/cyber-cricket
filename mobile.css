@@ -75,6 +75,8 @@
     touch-action: pan-y pinch-zoom;
     overflow-wrap: anywhere;
   }
+  .cc-stage-canvas .cc-report { display: flex; transform: none; }
+  .cc-report-content { overflow: visible; flex: 0 0 auto; padding-right: 0; scrollbar-gutter: auto; }
   .cc-rep-title { display: block; max-width: 100%; font-size: 18px; letter-spacing: 1px; }
   .cc-rep-sub { display: block; margin: 6px 0 0; font-size: 12px; line-height: 1.6; }
   .cc-rep-lines { gap: 6px; margin-top: 10px; min-width: 0; }
@@ -92,6 +94,10 @@
   .cc-rep-foot { margin-top: 10px; text-align: left; font-size: 12px; line-height: 1.6; }
   .cc-report-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
   .cc-report-actions .cc-btn { flex: 1 1 120px; min-width: 0; }
+  .cc-instance-grid { grid-template-columns: minmax(0, 1fr); }
+  .cc-instance-summary { padding: 10px; font-size: 13px; }
+  .cc-instance-heading { font-size: 14px; }
+  .cc-instance-note, .cc-instance-stats, .cc-instance-skills { font-size: 12px; }
   .cc-mask-box { max-width: calc(100% - 16px); flex-wrap: wrap; justify-content: center; gap: 4px 10px; }
   .cc-err-stack { max-width: 100%; }
   .cc-err-line { overflow-wrap: anywhere; }

@@ -126,6 +126,24 @@
       const winner = b.result === 'A' || b.result === 'B' ? b.result : null;      // 'A' | 'B' | null
       // 战场数组会移除尸体；人数与评分始终依据原始参赛者，排除召唤物和诱饵。
       const participants = (b.participants || b.A.concat(b.B)).filter((e) => !e.isMinion && !e.isDecoy);
+      const byEntity = {};
+      const entities = participants.map((entity) => {
+        const original = b.stats.byEntity && b.stats.byEntity[entity.id] || {};
+        const name = entity.unit && entity.unit.name || entity.unitId;
+        const finite = (value) => Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : 0;
+        const row = Object.assign({}, original, {
+          id: entity.id, unitId: entity.unitId, side: entity.side, slot: entity.slot,
+          name, label: (b.mode === 'brawl' ? '' : entity.side === 'A' ? '左·' : '右·') + name + ' ' + entity.id + '号',
+          alive: !!entity.alive,
+          skillDamage: Object.assign({}, original.skillDamage || {}),
+        });
+        ['damage', 'damageTaken', 'healing', 'shielding', 'controlSeconds', 'interrupts', 'kills', 'casts', 'hits', 'aliveSeconds']
+          .forEach((key) => { row[key] = finite(original[key]); });
+        byEntity[row.id] = row;
+        return row;
+      }).sort((a, z) => z.damage - a.damage || z.kills - a.kills || a.id - z.id);
+      const hasEntityStats = !!b.stats.byEntity;
+      const mvpEntity = hasEntityStats && entities.find((entity) => entity.damage > 0);
       const totalUnitsBySide = { A: participants.filter((e) => e.side === 'A').length,
         B: participants.filter((e) => e.side === 'B').length };
       const survivors = winner ? participants.filter((e) => e.side === winner && e.alive).length : 0;
@@ -149,6 +167,9 @@
         dmgByUnit: dmg, killsByUnit: Object.assign({}, b.stats.killsByUnit),
         dmgBySideUnit: Object.assign({}, b.stats.dmgBySideUnit),
         killsBySideUnit: Object.assign({}, b.stats.killsBySideUnit),
+        byEntity: hasEntityStats ? byEntity : {}, entities: hasEntityStats ? entities : [],
+        mvpEntityId: mvpEntity ? mvpEntity.id : null,
+        mvpEntityLabel: mvpEntity ? mvpEntity.label : null,
         maxCombo: b.stats.maxCombo, casts: b.stats.casts.slice(0, 40),
         picked: Object.assign({}, b.stats.picked),
         mvp, mvpDmg: best > 0 ? best : 0, grade,

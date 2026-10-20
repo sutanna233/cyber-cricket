@@ -117,6 +117,144 @@
     return best;
   }
 
+  function remainingSteps(ally) {
+    const c = ally.cast;
+    if (!c || !Array.isArray(c.steps)) return [];
+    const charge = c.charging ? Math.max(0, c.chargeDur - c.chargeT) : 0;
+    return c.steps.slice(c.charging ? 0 : (c.idx || 0)).map((step) => ({
+      step, eta: charge + Math.max(0, (step.t || 0) - (c.charging ? 0 : c.t || 0)),
+    }));
+  }
+
+  function controlRemaining(e) {
+    let duration = Math.max(e.hitstun || 0, e.bubbleCageT || 0);
+    for (const b of e.buffs) if (b.kind === 'stun') duration = Math.max(duration, b.dur - b.t);
+    return duration;
+  }
+
+  function reservedControl(battle, e, target, arrival) {
+    let duration = controlRemaining(target);
+    const allies = alliesOf(battle, e).filter((a) => a !== e);
+    for (const ally of allies) {
+      for (const next of remainingSteps(ally)) {
+        const step = next.step;
+        const center = step.at === 'self' ? ally
+          : foesOf(battle, e).find((o) => o.id === ally.cast.targetId);
+        if (!center || U.dist(target.x, target.z, center.x, center.z) > (step.radius || 95)) continue;
+        const stun = (step.effects || []).find((b) => b.kind === 'stun');
+        const land = next.eta + (step.kind === 'bubble_trap' ? step.arm || 0.4 : step.warn || 0);
+        if (land > arrival || (!stun && step.kind !== 'bubble_trap')) continue;
+        duration = Math.max(duration, land + (stun ? stun.dur || 1 : 0.8));
+      }
+    }
+    for (const trap of battle.bubbleTraps || []) {
+      if (!allies.some((a) => a.id === trap.ownerId)
+          || U.dist(target.x, target.z, trap.x, trap.z) > trap.radius) continue;
+      const land = Math.max(0, trap.arm - trap.t);
+      if (land <= arrival && trap.life - trap.t > land) duration = Math.max(duration, land + 0.8);
+    }
+    return duration;
+  }
+
+  // 聚敌、陷阱、落石和弹射各自挑选作用中心，普通单体技保留当前锁定。
+  // 只看当前公开位置与队友已开始的聚敌，不读取未来随机数或敌方决策。
+  function skillTarget(battle, e, sk, policy, fallback) {
+    const steps = sk.steps || [];
+    const area = steps.find((s) => (s.kind === 'aoe' && s.at === 'target')
+      || s.kind === 'stone_rain' || s.kind === 'throw_stones' || s.kind === 'bubble_trap'
+      || (s.kind === 'projectile' && s.phone));
+    if (!area) return fallback;
+    const foes = foesOf(battle, e).filter((o) => !hasBuff(o, 'invuln'));
+    const radius = area.kind === 'bubble_trap' ? area.radius || 95
+      : area.kind === 'projectile' ? area.bounceRange || 360
+      : area.spread || area.radius || 150;
+    const globalRain = area.kind === 'stone_rain' || area.kind === 'throw_stones';
+    const reach = globalRain ? Infinity : policy.when === 'enemyInRange' ? policy.range || 200
+      : Math.max(targetRange(e), 300);
+    const pull = steps.find((s) => s.kind === 'pull');
+    const allies = alliesOf(battle, e);
+    const pendingPulls = [];
+    for (const ally of allies) {
+      if (ally === e) continue;
+      const target = foes.find((o) => o.id === (ally.cast && ally.cast.targetId));
+      if (!target) continue;
+      for (const next of remainingSteps(ally)) {
+        if (next.step.kind === 'pull' && next.eta <= 1.5) pendingPulls.push({ target, ...next });
+      }
+    }
+    let best = fallback, bestScore = -Infinity;
+    for (const candidate of foes) {
+      const distance = U.dist(e.x, e.z, candidate.x, candidate.z);
+      if (distance > reach + candidate.unit.radius * 0.5 - 4) continue;
+      let score = (candidate.id === e.targetId ? 8 : 0) - distance * 0.035;
+      let count = 0;
+      for (const o of foes) {
+        const gap = U.dist(candidate.x, candidate.z, o.x, o.z);
+        if (gap <= radius) {
+          count += 1;
+          if (area.kind === 'bubble_trap') {
+            const bubble = o.buffs.find((b) => b.kind === 'bubble' && b.t < b.dur);
+            score += (!bubble || bubble.mag < 3 ? 9 : 0)
+              - Math.min(24, reservedControl(battle, e, o, (sk.cast || 0.65) + (area.arm || 0.4)) * 20);
+          }
+          if (area.effects && area.effects.some((b) => b.kind === 'marked')) {
+            score += hasBuff(o, 'marked') ? 0 : 10;
+          }
+        } else if (pull && gap <= (pull.radius || 280)) count += 0.5;
+      }
+      score += Math.min(4, count) * 32;
+      // 落石/陷阱瞄准已经开始的聚敌中心，而不是把范围技分散到远处。
+      for (const pending of pendingPulls) {
+        if (U.dist(candidate.x, candidate.z, pending.target.x, pending.target.z) <= radius * 0.6) score += 18;
+      }
+      score += (1 - candidate.hp / candidate.maxHp) * 12;
+      if (candidate.isMinion) score -= 12;
+      if (score > bestScore) { bestScore = score; best = candidate; }
+    }
+    return best;
+  }
+
+  // 只在队友固定预警即将命中、该击退确实可能推出范围时稍等。
+  // 预警过期便自动放行；危急或五秒无输出也放行，不积累隐藏等待状态。
+  function disruptsAllyZone(battle, e, sk, target) {
+    if (!target || target.su7 || e.hp / e.maxHp <= 0.3 || (e.noDmgT || 0) >= 5) return false;
+    const knock = sk.steps.find((s) => (s.kind === 'dash' || s.kind === 'melee') && s.dmg > 0 && s.knock > 0);
+    if (!knock) return false;
+    const arrival = (sk.cast == null ? 0.6 : sk.cast) + (knock.t || 0)
+      + (knock.kind === 'dash' ? (knock.dur || 0.3) * 0.5 : 0);
+    const allies = alliesOf(battle, e).filter((a) => a !== e);
+    const weight = Math.max(0.3, target.unit.stats.weight || 1);
+    const travel = Math.pow(knock.knock / weight, 2) / 2800;
+    const dx = target.x - e.x, dz = target.z - e.z, length = Math.hypot(dx, dz) || 1;
+    for (const zone of battle.zones || []) {
+      if (zone.done || !allies.some((a) => a.id === zone.ownerId)) continue;
+      const eta = zone.warn - zone.t;
+      if (eta < arrival || eta > 0.95) continue;
+      const gap = U.dist(target.x, target.z, zone.x, zone.z);
+      const after = U.dist(target.x + dx / length * travel, target.z + dz / length * travel, zone.x, zone.z);
+      if (gap < zone.radius && after > zone.radius && after > gap + 2) return true;
+    }
+    return false;
+  }
+
+  // 有效技能均有基础收益；机会加减分不改变数值，也不会为等连招永久扣住技能。
+  function opportunityScore(battle, e, sk, key, target, interrupt) {
+    if (key === 's1' && interrupt && target === interrupt) return 1000;
+    let score = key === 'ult' ? 110 : key === 's2' ? 60 : key === 's3' ? 45 : 35;
+    const steps = sk.steps || [];
+    if (steps.some((s) => s.kind === 'heal')) score += (1 - e.hp / e.maxHp) * 100;
+    if (!target) return score;
+    const arrival = (sk.cast == null ? 0.6 : sk.cast) + 0.2;
+    const control = steps.some((s) => s.kind === 'bubble_trap' || (s.effects || []).some((b) => b.kind === 'stun'));
+    if (control && reservedControl(battle, e, target, arrival) > arrival + 0.25) score -= 45;
+    if (target.hp / target.maxHp < 0.2 && steps.some((s) => s.dmg > 0)) score += 18;
+    if (steps.some((s) => s.kind === 'bubble_trap')) {
+      const mark = target.buffs.find((b) => b.kind === 'bubble' && b.t < b.dur);
+      if (mark && mark.mag >= 3 && mark.dur - mark.t > 3) score -= 20;
+    }
+    return score;
+  }
+
   /** 只有能打到人、补到血或收集到资源时才交技能；纯防御不在开局空放。 */
   function usefulSkill(battle, e, sk, c, targetOverride) {
     const foes = foesOf(battle, e).filter((o) => !hasBuff(o, 'invuln'));
@@ -238,20 +376,22 @@
     const current = foes.find((o) => o.id === e.targetId && !hasBuff(o, 'invuln'));
     const target = current || selectTarget(battle, e, foes.filter((o) => !hasBuff(o, 'invuln')));
     const interrupt = interruptTarget(battle, e);
-    const order = interrupt ? ['ult', 's1', 's2', 's3'] : ['ult', 's2', 's3', 's1'];
-    for (const key of order) {
+    let best = null;
+    for (const key of ['ult', 's2', 's3', 's1']) {
       const sk = e.unit[key];
       if (!sk) continue;
       if (key === 'ult' && e.energy < 100) continue;
       if (key !== 'ult' && ((e.cds[key] || 0) > 0 || e.energy < (sk.cost || 0))) continue;
       const c = p[key];
       if (!c) continue;
-      const chosenTarget = key === 's1' && interrupt ? interrupt : target;
-      if (cond(battle, e, c) && usefulSkill(battle, e, sk, c, chosenTarget)) {
-        commitTarget(e, chosenTarget);
-        return key;
+      const chosenTarget = key === 's1' && interrupt ? interrupt : skillTarget(battle, e, sk, c, target);
+      if (cond(battle, e, c) && usefulSkill(battle, e, sk, c, chosenTarget)
+          && !disruptsAllyZone(battle, e, sk, chosenTarget)) {
+        const score = opportunityScore(battle, e, sk, key, chosenTarget, interrupt);
+        if (!best || score > best.score) best = { key, target: chosenTarget, score };
       }
     }
+    if (best) { commitTarget(e, best.target); return best.key; }
     // 取消平A后，基础近战技仍要能主动出击（如王境泽的护盾+斩击）。
     // 不绕过治疗、防御技或石头库存条件，也不拿空挥代替移动。
     const basic = e.unit.s1;

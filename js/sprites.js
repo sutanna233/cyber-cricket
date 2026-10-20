@@ -405,7 +405,7 @@
       ctx.font = 'bold 11px "PingFang SC","Microsoft YaHei",sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
-      const nm = (u.name || ent.unitId || '?') + (ent.brawl ? ' #' + ent.id : '');
+      const nm = (u.name || ent.unitId || '?') + (!ent.isMinion && typeof ent.id === 'number' ? ' #' + ent.id : '');
       ctx.fillStyle = 'rgba(0,0,0,0.65)';
       ctx.fillText(nm, p.sx + 1, y + BAR.nameGap + 1);
       ctx.fillStyle = ent.side === 'B' ? '#ffd0d8' : '#d8f4ff';

@@ -38,25 +38,28 @@
     for (let i = 0; i < e.buffs.length; i++) if (e.buffs[i].kind === kind && e.buffs[i].t < e.buffs[i].dur) return true;
     return false;
   }
-  function addBuff(e, kind, dur, mag) {
+  function addBuff(e, kind, dur, mag, src) {
     if (!kind) return;
     if (kind === 'cleanse') {
       e.buffs = e.buffs.filter((b) => !NEGATIVE[b.kind]);
       return;
     }
     if (kind === 'regen' || kind === 'shield' || kind === 'lifesteal') mag *= SUSTAIN_SCALE;
-    if (kind === 'shield') e.shield = Math.max(e.shield || 0, Math.round(e.maxHp * mag));
+    if (kind === 'shield') {
+      const capacity = Math.round(e.maxHp * mag);
+      if (capacity > (e.shield || 0)) { e.shield = capacity; e.shieldOwnerId = src ? src.id : e.id; }
+    }
     // 同类叠加取更强的一条，避免无限堆叠
     for (let i = 0; i < e.buffs.length; i++) {
       const b = e.buffs[i];
       if (b.kind === kind && b.t < b.dur) {
         if (kind === 'bubble') { b.mag = Math.min(3, b.mag + mag); b.t = 0; b.dur = dur; return; }
-        if (mag >= b.mag) { b.mag = mag; b.dur = Math.max(b.dur, dur); b.t = 0; }
+        if (mag >= b.mag) { b.mag = mag; b.dur = Math.max(b.dur, dur); b.t = 0; b.ownerId = src ? src.id : e.id; }
         else b.dur = Math.max(b.dur, dur);
         return;
       }
     }
-    e.buffs.push({ kind, dur, mag, t: 0 });
+    e.buffs.push({ kind, dur, mag, t: 0, ownerId: src ? src.id : e.id });
   }
   function speedOf(e) {
     const s = e.unit.stats.spd * (1 + buffMag(e, 'speedUp') - buffMag(e, 'speedDown'));
@@ -79,7 +82,7 @@
       time: 0, tick: 0, over: false, result: null, endReason: null,
       A: [], B: [], projectiles: [], zones: [], pickups: [], rains: [], tracks: [], bubbleTraps: [],
       events: [], fxSeq: 0,
-      stats: { dmgByUnit: {}, dmgBySideUnit: {}, killsByUnit: {}, killsBySideUnit: {}, maxCombo: 0, casts: [], duration: 0, picked: {} },
+      stats: { dmgByUnit: {}, dmgBySideUnit: {}, killsByUnit: {}, killsBySideUnit: {}, byEntity: {}, maxCombo: 0, casts: [], duration: 0, picked: {} },
       _eid: 1, _pickupT: 0,
     };
 
@@ -122,6 +125,13 @@
         e.lastX = e.x; e.lastZ = e.z; e.facing = e.x < 600 ? 1 : -1;
       });
     }
+    // 原始参赛者永久留在统计表；尸体移除、诱饵消失后仍可查到贡献归属。
+    for (const e of battle.participants) {
+      battle.stats.byEntity[e.id] = { id: e.id, unitId: e.unitId, side: e.side, slot: e.slot,
+        damage: 0, damageTaken: 0, healing: 0, shielding: 0, controlSeconds: 0,
+        interrupts: 0, kills: 0, casts: 0, hits: 0, aliveSeconds: 0, skillDamage: {} };
+    }
+    const ownership = new Map(battle.participants.map((e) => [e.id, e.id]));
     battle.ramp = 1;
     battle.dbg = { kite: 0, retreat: 0, approach: 0, attack: 0, idle: 0, early: {} };
     function dbg(k) { battle.dbg.early[k] = (battle.dbg.early[k] || 0) + 1; }
@@ -139,6 +149,40 @@
       return owner ? owner.team === e.team : mode !== 'brawl' && effect.side === e.side;
     };
     battle.foes = foes; battle.allies = allies;
+
+    function contribution(e) {
+      const id = typeof e === 'number' ? e : e && e.id;
+      return battle.stats.byEntity[ownership.get(id) || id] || null;
+    }
+
+    function recordDamage(src, dst, amount, skill, detail) {
+      const from = contribution(src), to = contribution(dst);
+      if (from) {
+        from.damage += amount;
+        from.hits++;
+        const key = skill || 'basic';
+        from.skillDamage[key] = (from.skillDamage[key] || 0) + amount;
+        if (detail && detail !== key) from.skillDamage[detail] = (from.skillDamage[detail] || 0) + amount;
+      }
+      if (to) to.damageTaken += amount;
+    }
+
+    function restoreHealth(src, dst, amount) {
+      const effective = Math.max(0, Math.min(amount, dst.maxHp - dst.hp));
+      dst.hp = U.clamp(dst.hp + amount, 0, dst.maxHp);
+      const row = contribution(src);
+      if (row) row.healing += effective;
+      return effective;
+    }
+
+    // 记录控制的实际占用时间，而非把多个重叠的标称持续时间相加。
+    function creditControl(src, dst, duration) {
+      if (!src || !dst.alive || dst.isDecoy || src.team === dst.team || duration <= 0) return;
+      const end = battle.tick + Math.ceil(duration / TICK - 1e-9);
+      if (!dst.controlCredit || end > dst.controlCredit.end) {
+        dst.controlCredit = { ownerId: ownership.get(src.id) || src.id, end };
+      }
+    }
 
     function push(ev) {
       ev.seq = ++battle.fxSeq;
@@ -180,11 +224,14 @@
       dmg *= DMG_SCALE;
       dmg = Math.max(1, Math.round(dmg));
 
-      // 护盾先吃
+      const beforeHp = dst.hp;
+      // 护盾先吃；只把实际吸收计入贡献，而不是把生成的护盾算成收益。
       if (dst.shield > 0) {
         const use = Math.min(dst.shield, dmg);
         dst.shield = U.round2(dst.shield - use);
         dmg -= use;
+        const shieldRow = contribution(dst.shieldOwnerId || dst.id);
+        if (shieldRow) shieldRow.shielding += use;
       }
       if (dmg > 0) dst.hp = U.clamp(dst.hp - dmg, 0, dst.maxHp);
 
@@ -192,7 +239,9 @@
       const refl = buffMag(dst, 'reflect');
       if (refl > 0) {
         const back = Math.max(1, Math.round((dmg + (opt.rawDmg || 0)) * refl * 0.5));
+        const actual = Math.min(src.hp, back);
         src.hp = U.clamp(src.hp - back, 0, src.maxHp);
+        recordDamage(dst, src, actual, 'reflect');
         push({ type: 'reflect', unitId: dst.id, targetId: src.id, dmg: back, x: src.x, z: src.z, h: src.h });
         if (src.hp <= 0) kill(src, dst);
       }
@@ -200,8 +249,8 @@
       const ls = buffMag(src, 'lifesteal');
       if (ls > 0 && dmg > 0) {
         const healV = Math.round(dmg * ls);
-        src.hp = U.clamp(src.hp + healV, 0, src.maxHp);
-        push({ type: 'heal', unitId: src.id, amount: healV, x: src.x, z: src.z, h: src.h });
+        const actual = restoreHealth(src, src, healV);
+        push({ type: 'heal', unitId: src.id, amount: actual, x: src.x, z: src.z, h: src.h });
       }
       // 怒气：命中 +4 / 受击 +6 / 被动 +3 每秒（保证必杀大约 20~30 秒能出一次）
       src.energy = U.clamp(src.energy + 4, 0, 100);
@@ -218,6 +267,7 @@
       // 两侧可能出现同一只单位，按「侧:unitId」再记一份，战报可区分左右
       const sideKey = src.side + ':' + src.unitId;
       battle.stats.dmgBySideUnit[sideKey] = (battle.stats.dmgBySideUnit[sideKey] || 0) + dmg;
+      recordDamage(src, dst, Math.min(beforeHp, dmg), opt.skill, opt.detail);
 
       push({
         type: 'hit', unitId: src.id, targetId: dst.id, dmg, crit,
@@ -240,6 +290,9 @@
         dst.state = 'hurt';
         dst.stateT = 0;
         dst.hitstun = Math.max(dst.hitstun, 0.35);
+        creditControl(src, dst, 0.35);
+        const interrupter = contribution(src);
+        if (interrupter) interrupter.interrupts++;
         if (key === 'ult') {
           dst.energy = Math.max(0, dst.energy - 60);      // 必杀被打断：掉大半怒气
         } else {
@@ -274,6 +327,8 @@
         }
         return;
       }
+      const creditedKiller = contribution(killer);
+      if (creditedKiller && !e.isMinion) creditedKiller.kills++;
       battle.stats.killsByUnit[killer ? killer.unitId : 'none'] =
         (battle.stats.killsByUnit[killer ? killer.unitId : 'none'] || 0) + 1;
       if (killer) {
@@ -289,8 +344,11 @@
         if (ef.chance != null && battle.rng.next() > ef.chance) continue;
         const self = ef.target === 'self' ? src : dst;
         if (ef.kind === 'stun' && self.su7) continue;
-        addBuff(self, ef.kind, ef.dur == null ? 1 : ef.dur, ef.mag == null ? 1 : ef.mag);
-        if (ef.kind === 'stun') { self.hitstun = Math.max(self.hitstun, ef.dur || 1); self.state = 'stun'; self.stateT = 0; }
+        addBuff(self, ef.kind, ef.dur == null ? 1 : ef.dur, ef.mag == null ? 1 : ef.mag, src);
+        if (ef.kind === 'stun') {
+          self.hitstun = Math.max(self.hitstun, ef.dur || 1); self.state = 'stun'; self.stateT = 0;
+          creditControl(src, self, ef.dur || 1);
+        }
         push({ type: 'buff', kind: ef.kind, unitId: self.id, dur: ef.dur, mag: ef.mag,
           x: self.x, z: self.z, h: self.h + 60 });
       }
@@ -350,6 +408,7 @@
             if (step.knock && dst.alive) knockback(src, dst, step.knock, step.up);
             if (step.hitstun && dst.alive) {
               dst.hitstun = Math.max(dst.hitstun, step.hitstun * (hasBuff(dst, 'superArmor') ? 0.2 : 1));
+              creditControl(src, dst, step.hitstun * (hasBuff(dst, 'superArmor') ? 0.2 : 1));
               if (!hasBuff(dst, 'superArmor')) { dst.state = 'hurt'; dst.stateT = 0; }
             }
             hitAny = true;
@@ -425,7 +484,10 @@
               if (U.dist(o.x, o.z, target.x, target.z) > step.radius || (hitCounts[o.id] || 0) >= 2) continue;
               hitCounts[o.id] = (hitCounts[o.id] || 0) + 1;
               applyDamage(src, o, step.dmg + stacks * step.perBubble, { skill: opt.skillKey });
-              if (o.alive) { knockback(target, o, 100); o.hitstun = Math.max(o.hitstun, 0.25); }
+              if (o.alive) {
+                knockback(target, o, 100); o.hitstun = Math.max(o.hitstun, 0.25);
+                creditControl(src, o, 0.25);
+              }
             }
           }
           break;
@@ -438,14 +500,16 @@
         case 'run_lap': {
           const target = castTarget(src);
           if (!target) break;
-          const cx = U.clamp(target.x, 170, W - 170), cz = U.clamp(target.z, 175, D - 175);
+          const route = chooseRunRoute(src, target, step);
+          const cx = route.cx, cz = route.cz;
           const bonus = src.stacks.paceBoost || 0;
           src.stacks.paceBoost = 0; src.stacks.pace = bonus;
-          src.run = { t: 0, step, cx, cz, angle: Math.atan2(src.z - cz, src.x - cx),
-            direction: src.id % 2 ? 1 : -1, targetId: target.id, distance: 0, bonus, pace: bonus,
+          src.run = { t: 0, step, cx, cz, angle: route.angle,
+            direction: route.direction, targetId: target.id, distance: 0, bonus, pace: bonus,
             lastX: src.x, lastZ: src.z, marked: {}, skill: opt.skillKey };
           src.state = 'run'; src.stateT = 0;
-          push({ type: 'run_start', unitId: src.id, x: src.x, z: src.z, cx, cz, radius: step.radius, ult: opt.skillKey === 'ult' });
+          push({ type: 'run_start', unitId: src.id, x: src.x, z: src.z, cx, cz, radius: step.radius,
+            trailLife: step.trailLife, ult: opt.skillKey === 'ult' });
           break;
         }
         case 'dash': {
@@ -480,7 +544,7 @@
           const list = step.at === 'allies' ? allies(src) : step.at === 'enemies' ? foes(src) : [src];
           for (const tgt of list) {
             for (const ef of step.effects || []) {
-              addBuff(tgt, ef.kind, ef.dur == null ? 3 : ef.dur, ef.mag == null ? 1 : ef.mag);
+              addBuff(tgt, ef.kind, ef.dur == null ? 3 : ef.dur, ef.mag == null ? 1 : ef.mag, src);
               push({ type: 'buff', kind: ef.kind, unitId: tgt.id, dur: ef.dur, mag: ef.mag,
                 x: tgt.x, z: tgt.z, h: tgt.h + 60 });
             }
@@ -492,8 +556,8 @@
           const amt = (step.amount || 0.12) * SUSTAIN_SCALE;
           for (const tgt of list) {
             const v = Math.round(tgt.maxHp * amt);
-            tgt.hp = U.clamp(tgt.hp + v, 0, tgt.maxHp);
-            push({ type: 'heal', unitId: tgt.id, amount: v, x: tgt.x, z: tgt.z, h: tgt.h + 40 });
+            const actual = restoreHealth(src, tgt, v);
+            push({ type: 'heal', unitId: tgt.id, amount: actual, x: tgt.x, z: tgt.z, h: tgt.h + 40 });
           }
           break;
         }
@@ -501,6 +565,7 @@
           const e = spawn(src.side, { id: src.unitId, pos: [src.x, src.z], lane: src.lane,
             team: src.team, isMinion: true, ownerId: src.id, life: step.life || 3, hpMul: step.hpRatio || 0.25 }, 0);
           if (!e) break;
+          ownership.set(e.id, ownership.get(src.id) || src.id);
           e.isDecoy = true; e.decoyStep = step; e.unitId = 'decoy_' + src.unitId;
           e.unit = Object.assign({}, src.unit, { id: e.unitId, name: '空楼', radius: 30, height: 70,
             stats: Object.assign({}, src.unit.stats, { spd: 0, weight: 4 }),
@@ -524,6 +589,7 @@
               stacks: {}, trait: null, deadT: 0,
             };
             battle[m.side].push(m);
+            ownership.set(m.id, ownership.get(src.id) || src.id);
             push({ type: 'spawn', unitId: m.id, of: src.unitId, x: m.x, z: m.z, h: 0 });
           }
           break;
@@ -595,7 +661,9 @@
             o.x += (dx / l) * (step.dist || 120) * k;
             o.z += (dz / l) * (step.dist || 120) * k;
             o.vx = 0; o.vz = 0;
-            if (!hasBuff(o, 'superArmor')) { o.hitstun = Math.max(o.hitstun, 0.25); o.state = 'hurt'; }
+            if (!hasBuff(o, 'superArmor')) {
+              o.hitstun = Math.max(o.hitstun, 0.25); o.state = 'hurt'; creditControl(src, o, 0.25);
+            }
             pulled++;
           }
           push({ type: 'pull', unitId: src.id, x: cx, z: cz, radius, count: pulled });
@@ -625,7 +693,7 @@
             const take = Math.min(o.energy, step.amount || 25);
             o.energy = U.clamp(o.energy - take, 0, 100);
             got += take;
-            addBuff(o, 'atkDown', step.debuffDur || 3, step.debuffMag || 0.15);
+            addBuff(o, 'atkDown', step.debuffDur || 3, step.debuffMag || 0.15, src);
             push({ type: 'steal', unitId: src.id, targetId: o.id, amount: take, x: o.x, z: o.z, h: o.h + 30 });
           }
           src.energy = U.clamp(src.energy + got, 0, 100);
@@ -667,6 +735,113 @@
       return pool.sort((a, b) => U.dist2(e.x, e.z, a.x, a.z) - U.dist2(e.x, e.z, b.x, b.z))[0] || null;
     }
 
+    // 只外推已经观察到的短时移动。把敌人放在跑道附近，而不是空心圆中央。
+    // 施放时选定整圈路线，之后不吸附敌人，也不改变跑速或跑道寿命。
+    function chooseRunRoute(src, target, step) {
+      const radius = step.radius || 105;
+      const predict = (o, t) => ({ x: U.clamp(o.x + (o.moveVX || 0) * t, 55, W - 55),
+        z: U.clamp(o.z + (o.moveVZ || 0) * t, 65, D - 65) });
+      const lead = predict(target, 0.45);
+      const enemies = foes(src);
+      let best = null, bestScore = -Infinity;
+      for (let i = 0; i < 9; i++) {
+        const offset = i === 8 ? 0 : radius * 0.85;
+        const cx = U.clamp(lead.x + Math.cos(i * Math.PI / 4) * offset, radius + 60, W - radius - 60);
+        const cz = U.clamp(lead.z + Math.sin(i * Math.PI / 4) * offset, radius + 70, D - radius - 70);
+        const angle = Math.atan2(src.z - cz, src.x - cx);
+        for (const direction of [src.id % 2 ? 1 : -1, src.id % 2 ? -1 : 1]) {
+          let score = -Math.abs(U.dist(src.x, src.z, cx, cz) - radius) * 0.18;
+          for (const o of enemies) {
+            for (const t of [0, 0.45, 0.9]) {
+              const p = predict(o, t);
+              const gap = Math.abs(U.dist(p.x, p.z, cx, cz) - radius);
+              score += Math.max(0, 90 - gap) * (o === target ? 1 : 0.65);
+            }
+          }
+          // 选择先经过目标的方向，减少绕完空的一半才接触敌人的情况。
+          const first = angle + direction * Math.PI * 0.6;
+          score -= U.dist(cx + Math.cos(first) * radius, cz + Math.sin(first) * radius, lead.x, lead.z) * 0.2;
+          if (score > bestScore) { bestScore = score; best = { cx, cz, angle, direction }; }
+        }
+      }
+      return best;
+    }
+
+    function segmentDistance(x, z, x1, z1, x2, z2) {
+      const dx = x2 - x1, dz = z2 - z1;
+      const t = U.clamp(((x - x1) * dx + (z - z1) * dz) / (dx * dx + dz * dz || 1), 0, 1);
+      return U.dist(x, z, x1 + dx * t, z1 + dz * t);
+    }
+
+    // 每个决策周期快照一次公开的持久危险；同一跑道的许多线段不会重复叠加评分。
+    function persistentHazards(e) {
+      if (e.hazardTick != null && battle.tick - e.hazardTick < 12) return e.hazards;
+      e.hazardTick = battle.tick;
+      e.hazards = [];
+      const owners = new Map(all().map((o) => [o.id, o]));
+      for (const track of battle.tracks) {
+        const owner = owners.get(track.ownerId);
+        if (track.finish || !(track.dmg > 0) || !owner || !owner.alive || owner.team === e.team
+            || track.life - track.t < 0.2) continue;
+        e.hazards.push({ ownerId: owner.id, track, radius: 30 + e.unit.radius * 0.5 });
+      }
+      for (const trap of battle.bubbleTraps) {
+        const owner = owners.get(trap.ownerId);
+        if (!owner || !owner.alive || owner.team === e.team || trap.life - trap.t < 0.2) continue;
+        e.hazards.push({ ownerId: owner.id, trap, radius: trap.radius });
+      }
+      return e.hazards;
+    }
+
+    function hazardCost(e, hazards, x, z, arrival) {
+      const costs = {};
+      for (const hazard of hazards) {
+        const effect = hazard.track || hazard.trap;
+        if (effect.t + arrival >= effect.life) continue;
+        const gap = hazard.track ? segmentDistance(x, z, effect.x1, effect.z1, effect.x2, effect.z2)
+          : U.dist(x, z, effect.x, effect.z);
+        const margin = hazard.radius + 24;
+        const risk = Math.max(0, 1 - gap / margin);
+        // 陷阱尚未激活且来得及走出时不把整片区域当墙。
+        const weight = hazard.trap ? (effect.t + arrival < effect.arm ? 0.35 : 1.35) : 1;
+        costs[hazard.ownerId] = Math.max(costs[hazard.ownerId] || 0, risk * weight);
+      }
+      return Object.values(costs).reduce((sum, cost) => sum + cost, 0);
+    }
+
+    function walkSafely(e, dx, dz, speed, dt) {
+      const len = Math.hypot(dx, dz) || 1;
+      dx /= len; dz /= len;
+      const hazards = persistentHazards(e);
+      if (hazards.length) {
+        const heading = Math.atan2(dz, dx);
+        if (!e.steer || battle.tick >= e.steer.until
+            || e.steer.dx * dx + e.steer.dz * dz < 0.5) {
+          let best = { dx, dz }, bestScore = -Infinity;
+          for (const offset of [0, 0.4, -0.4, 0.8, -0.8, 1.2, -1.2, 1.7, -1.7, Math.PI]) {
+            const ux = Math.cos(heading + offset), uz = Math.sin(heading + offset);
+            let cost = 0;
+            for (const t of [0.25, 0.55, 0.85]) {
+              const x = U.clamp(e.x + ux * speed * t, 55, W - 55);
+              const z = U.clamp(e.z + uz * speed * t, 65, D - 65);
+              cost += hazardCost(e, hazards, x, z, t) / 3;
+            }
+            const x = e.x + ux * speed * 0.55, z = e.z + uz * speed * 0.55;
+            const wall = Math.max(0, 65 - x, x - W + 65, 75 - z, z - D + 75);
+            // 长时间没有收益时仍允许冒险接敌，不能被跑道永远隔在外面。
+            const penalty = e.noDmgT > 9 ? 85 : 210;
+            const score = (ux * dx + uz * dz) * 65 - cost * penalty - wall * 2;
+            if (score > bestScore) { bestScore = score; best = { dx: ux, dz: uz }; }
+          }
+          e.steer = { dx: best.dx, dz: best.dz, until: battle.tick + 9 };
+        }
+        dx = e.steer.dx; dz = e.steer.dz;
+      }
+      e.x = U.clamp(e.x + dx * speed * dt, 50, W - 50);
+      e.z = U.clamp(e.z + dz * speed * dt, 60, D - 60);
+      e.state = 'walk';
+    }
+
     /** 在场地内选择闪避落点，惩罚仍在敌方预警范围内的方向。 */
     function startDodge(e, dx, dz, distance, duration, kind) {
       const len = Math.hypot(dx, dz) || 1;
@@ -691,6 +866,7 @@
           const gap = U.dist(x, z, p.x + p.vx * duration, p.z + p.vz * duration);
           score -= Math.max(0, (p.radius || 24) + e.unit.radius - gap) * 3;
         }
+        score -= hazardCost(e, persistentHazards(e), x, z, duration) * 180;
         if (score > bestScore) { bestScore = score; best = { x, z }; }
       }
       if (!best) return false;
@@ -726,6 +902,8 @@
       const sk = e.unit[key];
       if (!sk) return false;
       if (!canCast(e, key)) return false;
+      const row = contribution(e);
+      if (row) row.casts++;
       if (key === 'ult') e.energy = U.clamp(e.energy - (sk.cost || 100), 0, 100);
       else {
         e.energy = U.clamp(e.energy - (sk.cost || 0), 0, 100);
@@ -825,6 +1003,7 @@
           knockback({ x: o.x - d.dx * 20, z: o.z - d.dz * 20 }, o, d.step.knock || 210);
           if (!hasBuff(o, 'superArmor')) {
             o.hitstun = Math.max(o.hitstun, d.step.hitstun || 0.3); o.state = 'hurt'; o.stateT = 0;
+            creditControl(e, o, d.step.hitstun || 0.3);
           }
         }
       }
@@ -851,7 +1030,8 @@
       battle.tracks.push({ id: battle._eid++, ownerId: e.id, side: e.side, finish: true,
         x1: target.x - dz / len * 85, z1: target.z + dx / len * 85,
         x2: target.x + dz / len * 85, z2: target.z - dx / len * 85, t: 0, life: 1.5 });
-      push({ type: 'run_finish', unitId: e.id, x: e.x, z: e.z, pace: r.pace, distance: r.distance });
+      push({ type: 'run_finish', unitId: e.id, x: e.x, z: e.z, pace: r.pace, distance: r.distance,
+        trackHits: Object.keys(r.marked).length });
     }
 
     function updateRun(e, dt) {
@@ -895,8 +1075,8 @@
           if ((o.trackCd[owner.id] || 0) > battle.tick) continue;
           o.trackCd[owner.id] = battle.tick + 24;
           track.marked[o.id] = true;
-          applyDamage(owner, o, track.dmg, { skill: track.skill });
-          if (o.alive) addBuff(o, 'speedDown', 0.7, 0.22);
+          applyDamage(owner, o, track.dmg, { skill: track.skill, detail: 'track' });
+          if (o.alive) addBuff(o, 'speedDown', 0.7, 0.22, owner);
         }
       }
     }
@@ -910,10 +1090,11 @@
         const targets = foes(owner).filter((o) => U.dist(o.x, o.z, trap.x, trap.z) < trap.radius);
         if (!targets.length) continue;
         for (const o of targets.slice(0, 2)) {
-          applyDamage(owner, o, trap.dmg, { skill: 's2' });
+          applyDamage(owner, o, trap.dmg, { skill: 's2', detail: 'trap' });
           if (!o.alive) continue;
-          addBuff(o, 'bubble', 8, 2);
+          addBuff(o, 'bubble', 8, 2, owner);
           o.hitstun = Math.max(o.hitstun, 0.8); o.state = 'stun'; o.bubbleCageT = 0.8;
+          creditControl(owner, o, 0.8);
           push({ type: 'bubble_cage', unitId: o.id, x: o.x, z: o.z });
         }
         battle.bubbleTraps.splice(i, 1);
@@ -923,6 +1104,13 @@
     // ---------- 实体更新 ----------
     function updateEntity(e, dt) {
       if (!e.alive) return;
+      const row = !e.isMinion && contribution(e);
+      if (row) row.aliveSeconds += dt;
+      const control = e.controlCredit;
+      if (control && control.end >= battle.tick && !e.su7) {
+        const controller = contribution(control.ownerId);
+        if (controller) controller.controlSeconds += Math.min(dt, Math.max(e.hitstun, e.bubbleCageT || 0));
+      }
 
       // 计时器
       e.stateT += dt;
@@ -942,10 +1130,12 @@
         const b = e.buffs[i];
         b.t += dt;
         if (b.kind === 'poison') {
-          e.hp = U.clamp(e.hp - e.maxHp * b.mag * dt, 0, e.maxHp);
-          if (e.hp <= 0) { kill(e, null); return; }
+          const damage = Math.min(e.hp, e.maxHp * b.mag * dt);
+          e.hp = U.clamp(e.hp - damage, 0, e.maxHp);
+          recordDamage(b.ownerId, e, damage, 'poison');
+          if (e.hp <= 0) { kill(e, all().find((o) => o.id === b.ownerId) || null); return; }
         } else if (b.kind === 'regen') {
-          e.hp = U.clamp(e.hp + e.maxHp * b.mag * dt, 0, e.maxHp);
+          restoreHealth(b.ownerId || e.id, e, e.maxHp * b.mag * dt);
         }
         if (b.t >= b.dur) {
           if (b.kind === 'shield') e.shield = 0;
@@ -987,11 +1177,13 @@
             if (!(o._dashHit && o._dashHit === d)) {
               o._dashHit = d;
               const coef = d.step.dmg + (d.step.finish && d.step.marked[o.id] ? 0.3 : 0);
-              applyDamage(e, o, coef, { skill: d.skill || (e.cast ? e.cast.key : 's1'), melee: true,
+              applyDamage(e, o, coef, { skill: d.skill || (e.cast ? e.cast.key : 's1'), detail: d.step.finish ? 'run_finish' : null, melee: true,
                 armorPierce: d.step.pierceArmor ? 0.4 : (d.step.armorPierce || 0),
                 lowHpBonus: d.step.lowHpBonus });
               if (d.step.knock && o.alive) knockback(e, o, d.step.knock, d.step.up);
-              if (d.step.hitstun && o.alive && !hasBuff(o, 'superArmor')) { o.hitstun = d.step.hitstun; o.state = 'hurt'; }
+              if (d.step.hitstun && o.alive && !hasBuff(o, 'superArmor')) {
+                o.hitstun = d.step.hitstun; o.state = 'hurt'; creditControl(e, o, d.step.hitstun);
+              }
               if (d.step.grab && o.alive) { o.x = e.x + e.facing * 30; o.h = 16; }
             }
           }
@@ -1092,6 +1284,14 @@
         }
       }
 
+      // 有反应时间才能走开；蓄力/受控中的角色仍会踩陷阱，不获得免费无敌闪避。
+      const hazards = persistentHazards(e);
+      if (hazards.length && e.noDmgT < 8 && hazardCost(e, hazards, e.x, e.z, 0.2) > 0.6) {
+        walkSafely(e, tgt.x - e.x, tgt.z - e.z, speedOf(e), dt);
+        battle.dbg.avoid = (battle.dbg.avoid || 0) + 1;
+        return;
+      }
+
       // 技能释放（AI 决定 + 硬校验）
       if (CC.ai && CC.ai.wantSkill) {
         const key = CC.ai.wantSkill(battle, e);
@@ -1109,9 +1309,7 @@
           const dx = pk.x - e.x, dz = pk.z - e.z;
           const l = Math.hypot(dx, dz) || 1;
           if (l > 12) {
-            e.x += (dx / l) * speedOf(e) * dt;
-            e.z += (dz / l) * speedOf(e) * dt;
-            e.state = 'walk';
+            walkSafely(e, dx / l, dz / l, speedOf(e), dt);
             e.facing = dx >= 0 ? 1 : -1;
             e.x = U.clamp(e.x, 50, W - 50);
             e.z = U.clamp(e.z, 60, D - 60);
@@ -1128,12 +1326,13 @@
       const len = Math.hypot(dx, dz) || 1;
       const mx = dx / len, mz = dz / len;
 
-      // 反僵死：远程适度缩短距离寻找命中机会，不能退化为按旧普攻范围贴脸。
+      // 等冷却时侧移找角度；只有进攻技能快准备好时才略微缩短交战距离。
       if ((e.stuck > 2.5 && e.plan.mode !== 'approach') || e.noDmgT > 5) {
         const ranged = !!e.plan.ranged;
         const reach = e.plan.attackRange || rangeOf(e);
-        e.plan = { mode: 'approach', targetId: tgt.id, ranged, attackRange: reach,
-          wantRange: ranged ? Math.max(140, reach * 0.65) : rangeOf(e) };
+        const ready = ['s1', 's2'].some((key) => e.unit[key] && e.cds[key] <= 0.8);
+        e.plan = { mode: ranged ? 'kite' : 'approach', targetId: tgt.id, threatId: e.plan.threatId,
+          ranged, attackRange: reach, wantRange: ranged ? Math.max(160, reach * (ready ? 0.75 : 0.9)) : rangeOf(e) };
         e.stuck = 0;
         e._fleeing = false;
         e._kiting = false;
@@ -1161,19 +1360,13 @@
       } else e._fleeing = false;
 
       if (e._kiting && hasSpace) {
-        e.x += fleeX * sp * dt;                    // 远离最近的威胁，不是背对锁定目标乱退
-        e.z += fleeZ * sp * dt;
-        e.state = 'walk';
+        walkSafely(e, fleeX, fleeZ, sp, dt);
         battle.dbg.kite++;
       } else if (e._fleeing && hasSpace) {
-        e.x += fleeX * sp * dt;
-        e.z += fleeZ * sp * dt;
-        e.state = 'walk';
+        walkSafely(e, fleeX, fleeZ, sp, dt);
         battle.dbg.retreat++;
       } else if (d > atkRange) {
-        e.x += mx * sp * dt;                       // 够不着就贴上去
-        e.z += mz * sp * dt;
-        e.state = 'walk';
+        walkSafely(e, mx, mz, sp, dt);
         battle.dbg.approach++;
       } else {
         // 等技能时不要呆立：保持间距 + 缓慢侧移绕圈（看上去像在找出手机会）
@@ -1192,14 +1385,12 @@
           e._orbitDir = -e._orbitDir;
         }
         const drift = speedOf(e) * 0.33;
-        e.x += px * e._orbitDir * drift * dt;
-        e.z += pz * e._orbitDir * drift * dt;
+        let ox = px * e._orbitDir, oz = pz * e._orbitDir;
         // 贴太近再慢慢拉开（阈值远低于接近阈值，不会来回抖）
         if (d < atkRange * 0.6) {
-          e.x -= mx * drift * dt;
-          e.z -= mz * drift * dt;
+          ox -= mx; oz -= mz;
         }
-        e.state = 'walk';
+        walkSafely(e, ox, oz, drift * Math.hypot(ox, oz), dt);
         battle.dbg.orbit = (battle.dbg.orbit || 0) + 1;
       }
 
@@ -1454,6 +1645,7 @@
       battle.tick++;
       battle.time = U.round2(battle.tick * TICK);
       const list = all();
+      const positions = new Map(list.map((e) => [e.id, [e.x, e.z]]));
       for (const e of list) updateEntity(e, dt);
       // 单位互斥：不让两个单位叠在一起（简单的两两分离松弛）
       for (let i = 0; i < list.length; i++) {
@@ -1489,6 +1681,10 @@
         const marginZ = e.su7 ? Math.max(90, e.su7.radius) : 60;
         e.x = U.clamp(e.x, marginX, W - marginX);
         e.z = U.clamp(e.z, marginZ, D - marginZ);
+        const previous = positions.get(e.id);
+        const limit = e.unit.stats.spd * 1.5;
+        e.moveVX = (e.moveVX || 0) * 0.65 + U.clamp((e.x - previous[0]) / dt, -limit, limit) * 0.35;
+        e.moveVZ = (e.moveVZ || 0) * 0.65 + U.clamp((e.z - previous[1]) / dt, -limit, limit) * 0.35;
       }
       updateProjectiles(dt);
       updateZones(dt);
@@ -1521,7 +1717,9 @@
           Math.round(e.cds.s1 * 50), Math.round(e.cds.s2 * 50), e.buffs.length);
         if (e.unit.s3) parts.push('s3', Math.round(e.cds.s3 * 50));
         if (e.isDecoy) parts.push('decoy', e.ownerId, Math.round(e.life * 60));
-        if (e.run) parts.push('run', Math.round(e.run.t * 60), Math.round(e.run.distance), e.run.pace);
+        parts.push('motion', Math.round((e.moveVX || 0) * 50), Math.round((e.moveVZ || 0) * 50));
+        if (e.run) parts.push('run', Math.round(e.run.t * 60), Math.round(e.run.distance), e.run.pace,
+          Math.round(e.run.cx), Math.round(e.run.cz), e.run.direction);
         if (e.su7) parts.push('su7', Math.round(e.su7.t * 60), Math.round(e.su7.dx * 10000),
           Math.round(e.su7.dz * 10000), e.su7.targetId, Math.round(e.su7.retargetT * 60),
           Object.keys(e.su7.lastHit).sort((a, b) => a - b).map((id) => id + ':' + e.su7.lastHit[id]).join(','));

@@ -11,11 +11,12 @@
   const CC = (globalThis.CC = globalThis.CC || {});
 
   const SAVE_KEY = 'cyber-cricket-save-v1';
-  const SAVE_VERSION = 3;
+  const SAVE_VERSION = 4;
 
   const CONFIG = {
     countdownSeconds: 5,     // 停手自动开打
-    reportSeconds: 3,        // 自动模式 / 游客的战报停留，手动玩家可一直阅读
+    reportSeconds: 5,        // 玩家连续对战的结算停留
+    spectatorReportSeconds: 3,
     maxFrameDt: 0.05,
     debugSpeedMax: 16,
     placeShotCount: 3,       // ?shot=placing 时每侧预置的单位数（便于截图看清布阵）
@@ -28,6 +29,8 @@
     booted: false,
     gameMode: 'team',
     autoStart: false,
+    continuousPlay: true,
+    reportHeld: false,
     phase: 'placing',      // placing | fighting | report
     paused: false,
     running: false,
@@ -145,7 +148,9 @@
 
   function validateSave(d) {
     if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
-    const out = { mode: d.mode === 'brawl' ? 'brawl' : 'team', round: 0, level: 1, sizes: { A: CONFIG.defaultSize, B: CONFIG.defaultSize }, lineup: { A: [], B: [] } };
+    const out = { mode: d.mode === 'brawl' ? 'brawl' : 'team', round: 0, level: 1,
+      continuousPlay: d.continuousPlay !== false, autoStart: d.autoStart === true,
+      sizes: { A: CONFIG.defaultSize, B: CONFIG.defaultSize }, lineup: { A: [], B: [] } };
     let corrupt = false;
     if (d.round !== undefined && d.round !== null) {
       if (typeof d.round !== 'number' || !isFinite(d.round)) return null;   // 结构损坏
@@ -203,6 +208,8 @@
     const data = {
       version: SAVE_VERSION,
       mode: state.gameMode,
+      continuousPlay: state.continuousPlay,
+      autoStart: state.autoStart,
       round: state.round,
       size: (B && B.sizes) ? B.sizes() : { A: CONFIG.defaultSize, B: CONFIG.defaultSize },
       lineup: (B && B.rawSlots) ? B.rawSlots() : { A: [], B: [] },
@@ -365,7 +372,7 @@
     const bench = B.benchIds(side).length;
     const pool = B.poolIds().length;
     const sz = B.sizes();
-    const sig = [state.autoStart, state.phase, state.paused ? 1 : 0, state.round, state.level, side, sz.A, sz.B,
+    const sig = [state.autoStart, state.continuousPlay, state.reportHeld, Math.ceil(state.reportTimer), state.phase, state.paused ? 1 : 0, state.round, state.level, side, sz.A, sz.B,
       countdown.toFixed(1), bench, pool, alive.a, alive.b, time, state.shot, hint].join('|');
     if (sig === state.hudSig) return;
     state.hudSig = sig;
@@ -380,6 +387,7 @@
       ui().setSide(side);
       const startButton = byId('btn-start');
       if (startButton) startButton.disabled = state.phase !== 'placing';
+      if (state.phase === 'report' && ui().syncReportActions) ui().syncReportActions();
       const countdownWrap = byId('autostart-wrap');
       if (countdownWrap && !state.autoStart && !(CC.access && !CC.access.caps.place)) countdownWrap.classList.add('hidden');
     } catch (e) { fail(e, 'updateHud'); }
@@ -486,6 +494,7 @@
     state.battleClock = 0;
     state.report = null;
     state.reportTimer = 0;
+    state.reportHeld = false;
     if (state.paused) syncMatchPause();
     try { ui().hideReport(); } catch (e) { /* ignore */ }
     try { ui().setPhase(phaseText()); } catch (e) { /* ignore */ }
@@ -523,11 +532,14 @@
     const winner = (rep.winner === 'A' || rep.winner === 'B') ? rep.winner : null;
     state.report = rep;
     state.winner = winner;
+    rep.round = state.round + 1;
+    rep.level = state.level;
     state.round += 1;
     const W = waves();
     state.level = (W && typeof W.nextDifficulty === 'function') ? W.nextDifficulty(state.round) : 1;
     state.phase = 'report';
-    state.reportTimer = CONFIG.reportSeconds;
+    state.reportTimer = reportDelay();
+    state.reportHeld = false;
     state.hudSig = '';
     safe(() => ui().showReport(rep), 'showReport');
     safe(() => ui().setPhase(phaseText()), 'setPhase');
@@ -540,6 +552,7 @@
     state.match = null;
     state.report = null;
     state.reportTimer = 0;
+    state.reportHeld = false;
     state.battleClock = 0;
     state.winner = null;
     state.phase = 'placing';
@@ -561,10 +574,14 @@
   }
 
   function reportAutoAdvances() {
-    return state.autoStart || !canControlReport();
+    return state.continuousPlay || !canControlReport();
   }
 
-  // 自动模式 / 游客 3 秒后连场；手动玩家通过战报按钮继续。
+  function reportDelay() {
+    return canControlReport() ? CONFIG.reportSeconds : CONFIG.spectatorReportSeconds;
+  }
+
+  // 首局仍由玩家开始；之后按连续对战选项衔接，游客保持原有连场行为。
   function advanceFromReport() {
     if (state.phase !== 'report') return false;
     safe(() => ui().hideReport(), 'hideReport');
@@ -594,11 +611,31 @@
     state.autoStart = !!enabled;
     const B = board();
     if (B) B.setAutoStart(CONFIG.countdownSeconds);
-    if (state.phase === 'report') {
-      state.reportTimer = CONFIG.reportSeconds;
-      if (ui() && ui().syncReportActions) safe(() => ui().syncReportActions(), 'reportActions');
+    saveNow();
+    state.hudSig = ''; updateHud();
+  }
+
+  function handleContinuousPlay(enabled) {
+    if (!canControlReport()) return false;
+    state.continuousPlay = !!enabled;
+    state.reportHeld = false;
+    if (state.phase === 'report') state.reportTimer = reportDelay();
+    saveNow();
+    state.hudSig = ''; updateHud();
+    return state.continuousPlay;
+  }
+
+  function handleReportHold(held) {
+    if (state.phase !== 'report' || !canControlReport()) return false;
+    state.reportHeld = held === undefined ? !state.reportHeld : !!held;
+    if (!state.reportHeld) {
+      state.continuousPlay = true;
+      state.reportTimer = reportDelay();
+      setPaused(false);
+      saveNow();
     }
     state.hudSig = ''; updateHud();
+    return state.reportHeld;
   }
 
   // ---------- 帧推进 ----------
@@ -621,7 +658,7 @@
       return;
     }
     if (state.phase === 'report') {
-      if (!reportAutoAdvances()) return;
+      if (!reportAutoAdvances() || state.reportHeld) return;
       state.reportTimer -= dt;
       if (state.reportTimer <= 0) advanceFromReport();
     }
@@ -807,6 +844,7 @@
     state.match = null;
     state.report = null;
     state.reportTimer = 0;
+    state.reportHeld = false;
     state.battleClock = 0;
     state.round = 0;
     state.winner = null;
@@ -1083,6 +1121,8 @@
       onStart: handleStart,
       onExport: handleExport,
       onAutoStart: handleAutoStart,
+      onContinuousPlay: handleContinuousPlay,
+      onReportHold: handleReportHold,
       onMode: function () { handleMode(state.gameMode === 'brawl' ? 'team' : 'brawl'); },
       onRemove: handleRemove,
       onPause: togglePause,
@@ -1099,6 +1139,8 @@
     state.saveCorrupted = !!save.corrupted;
     if (save.data) {
       state.gameMode = save.data.mode;
+      state.continuousPlay = save.data.continuousPlay;
+      state.autoStart = save.data.autoStart;
       state.round = save.data.round || 0;
       const W0 = waves();
       state.level = (W0 && typeof W0.nextDifficulty === 'function') ? W0.nextDifficulty(state.round) : 1;
@@ -1115,6 +1157,10 @@
     }
 
     if (state.query.battle === 'brawl') state.gameMode = 'brawl';
+    const continuousInput = byId('continuous-play');
+    if (continuousInput) continuousInput.checked = state.continuousPlay;
+    const autoStartInput = byId('auto-start');
+    if (autoStartInput) autoStartInput.checked = state.autoStart;
     const modeButton = byId('btn-mode');
     if (modeButton) modeButton.textContent = state.gameMode === 'brawl' ? '模式：自由乱斗' : '模式：阵营对战';
     const B1 = board();
@@ -1181,7 +1227,7 @@
     startLoop, stopLoop,
     setPaused, togglePause, restart,
     startFight, toPlacing, enterReport, advanceFromReport, reportAutoAdvances, fillEmptySides,
-    handleReportBack, handleReportRematch, handleAutoStart,
+    handleReportBack, handleReportRematch, handleAutoStart, handleContinuousPlay, handleReportHold, reportDelay,
     handlePlace, handleMove, handleStart, handleExport, handleMode, handleRemove, handleSide, handleSize,
     canPlace, saveNow, loadSave, save: () => saveNow(),
     applyShot, defineDebug, fail,

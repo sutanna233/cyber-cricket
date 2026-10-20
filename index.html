@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>赛博斗蛐蛐 · 放置 ARPG</title>
   <!-- 相对路径：直接双击 file:// 打开也不白屏 -->
-  <link rel="stylesheet" href="styles.css?v=13" />
-  <link rel="stylesheet" href="mobile.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=15" />
+  <link rel="stylesheet" href="mobile.css?v=6" />
 </head>
 
 <body>
@@ -53,9 +53,14 @@
         <div id="report" class="cc-panel cc-report hidden" role="region" aria-labelledby="rep-title">
           <div id="rep-title" class="cc-rep-title">左方</div>
           <div id="rep-sub" class="cc-rep-sub">第 1 场 · 对局等级 1.0 · 用时 0:00</div>
-          <div id="rep-lines" class="cc-rep-lines"></div>
+          <div id="report-content" class="cc-report-content" tabindex="0" aria-label="完整战报，可滚动查看所有参赛者">
+            <div id="rep-lines" class="cc-rep-lines"></div>
+            <div id="rep-instances" class="cc-rep-instances hidden"></div>
+          </div>
+          <div id="report-next" class="cc-report-next" role="status"></div>
           <div id="rep-foot" class="cc-rep-foot">战报会保留，查看完可返回布阵或再来一局。</div>
           <div id="report-actions" class="cc-report-actions hidden">
+            <button id="btn-report-hold" class="cc-btn ghost" type="button" title="暂停下一局倒计时，留在战报查看详情">留在战报</button>
             <button id="btn-report-back" class="cc-btn ghost" type="button" title="返回布阵，保留当前阵容和已完成场数">返回布阵</button>
             <button id="btn-report-rematch" class="cc-btn" type="button" title="沿用当前阵容，立即开始新的一局">再来一局</button>
           </div>
@@ -91,7 +96,8 @@
           </div>
         </div>
 
-        <label style="padding:6px 12px"><input id="auto-start" type="checkbox"> 停手5秒自动开战</label>
+        <label class="cc-play-option"><input id="continuous-play" type="checkbox" checked> 连续对战：结算5秒后下一局</label>
+        <label class="cc-play-option"><input id="auto-start" type="checkbox"> 布阵时停手5秒自动开始</label>
         <div id="export-controls" class="hidden" style="padding:6px 12px">
           <label>录像种子 <input id="export-seed" type="number" min="0" max="4294967295" step="1" value="20261019" style="width:115px"></label>
           <button id="btn-export" class="cc-btn ghost" type="button">导出录像</button>
@@ -114,15 +120,15 @@
   <script src="js/waves.js?v=13"></script>
   <script src="js/assets.js?v=26"></script>
   <script src="js/audio-controls.js?v=1"></script>
-  <script src="js/sprites.js?v=22"></script>
-  <script src="js/engine.js?v=23"></script>
-  <script src="js/ai.js?v=22"></script>
-  <script src="js/battle.js?v=14"></script>
+  <script src="js/sprites.js?v=24"></script>
+  <script src="js/engine.js?v=25"></script>
+  <script src="js/ai.js?v=24"></script>
+  <script src="js/battle.js?v=16"></script>
   <script src="js/board.js?v=13"></script>
-  <script src="js/render.js?v=25"></script>
-  <script src="js/ui.js?v=15"></script>
+  <script src="js/render.js?v=27"></script>
+  <script src="js/ui.js?v=17"></script>
   <script src="js/input.js?v=14"></script>
-  <script src="js/main.js?v=14"></script>
+  <script src="js/main.js?v=16"></script>
 <script src="js/access.js?v=13"></script>
   <script src="js/mobile.js?v=2"></script>
 
